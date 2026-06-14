@@ -1,0 +1,26 @@
+name: commercial_analytics
+version: 0.3.0
+description: Commercial pharma base pack, seeded from commercial.yaml
+domain: commercial
+author: ontowiz
+layers: []
+depends_on: []
+artifact_count: 24
+artifact_kinds:
+  entity_registry: 1
+  decision_heuristic: 23
+evals:
+  eval_cases: 0
+  pass_rate: 0.0
+  agent_lift: null
+  last_run_at: null
+  gate_passed: false
+coverage: 0.0
+freshness_days: null
+compiled_at: null
+compiler_version: 0.1.0
+signed: true
+encrypted: false
+license_id: null
+ctx_l2_path: context.ctx
+ctx_l3_path: index.l3.ctx

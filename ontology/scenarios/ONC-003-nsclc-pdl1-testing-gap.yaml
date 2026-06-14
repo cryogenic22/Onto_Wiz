@@ -1,0 +1,22 @@
+id: "ONC-003"
+name: "NSCLC Wild-Type PD-L1 Testing Gap in Community Setting"
+description: >
+  Community oncology practice has low PD-L1 TPS testing rates. Patients with
+  PD-L1 ≥50% who qualify for IO monotherapy are instead receiving IO+chemo
+  combinations. Brand (IO monotherapy) underperforms relative to diagnosed
+  prevalence. Root cause is testing infrastructure, not clinical preference.
+therapeutic_area: "oncology"
+indication: "NSCLC — no actionable driver (wild-type)"
+molecular_context: "PD-L1 TPS scoring (22C3 assay)"
+brand_context:
+  brand: "Checkpoint inhibitor (anti-PD-1)"
+  lifecycle: "growth"
+  channel: "buy_and_bill"
+account_context:
+  type: "Community Oncology Practice"
+  biomarker_testing: "PD-L1 IHC available but reflex testing not standardized"
+trigger_signal: "IO monotherapy share below expected in community accounts despite PD-L1 ≥50% prevalence"
+expected_hypothesis: "demand_erosion"
+expected_drivers: ["low_pdl1_testing_rate", "reflex_testing_not_adopted", "community_practice_protocol_gap"]
+inference_rules_exercised: ["rule_biomarker_testing_gap"]
+complexity_level: "medium"

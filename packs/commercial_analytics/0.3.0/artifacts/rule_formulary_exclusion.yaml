@@ -1,0 +1,55 @@
+id: rule_formulary_exclusion
+kind: decision_heuristic
+name: Formulary Exclusion
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 2a391dc4-a9ca-4db1-81f6-14137dc10853
+  at: '2026-06-14T00:06:14.835514+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835514+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: market_access
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835514+00:00'
+trigger_signals:
+- signal_name: has_payer_action
+  threshold: Access:FormularyChange | Payer:TierChange
+  data_source: tag_match
+- signal_name: has_volume_impact
+  threshold: Commercial:VolumeDrop | Commercial:ShareLoss
+  data_source: tag_match
+trigger_context:
+- Payer formulary exclusion or non-preferred tier creating systematic access loss.
+decision_logic: has_payer_action AND has_volume_impact => Formulary-driven volume
+  loss. Payer action is the root cause, not field execution.
+judgment_type: empirical
+exceptions: []
+anti_patterns:
+- wrong_conclusion: A field-execution or sales-force performance problem
+  why_wrong: "Volume falling in lockstep across one payer's book after a tier/formulary\
+    \ action is payer-driven \u2014 not local rep execution."
+  unless_evidence: ''
+evidence_required: []
+typical_outcome: Formulary-driven volume loss. Payer action is the root cause, not
+  field execution.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '80'
+valid_for_days: 180

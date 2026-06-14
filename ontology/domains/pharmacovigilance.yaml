@@ -1,0 +1,179 @@
+name: "Pharmacovigilance & Drug Safety"
+version: "1.0.0"
+description: >
+  Adverse event monitoring, safety signal detection, risk management,
+  and regulatory safety reporting. Grounded in MedDRA terminology,
+  ICH E2B(R3) reporting format, ICH E2E pharmacovigilance planning,
+  and CIOMS working group standards.
+
+standards_referenced:
+  - MedDRA
+  - ICH_E2B
+  - ICH_E2E
+  - WHO_DD
+  - CIOMS
+
+# =========================================================================
+# ENTITY TYPES
+# =========================================================================
+
+entity_types:
+
+  - name: AdverseEvent
+    description: "An undesirable medical occurrence in a patient receiving a drug"
+    attributes:
+      - ae_id
+      - meddra_pt       # MedDRA Preferred Term (e.g., "Nausea", "Hepatotoxicity")
+      - meddra_soc      # System Organ Class (e.g., "Gastrointestinal disorders")
+      - meddra_hlgt     # High-Level Group Term
+      - meddra_hlt      # High-Level Term
+      - meddra_llt      # Lowest-Level Term (verbatim coded)
+      - seriousness     # Serious (SAE) or Non-Serious
+      - severity_grade  # Grade 1 (Mild) to Grade 5 (Death) — CTCAE scale
+      - expectedness    # Expected (listed in label) or Unexpected
+      - causality       # Related, Possibly Related, Unlikely, Not Related
+      - outcome         # Recovered, Recovering, Not Recovered, Fatal, Unknown
+      - onset_date
+      - resolution_date
+
+  - name: ICSR
+    description: "Individual Case Safety Report — single AE report per ICH E2B"
+    attributes:
+      - case_id
+      - report_type     # Initial, Follow-up, Final
+      - source          # Spontaneous, Clinical Trial, Literature, Solicited
+      - reporter_type   # HCP, Consumer, Regulatory Authority, Literature
+      - country
+      - suspect_drug
+      - concomitant_drugs
+      - patient_age
+      - patient_sex
+      - narrative       # Free-text case narrative
+      - expedited       # Boolean — meets expedited reporting criteria (15-day)
+      - submission_date
+      - submitted_to    # List of regulatory authorities
+
+  - name: SafetySignal
+    description: "A detected pattern suggesting a new or changed drug risk"
+    attributes:
+      - signal_id
+      - signal_name     # e.g., "Cardiac events in elderly", "Hepatotoxicity cluster"
+      - detection_method  # Disproportionality analysis, Clinical review, Literature, Spontaneous cluster
+      - detection_date
+      - status          # Detected, Under Evaluation, Confirmed, Refuted, Closed
+      - strength        # Weak, Moderate, Strong
+      - supporting_cases  # Number of ICSRs supporting the signal
+      - meddra_pt       # Primary MedDRA term
+      - regulatory_action  # None, Label Update, DHCP Letter, REMS, Restriction, Withdrawal
+
+  - name: REMS
+    description: "Risk Evaluation and Mitigation Strategy (FDA)"
+    attributes:
+      - rems_id
+      - product
+      - rems_type       # Medication Guide, Communication Plan, ETASU
+      - etasu_elements  # Elements to Assure Safe Use (if applicable)
+      - certification_required  # Prescriber, pharmacy, patient certification
+      - enrollment_count  # Number enrolled in REMS program
+      - compliance_rate
+      - modification_date  # Last REMS modification
+
+  - name: PSMF
+    description: "Pharmacovigilance System Master File (EU)"
+    attributes:
+      - psmf_reference
+      - qppv_name       # Qualified Person for Pharmacovigilance
+      - last_updated
+      - covered_products
+      - signal_management_process
+      - audit_date
+
+# =========================================================================
+# RELATIONSHIPS
+# =========================================================================
+
+relationships:
+  - { source: AdverseEvent, target: ICSR, type: reported_in }
+  - { source: ICSR, target: SafetySignal, type: contributes_to }
+  - { source: SafetySignal, target: REMS, type: may_trigger }
+  - { source: SafetySignal, target: DrugLabel, type: may_update }
+  - { source: REMS, target: Brand, type: applies_to }
+  - { source: PSMF, target: Brand, type: covers }
+
+# =========================================================================
+# TAXONOMY — MedDRA hierarchy and CTCAE grading
+# =========================================================================
+
+taxonomy:
+
+  meddra_hierarchy:
+    description: >
+      MedDRA uses a 5-level hierarchy for coding adverse events.
+      All AE verbatims are coded to LLT, then rolled up.
+    levels:
+      SOC: "System Organ Class (top) — 27 classes (e.g., Cardiac disorders, GI disorders)"
+      HLGT: "High-Level Group Term — groups of related HLTs"
+      HLT: "High-Level Term — groups of related PTs"
+      PT: "Preferred Term — distinct medical concept (e.g., Myocardial infarction)"
+      LLT: "Lowest-Level Term — verbatim-coded synonyms and specifics"
+    example:
+      SOC: "Cardiac disorders"
+      HLGT: "Coronary artery disorders"
+      HLT: "Ischaemic coronary artery disorders"
+      PT: "Myocardial infarction"
+      LLT: "Heart attack"
+
+  ctcae_grading:
+    description: "Common Terminology Criteria for Adverse Events (NCI CTCAE v5.0)"
+    grades:
+      1: { label: "Mild", definition: "Asymptomatic or mild symptoms; clinical or diagnostic observations only" }
+      2: { label: "Moderate", definition: "Minimal, local, or noninvasive intervention indicated" }
+      3: { label: "Severe", definition: "Medically significant but not immediately life-threatening; hospitalization indicated" }
+      4: { label: "Life-threatening", definition: "Urgent intervention indicated" }
+      5: { label: "Death", definition: "Death related to AE" }
+
+  seriousness_criteria:
+    description: "ICH E2A criteria for serious adverse events (SAEs)"
+    criteria:
+      - death
+      - life_threatening
+      - hospitalization_or_prolongation
+      - disability_or_incapacity
+      - congenital_anomaly
+      - medically_important_event
+
+  causality_assessment:
+    methods:
+      who_umc: "WHO-UMC system: Certain, Probable, Possible, Unlikely, Conditional, Unassessable"
+      naranjo: "Naranjo Algorithm: Definite (≥9), Probable (5-8), Possible (1-4), Doubtful (≤0)"
+      company_algorithm: "Sponsor-specific causality rules based on temporal, biological, and rechallenge criteria"
+
+  signal_detection_methods:
+    quantitative:
+      - { name: "PRR", full_name: "Proportional Reporting Ratio", description: "Ratio of AE proportion for drug vs all drugs" }
+      - { name: "ROR", full_name: "Reporting Odds Ratio", description: "Odds ratio of AE reporting for drug vs background" }
+      - { name: "BCPNN", full_name: "Bayesian Confidence Propagation Neural Network", description: "WHO-UMC Bayesian method using IC (Information Component)" }
+      - { name: "MGPS", full_name: "Multi-item Gamma Poisson Shrinker", description: "FDA method using EBGM (Empirical Bayes Geometric Mean)" }
+    qualitative:
+      - clinical_review
+      - literature_surveillance
+      - spontaneous_cluster_analysis
+      - clinical_trial_safety_review
+
+# =========================================================================
+# SIGNALS — Safety events impacting commercial
+# =========================================================================
+
+signals_to_commercial:
+  - signal: "PV:SignalConfirmed"
+    commercial_impact: "May require label update, DHCP letter, or promotion restrictions"
+    tags: ["Clinical:Safety", "Regulatory:LabelChange"]
+  - signal: "PV:REMSRequired"
+    commercial_impact: "REMS adds prescribing burden, may reduce adoption"
+    tags: ["Clinical:Safety", "Access:Restricted"]
+  - signal: "PV:SafetyWithdrawal"
+    commercial_impact: "Product withdrawal — catastrophic commercial impact"
+    tags: ["Clinical:Safety", "Supply:Shortage"]
+  - signal: "PV:InquiryCluster"
+    commercial_impact: "Cluster of medical inquiries about specific AE — early warning"
+    tags: ["Clinical:Safety"]

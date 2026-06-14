@@ -1,0 +1,20 @@
+id: GOLD-004
+name: "Demand erosion with field execution gap at Northern Medical"
+description: >
+  When NBRx decline and engagement drop co-occur at an account
+  with a vacant territory, the engine should identify the issue.
+  Both rule_demand_erosion (P70) and rule_field_execution_gap (P60)
+  could match. Demand erosion wins on priority since NBRx decline
+  is present. Tests that the engine picks the higher-priority rule.
+
+input:
+  question: "Why are new prescriptions dropping at Northern Medical Center?"
+  context:
+    account_id: "northern_medical_center"
+    brand_id: "brand_oncovance"
+
+expected:
+  min_confidence: 0.5
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "demand"

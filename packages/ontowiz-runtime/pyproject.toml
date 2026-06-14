@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ontowiz-runtime"
+version = "0.1.0"
+description = "Onto_Wiz consumer SDK (Tier A — ships to clients). get_context(), pack loading, governance-gated context assembly."
+requires-python = ">=3.10"
+dependencies = [
+    "ontowiz-spec",
+    "ontowiz-ctx",
+    "pyyaml>=6.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["ontowiz_runtime*"]

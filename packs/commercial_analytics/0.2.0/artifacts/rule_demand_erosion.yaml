@@ -1,0 +1,52 @@
+id: rule_demand_erosion
+kind: decision_heuristic
+name: Demand Erosion
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 049ab3b7-3111-48e8-b288-23b02e019998
+  at: '2026-06-12T00:05:45.715337+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-12T00:05:45.715337+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-12T00:05:45.715337+00:00'
+trigger_signals:
+- signal_name: has_demand_decline
+  threshold: Demand:NBRxDecline
+  data_source: tag_match
+- signal_name: has_engagement_drop
+  threshold: Demand:EngagementDrop | Field:KOLDisengaged
+  data_source: tag_match
+trigger_context:
+- Genuine demand decline evidenced by NBRx drop plus HCP disengagement.
+decision_logic: has_demand_decline AND has_engagement_drop => Demand erosion confirmed.
+  NBRx decline plus HCP disengagement indicates genuine loss of clinical preference.
+judgment_type: empirical
+exceptions: []
+anti_patterns:
+- wrong_conclusion: A channel-shift measurement artifact or an access barrier
+  why_wrong: "NBRx decline PLUS prescriber/KOL disengagement is a genuine loss of\
+    \ clinical preference \u2014 not a dispensing artifact and not coverage."
+  unless_evidence: ''
+evidence_required: []
+typical_outcome: Demand erosion confirmed. NBRx decline plus HCP disengagement indicates
+  genuine loss of clinical preference.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '70'
+valid_for_days: 180

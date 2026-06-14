@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OntoWiz · Domain Intelligence Catalog</title>
+<style>
+  :root{
+    --bg:#06080f; --bg-2:#0a0e1a; --panel:#0e1322; --panel-2:#131a2e;
+    --line:#1d2740; --line-2:#2a3858; --line-soft:#202a44;
+    --ink:#eef2fb; --ink-2:#c3ccdf; --mut:#8a96b4; --dim:#5a667f;
+    --teal:#2dd4bf; --blue:#5b9dff; --violet:#a78bfa; --gold:#f5c451;
+    --green:#46d18a; --red:#ff6b81; --orange:#ff9f5a;
+    --grad:linear-gradient(100deg,#2dd4bf 0%,#5b9dff 45%,#a78bfa 100%);
+    --grad-soft:linear-gradient(120deg,rgba(45,212,191,.16),rgba(91,157,255,.13) 50%,rgba(167,139,250,.15));
+    --shadow:0 24px 60px -28px rgba(0,0,0,.85); --r:16px; --r-lg:22px;
+    /* function colors */
+    --fn-base:#8a96b4; --fn-ma:#e6b450; --fn-bp:#5b9dff; --fn-ci:#ff6b81; --fn-fc:#2dd4bf; --fn-onc:#a78bfa;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:radial-gradient(1200px 700px at 80% -10%,rgba(91,157,255,.10),transparent 60%),
+        radial-gradient(900px 600px at 0% 0%,rgba(45,212,191,.08),transparent 55%),var(--bg);
+        color:var(--ink); font:15px/1.55 Inter,"Segoe UI",system-ui,-apple-system,sans-serif;
+        -webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1220px;margin:0 auto;padding:0 26px}
+  code,.mono{font-family:"SF Mono",ui-monospace,"Cascadia Code",Menlo,Consolas,monospace}
+
+  /* nav */
+  nav{position:sticky;top:0;z-index:40;backdrop-filter:saturate(140%) blur(14px);
+      background:rgba(6,8,15,.74);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;gap:18px;height:62px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.2px}
+  .logo{width:26px;height:26px;border-radius:8px;background:var(--grad);box-shadow:0 6px 18px -6px rgba(91,157,255,.7)}
+  .brand small{color:var(--mut);font-weight:500}
+  .tabs{display:flex;gap:4px;margin-left:8px}
+  .tab{padding:8px 14px;border-radius:10px;color:var(--ink-2);cursor:pointer;font-weight:600;font-size:13.5px;border:1px solid transparent}
+  .tab:hover{color:var(--ink);background:var(--panel)}
+  .tab.on{color:var(--ink);background:var(--panel-2);border-color:var(--line-2)}
+  .spacer{flex:1}
+  .rolepick{display:flex;align-items:center;gap:8px}
+  .rolepick label{color:var(--dim);font-size:12px;text-transform:uppercase;letter-spacing:.12em}
+  select.role{background:var(--panel-2);color:var(--ink);border:1px solid var(--line-2);border-radius:10px;
+    padding:7px 10px;font:inherit;font-size:13px;cursor:pointer}
+
+  section{padding:54px 0}
+  .eyebrow{display:flex;align-items:center;gap:10px;color:var(--teal);font-size:12px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.16em;margin:0 0 14px}
+  .eyebrow::before{content:"";width:24px;height:2px;background:var(--teal);border-radius:2px}
+  h1{font-size:clamp(30px,4.6vw,52px);line-height:1.05;margin:.1em 0 .25em;letter-spacing:-.02em}
+  h1 .g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{font-size:18px;color:var(--ink-2);max-width:760px}
+  .sub{color:var(--mut)}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:11px;font-weight:650;
+    font-size:14px;cursor:pointer;border:1px solid var(--line-2);background:var(--panel-2);color:var(--ink)}
+  .btn.primary{background:var(--grad);color:#04121f;border-color:transparent;box-shadow:0 14px 30px -14px rgba(91,157,255,.7)}
+  .btn.ghost{background:transparent}
+  .btn:hover{transform:translateY(-1px)}
+
+  /* hero */
+  .hero{padding-top:46px}
+  .herometrics{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px}
+  .metric{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);
+    border-radius:var(--r);padding:14px 18px;min-width:140px}
+  .metric .n{font-size:26px;font-weight:750;letter-spacing:-.01em}
+  .metric .n.g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .metric .l{color:var(--mut);font-size:12.5px;margin-top:2px}
+
+  /* cards / grid */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:980px){.grid{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);
+    border-radius:var(--r-lg);padding:20px;transition:.18s;cursor:pointer;position:relative}
+  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--line-2)}
+  .card h3{margin:.1em 0 .2em;font-size:18px}
+  .card .ver{color:var(--teal);font-weight:650;font-size:12.5px}
+  .card .desc{color:var(--mut);font-size:13.5px;min-height:38px}
+  .card .foot{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;color:var(--dim);font-size:12px}
+  .card .foot b{color:var(--ink-2);font-weight:650}
+
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .tg{font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--line-2);
+    color:var(--ink-2);background:rgba(255,255,255,.02);font-weight:600}
+  .tg.fn{cursor:pointer}
+  .tg[data-fn=base]{color:var(--fn-base);border-color:rgba(138,150,180,.4)}
+  .tg[data-fn=market_access]{color:var(--fn-ma);border-color:rgba(230,180,80,.4)}
+  .tg[data-fn=brand_performance]{color:var(--fn-bp);border-color:rgba(91,157,255,.4)}
+  .tg[data-fn=competitive_intel]{color:var(--fn-ci);border-color:rgba(255,107,129,.4)}
+  .tg[data-fn=forecasting]{color:var(--fn-fc);border-color:rgba(45,212,191,.4)}
+  .tg[data-fn=oncology]{color:var(--fn-onc);border-color:rgba(167,139,250,.4)}
+
+  .badge{position:absolute;top:16px;right:16px;font-size:10.5px;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;padding:4px 9px;border-radius:999px}
+  .badge.flag{color:#04121f;background:var(--gold)}
+  .badge.road{color:var(--violet);border:1px solid rgba(167,139,250,.5);background:rgba(167,139,250,.08)}
+  .badge.sealed{color:var(--green);border:1px solid rgba(70,209,138,.45);background:rgba(70,209,138,.08)}
+
+  /* toolbar */
+  .toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:8px 0 22px}
+  .search{flex:1;min-width:240px;display:flex;align-items:center;gap:10px;background:var(--panel-2);
+    border:1px solid var(--line-2);border-radius:12px;padding:11px 14px}
+  .search input{flex:1;background:transparent;border:0;outline:0;color:var(--ink);font:inherit}
+  .search svg{flex:none;opacity:.6}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{font-size:12.5px;padding:7px 12px;border-radius:999px;border:1px solid var(--line-2);
+    color:var(--ink-2);cursor:pointer;background:var(--panel);font-weight:600}
+  .chip.on{background:var(--panel-2);border-color:var(--teal);color:var(--ink)}
+
+  /* detail */
+  .back{display:inline-flex;align-items:center;gap:8px;color:var(--mut);cursor:pointer;font-weight:600;margin-bottom:14px}
+  .back:hover{color:var(--ink)}
+  .detailhead{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start;justify-content:space-between}
+  .install{background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--ink-2);
+    font-size:13px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .install code{color:var(--teal)}
+  .panel{background:linear-gradient(180deg,var(--panel),var(--bg-2));border:1px solid var(--line);
+    border-radius:var(--r-lg);padding:20px;margin-top:16px}
+  .panel h4{margin:0 0 12px;font-size:13px;text-transform:uppercase;letter-spacing:.13em;color:var(--mut)}
+  .slicebar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+  .slice{padding:8px 13px;border-radius:11px;border:1px solid var(--line-2);cursor:pointer;font-weight:650;font-size:13px;
+    color:var(--ink-2);background:var(--panel)}
+  .slice.on{color:var(--ink);background:var(--panel-2)}
+  .slice .ct{color:var(--dim);font-weight:600;margin-left:6px}
+
+  .arow{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;
+    margin-bottom:8px;cursor:pointer;background:var(--bg-2);transition:.15s}
+  .arow:hover{border-color:var(--line-2);transform:translateX(2px)}
+  .arow .dot{width:9px;height:9px;border-radius:3px;flex:none}
+  .arow .nm{font-weight:650}
+  .arow .kd{color:var(--dim);font-size:12px}
+  .arow .rt{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .pill{font-size:10.5px;padding:3px 8px;border-radius:999px;font-weight:700;letter-spacing:.04em}
+  .pill.ok{color:var(--green);background:rgba(70,209,138,.1);border:1px solid rgba(70,209,138,.35)}
+  .pill.no{color:var(--dim);background:rgba(138,150,180,.07);border:1px solid var(--line-2)}
+
+  .kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:780px){.kgrid{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .kpi .n{font-size:22px;font-weight:750}
+  .kpi .l{color:var(--mut);font-size:12px;margin-top:2px}
+
+  /* drawer */
+  .scrim{position:fixed;inset:0;background:rgba(3,5,11,.6);backdrop-filter:blur(3px);z-index:60;display:none}
+  .scrim.show{display:block}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(560px,94vw);background:var(--bg-2);
+    border-left:1px solid var(--line-2);z-index:61;transform:translateX(100%);transition:.28s;overflow-y:auto;
+    box-shadow:-30px 0 60px -20px rgba(0,0,0,.7)}
+  .drawer.show{transform:none}
+  .drawer .dh{padding:20px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg-2);z-index:2}
+  .drawer .db{padding:20px 22px}
+  .x{float:right;cursor:pointer;color:var(--mut);font-size:20px;line-height:1}
+  .x:hover{color:var(--ink)}
+  .verdict{background:var(--grad-soft);border:1px solid var(--line-2);border-radius:12px;padding:14px;color:var(--ink);font-size:14px}
+  .anti{border-left:3px solid var(--red);background:rgba(255,107,129,.06);padding:10px 14px;border-radius:8px;
+    color:var(--ink-2);font-size:13px;margin-top:12px}
+  .anti b{color:var(--red)}
+  pre.yaml{background:#05070d;border:1px solid var(--line);border-radius:12px;padding:14px;overflow-x:auto;
+    font-size:12.5px;color:var(--ink-2);margin:12px 0 0}
+  pre.yaml .k{color:var(--blue)} pre.yaml .s{color:var(--teal)} pre.yaml .c{color:var(--dim)}
+  .prov{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+  .prov .step{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--ink-2)}
+  .prov .step .b{width:7px;height:7px;border-radius:99px;background:var(--teal);flex:none}
+
+  /* comments */
+  .cmt{display:flex;gap:10px;margin-top:14px}
+  .av{width:30px;height:30px;border-radius:9px;flex:none;display:grid;place-items:center;font-size:12px;font-weight:700;color:#04121f}
+  .cmt .bd{flex:1}
+  .cmt .who{font-size:12.5px;color:var(--mut)}
+  .cmt .who b{color:var(--ink)}
+  .cmt .txt{font-size:13.5px;color:var(--ink-2);margin-top:3px}
+  .rolechip{font-size:10px;padding:2px 7px;border-radius:999px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-left:6px}
+  .cbox{display:flex;gap:8px;margin-top:14px}
+  .cbox input{flex:1;background:var(--panel-2);border:1px solid var(--line-2);border-radius:10px;padding:9px 12px;color:var(--ink);font:inherit}
+
+  .callout{background:var(--grad-soft);border:1px solid var(--line-2);border-radius:var(--r);padding:18px 20px;margin-top:18px}
+  .callout b{color:var(--ink)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:840px){.two{grid-template-columns:1fr}}
+  .step-n{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  @media(max-width:900px){.step-n{grid-template-columns:1fr 1fr}}
+  .stp{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .stp .i{width:30px;height:30px;border-radius:9px;background:var(--panel-2);border:1px solid var(--line-2);
+    display:grid;place-items:center;font-weight:750;color:var(--teal);margin-bottom:10px}
+  .stp h5{margin:0 0 6px;font-size:14px}
+  .stp p{margin:0;color:var(--mut);font-size:12.5px}
+  .rolelens{font-size:12.5px;color:var(--teal);background:rgba(45,212,191,.07);border:1px solid rgba(45,212,191,.3);
+    border-radius:10px;padding:8px 12px;display:inline-flex;gap:8px;align-items:center;margin-top:14px}
+
+  footer{border-top:1px solid var(--line);padding:30px 0 60px;color:var(--dim);font-size:12.5px}
+  .note{color:var(--dim);font-size:12px;margin-top:10px;max-width:820px}
+  .hidden{display:none !important}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand"><span class="logo"></span> OntoWiz <small>· Domain Intelligence Catalog</small></div>
+    <div class="tabs">
+      <div class="tab on" data-view="catalog">Catalog</div>
+      <div class="tab" data-view="evolve">How it evolves</div>
+      <div class="tab" data-view="sell">Build your own</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="rolepick">
+      <label>Role</label>
+      <select class="role" id="role">
+        <option value="sme">SME · domain expert</option>
+        <option value="curator">Curator · governance</option>
+        <option value="builder">Builder · agent dev</option>
+        <option value="manager">Manager · knowledge lead</option>
+      </select>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ CATALOG VIEW ============ -->
+<div id="view-catalog">
+
+  <!-- list mode -->
+  <div id="mode-list">
+    <section class="hero">
+      <div class="wrap">
+        <p class="eyebrow">Domain Intelligence Catalog</p>
+        <h1>Inside a governed<br><span class="g">commercial brain.</span></h1>
+        <p class="lede">Every pack of your firm's judgment — searchable, versioned, eval-proven, and
+          governed. Browse what each domain pack <em>knows</em>, drill into a single function slice,
+          read the YAML, see the provenance, and enrich it by sparring with the machine.</p>
+        <div class="herometrics">
+          <div class="metric"><div class="n g">24</div><div class="l">governed artifacts</div></div>
+          <div class="metric"><div class="n">4</div><div class="l">function slices</div></div>
+          <div class="metric"><div class="n">+0.308</div><div class="l">measured agent-lift</div></div>
+          <div class="metric"><div class="n">26/26</div><div class="l">with-pack eval pass</div></div>
+          <div class="metric"><div class="n">SHA-256</div><div class="l">integrity-sealed</div></div>
+        </div>
+        <div class="rolelens" id="rolelens-list"></div>
+      </div>
+    </section>
+
+    <section style="padding-top:0">
+      <div class="wrap">
+        <div class="toolbar">
+          <div class="search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <input id="q" placeholder="Search packs, functions, heuristics — e.g. 'formulary', 'forecasting', 'LOE'…"/>
+          </div>
+          <div class="chips" id="fnchips"></div>
+        </div>
+        <div class="grid" id="packgrid"></div>
+        <p class="note">The flagship <code>commercial_analytics@0.3.0</code> is a real compiled, sealed pack
+          (24 artifacts, 4 functions). Packs marked <span class="tg" style="color:var(--violet)">roadmap</span>
+          are illustrative of catalog breadth, not yet built.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- detail mode -->
+  <div id="mode-detail" class="hidden">
+    <section>
+      <div class="wrap">
+        <div class="back" id="back">← Back to catalog</div>
+        <div class="detailhead">
+          <div>
+            <p class="eyebrow" id="d-domain"></p>
+            <h1 style="font-size:clamp(26px,3.4vw,38px)" id="d-name"></h1>
+            <p class="lede" id="d-desc"></p>
+            <div class="tags" id="d-tags" style="margin-top:14px"></div>
+          </div>
+          <div style="min-width:260px">
+            <div class="install">
+              <span class="badge sealed" style="position:static">● sealed</span>
+              <span>pin like a dependency</span>
+              <code id="d-install"></code>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px" id="d-actions"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h4>Pack scorecard</h4>
+          <div class="kgrid" id="d-kpis"></div>
+        </div>
+
+        <div class="panel">
+          <h4>Function slices — serve one in isolation</h4>
+          <div class="slicebar" id="slicebar"></div>
+          <p class="sub" style="font-size:13px;margin:6px 0 16px" id="slicenote"></p>
+          <div id="artifacts"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ============ EVOLVE VIEW ============ -->
+<div id="view-evolve" class="hidden">
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">The living loop</p>
+      <h1 style="font-size:clamp(26px,3.6vw,40px)">A catalog that <span class="g">gets smarter</span> with use.</h1>
+      <p class="lede">Packs aren't published once and frozen. Every consult that misses, every SME who disagrees,
+        every correction becomes a governed change that ships as the next version — with the audit trail intact.</p>
+      <div class="step-n" style="margin-top:24px">
+        <div class="stp"><div class="i">1</div><h5>Consult</h5><p>An agent queries a pack. CTX flags when the served knowledge didn't actually answer — a usage gap.</p></div>
+        <div class="stp"><div class="i">2</div><h5>Mission</h5><p>The gap becomes a Forge mission. An SME spars with the machine and supplies the missing judgment.</p></div>
+        <div class="stp"><div class="i">3</div><h5>Govern</h5><p>The contribution is a Delta: proposed → reviewed → approved. Nothing enters a pack ungoverned.</p></div>
+        <div class="stp"><div class="i">4</div><h5>Evolve</h5><p>Approved Deltas promote to ACTIVE and recompile. <code>v0.1.0 → v0.2.0</code>, re-sealed.</p></div>
+        <div class="stp"><div class="i">5</div><h5>Serve</h5><p>The next consult is grounded in the new knowledge. The catalog shows both versions, diffable.</p></div>
+      </div>
+      <div class="callout">
+        <b>Proven, two ways.</b> A cyberattack-disruption query that <code>v0.1.0</code> answered generically produced a
+        Forge mission → <code>evolve_pack</code> → <code>commercial_analytics@0.2.0</code>, whose answer is now grounded in a new
+        <code>rule_cyber_disruption</code> heuristic. Offline regression + a live Haiku-4.5 driver both confirm it.
+      </div>
+      <div class="two" style="margin-top:18px">
+        <div class="panel"><h4>Drop-a-file expansion</h4>
+          <p class="sub" style="font-size:13.5px">A new function is a single YAML dropped into <code>ontology/commercial/</code>.
+          The <code>forecasting</code> module — LOE erosion curves, demand sensing, analog launch trajectories, scenario
+          sensitivity — joined the pack with <em>zero</em> code change. Functions version together; the catalog just shows a new slice.</p>
+        </div>
+        <div class="panel"><h4>Governance is the moat</h4>
+          <p class="sub" style="font-size:13.5px">Every ACTIVE artifact carries a real <code>delta_id</code> in its history —
+          even bootstrap seeds. A transition to ACTIVE/VERIFIED without a governing Delta <em>raises</em>. "Governed" is an
+          invariant here, not a convention.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ SELL VIEW ============ -->
+<div id="view-sell" class="hidden">
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">The platform play</p>
+      <h1 style="font-size:clamp(26px,3.6vw,40px)">Your domain. Your catalog.<br><span class="g">Your agents, smarter.</span></h1>
+      <p class="lede">The pharma commercial catalog you just browsed is the reference build. The same engine
+        codifies <em>any</em> firm's judgment — financial risk, claims adjudication, supply chain, legal review —
+        into governed, versioned, agent-ready packs your internal AI programs subscribe to.</p>
+      <div class="grid" style="margin-top:24px">
+        <div class="card" style="cursor:default">
+          <h3>Stop hard-coding knowledge into agents</h3>
+          <p class="desc">Build a governed domain layer agents <em>subscribe</em> to. One source of judgment, many agents,
+            full provenance — change the knowledge without redeploying a single agent.</p>
+        </div>
+        <div class="card" style="cursor:default">
+          <h3>The secret sauce never ships</h3>
+          <p class="desc">A two-tier boundary: the factory (mining, Forge, compiler, evals) stays inside your walls;
+            clients receive only signed, sealed Tier-A packs. Codified judgment without exposure.</p>
+        </div>
+        <div class="card" style="cursor:default">
+          <h3>Knowledge as a versioned asset</h3>
+          <p class="desc"><code>your_domain@1.3</code> is an asset on the balance sheet — measured by agent-lift, not a
+            slide in someone's folder. Prove value, then bill for it.</p>
+        </div>
+      </div>
+      <div class="callout" style="margin-top:22px;font-size:16px">
+        <b>The packs are the product. Everything else is the factory.</b> &nbsp;The catalog is how your firm — and your
+        clients — <em>see</em> the product.
+      </div>
+      <div style="display:flex;gap:10px;margin-top:22px">
+        <a class="btn primary">Book a domain workshop</a>
+        <a class="btn ghost" data-jump="catalog">Browse the reference catalog →</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- drawer -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer"><div id="drawer-inner"></div></aside>
+
+<footer>
+  <div class="wrap">
+    <b style="color:var(--ink-2)">OntoWiz · Domain Intelligence Catalog</b> — interactive vision mock.
+    The flagship <code>commercial_analytics@0.3.0</code> data (artifacts, functions, verdicts, the +0.308 lift on the
+    26-case suite) is from the real compiled pack. Comment threads, role permissions and roadmap packs are illustrative
+    of the intended product, not a shipping application. Status of truth lives in <code>docs/PROJECT_STATUS.md</code>.
+  </div>
+</footer>
+
+<script>
+/* ---------- real-ish data: commercial_analytics@0.3.0 ---------- */
+const FUNCS = {
+  base:{label:"base", color:"--fn-base", note:"Shared infrastructure + always-on safety/supply signals — evaluated first."},
+  market_access:{label:"market access", color:"--fn-ma", note:"Payer, formulary, copay, reimbursement & contract barriers."},
+  brand_performance:{label:"brand performance", color:"--fn-bp", note:"Demand, launch, channel & field-execution dynamics."},
+  competitive_intel:{label:"competitive intel", color:"--fn-ci", note:"Competitor launches, pricing & biosimilar erosion."},
+  forecasting:{label:"forecasting", color:"--fn-fc", note:"Forward-looking: LOE curves, demand sensing, analog launches, scenario bands."}
+};
+
+// heuristics: id, name, fn, onc(overlay?), served, eval, conf, verdict, anti?, signals
+const ART = [
+  {id:"commercial-entities",kind:"entity_registry",fn:"base",name:"Commercial Entities",conf:1.0,served:true,eval:false,
+   verdict:"16 commercial entities (Brand, HCP, Payer, Formulary, Channel, Signal…) and 17 relationships — the shared graph every heuristic reasons over."},
+  {id:"rule_safety_signal",fn:"base",name:"Safety Signal",conf:.8,served:true,eval:true,
+   verdict:"Emerging safety signal detected. The volume drop is likely clinical, not commercial.",
+   anti:["Competitive pressure or a pricing/commercial cause","A volume drop coinciding with clinical safety inquiries is most likely a SAFETY signal — clinical, not commercial."]},
+  {id:"rule_supply_disruption",fn:"base",name:"Supply Disruption",conf:.8,served:true,eval:true,
+   verdict:"Supply-chain disruption confirmed. Volume impact is supply-driven, not demand or access."},
+  {id:"rule_genuine_budget_crisis",fn:"market_access",name:"Genuine Budget Crisis",conf:.8,served:true,eval:true,
+   verdict:"Genuine budget crisis confirmed by hard financial evidence. Not a negotiation tactic.",
+   anti:["A competitor lockout or a negotiation tactic","HARD financial evidence (audited distress) makes the budget constraint genuine — not a bargaining lever."]},
+  {id:"rule_pa_access_barrier",fn:"market_access",name:"PA Access Barrier",conf:.8,served:true,eval:true,
+   verdict:"Access barrier detected. PA rejections correlate with a recent formulary policy change."},
+  {id:"rule_formulary_exclusion",fn:"market_access",name:"Formulary Exclusion",conf:.8,served:true,eval:true,
+   verdict:"Formulary-driven volume loss. Payer action is the root cause, not field execution.",
+   anti:["A field-execution or sales-force performance problem","Volume falling in lockstep across one payer's book after a tier action is payer-driven — not local rep execution."]},
+  {id:"rule_copay_accumulator_impact",fn:"market_access",name:"Copay Accumulator Impact",conf:.8,served:true,eval:true,
+   verdict:"Copay accumulator barrier detected. Patient abandonment correlates with copay-card benefit exhaustion."},
+  {id:"rule_medicare_reimbursement_squeeze",fn:"market_access",name:"Medicare Reimbursement Squeeze",conf:.8,served:true,eval:true,
+   verdict:"Reimbursement squeeze. Buy-and-bill margin compression is driving site-of-care or volume shifts."},
+  {id:"rule_340b_contract_erosion",fn:"market_access",name:"340B Contract Erosion",conf:.8,served:true,eval:true,
+   verdict:"340B margin erosion. Growing covered-entity utilization is compressing net revenue."},
+  {id:"rule_rebate_trap",fn:"market_access",name:"Rebate Trap",conf:.8,served:true,eval:true,
+   verdict:"Rebate trap. Unfavorable contract terms are constraining pricing flexibility and eroding margin."},
+  {id:"rule_competitor_lockout",fn:"market_access",name:"Competitor Lockout",conf:.8,served:true,eval:true,
+   verdict:"The budget objection is likely a secondary effect of a competitor lock-out negotiation.",
+   anti:["A genuine budget crisis","A pricing rumor plus a budget objection WITHOUT hard financial evidence is a competitor lockout, not a real funding crisis."]},
+  {id:"rule_pathway_exclusion",fn:"market_access",onc:true,name:"Pathway Exclusion",conf:.8,served:true,eval:true,
+   verdict:"Institutional pathway exclusion. A clinical pathway committee has deprioritized the brand, blocking new starts.",
+   anti:["An external clinical-guideline (NCCN/ESMO) shift","This is an INSTITUTIONAL pathway-committee deprioritization at specific centers — not a national guideline-body update."]},
+  {id:"rule_demand_erosion",fn:"brand_performance",name:"Demand Erosion",conf:.8,served:true,eval:true,
+   verdict:"Demand erosion confirmed. NBRx decline plus HCP disengagement indicates genuine loss of clinical preference.",
+   anti:["A channel-shift measurement artifact or an access barrier","NBRx decline PLUS prescriber/KOL disengagement is a genuine loss of clinical preference — not a dispensing artifact."]},
+  {id:"rule_launch_stall",fn:"brand_performance",name:"Launch Stall",conf:.8,served:true,eval:true,
+   verdict:"Launch trajectory at risk. Low adoption correlates with awareness or coverage gaps, not market rejection."},
+  {id:"rule_channel_shift",fn:"brand_performance",name:"Channel Shift",conf:.8,served:true,eval:true,
+   verdict:"Channel shift. Apparent volume decline may reflect dispensing migration, not true demand loss.",
+   anti:["A genuine loss of patient demand","A dispensing/channel migration is a measurement artifact — apparent volume loss, not true demand erosion."]},
+  {id:"rule_field_execution_gap",fn:"brand_performance",name:"Field Execution Gap",conf:.8,served:true,eval:true,
+   verdict:"Field execution gap. Territory underperformance correlates with rep vacancy or low call coverage.",
+   anti:["A payer/formulary access barrier or market-wide demand loss","Underperformance isolated to a territory with a rep vacancy, while neighbors are fine, is field execution — not payer action."]},
+  {id:"rule_guideline_driven_shift",fn:"brand_performance",onc:true,name:"Guideline-Driven Shift",conf:.8,served:true,eval:true,
+   verdict:"Guideline-driven displacement. An NCCN/ESMO update has shifted prescribing away from the brand.",
+   anti:["A single institution's pathway-committee decision","This is a national guideline body changing standard of care across institutions at once — not one center's pathway exclusion."]},
+  {id:"rule_biomarker_testing_gap",fn:"brand_performance",onc:true,name:"Biomarker Testing Gap",conf:.8,served:true,eval:true,
+   verdict:"Biomarker testing gap. Low testing rates are suppressing patient identification for the targeted therapy."},
+  {id:"rule_competitive_displacement",fn:"competitive_intel",name:"Competitive Displacement",conf:.8,served:true,eval:true,
+   verdict:"Competitive displacement. Share loss correlates with competitor market action."},
+  {id:"rule_biosimilar_erosion",fn:"competitive_intel",name:"Biosimilar Erosion",conf:.8,served:true,eval:true,
+   verdict:"Biosimilar erosion. Price-driven switching is accelerating share loss."},
+  {id:"rule_loe_erosion_curve",fn:"forecasting",name:"LOE Erosion Curve",conf:.8,served:true,eval:false,
+   verdict:"LOE erosion curve. Model the decline as a structural substitution trajectory (steep then plateau) — forecast the floor, do not chase the slope."},
+  {id:"rule_demand_sensing_divergence",fn:"forecasting",name:"Demand-Sensing Divergence",conf:.8,served:true,eval:false,
+   verdict:"Demand-sensing divergence. Leading indicators have decoupled from shipped volume — re-anchor the forecast on the leading signal."},
+  {id:"rule_analog_launch_trajectory",fn:"forecasting",name:"Analog Launch Trajectory",conf:.8,served:true,eval:false,
+   verdict:"Analog launch-trajectory miss. The uptake curve is tracking below the analog band — re-forecast against the analog early."},
+  {id:"rule_scenario_sensitivity",fn:"forecasting",name:"Scenario Sensitivity",conf:.8,served:true,eval:false,
+   verdict:"Scenario-sensitivity dominant. One driver's swing exceeds the base-case delta — deliver a scenario band, not a point estimate."}
+];
+
+const PACKS = [
+  {id:"commercial_analytics",ver:"0.3.0",domain:"Pharma · Commercial",flag:true,sealed:true,roadmap:false,
+   desc:"The flagship. 19 in-period diagnostic heuristics + a forecasting module, across 4 functions and an oncology overlay.",
+   artifacts:24, lift:"+0.308", evalpct:"19 / 23"},
+  {id:"market_access_pro",ver:"0.1.0",domain:"Pharma · Market Access",roadmap:true,
+   desc:"Deep payer archetypes, PBM dynamics, gross-to-net and contracting playbooks. Extends the market_access slice into its own pack.",
+   artifacts:31, lift:"—", evalpct:"—"},
+  {id:"oncology_intelligence",ver:"0.1.0",domain:"Pharma · Oncology",roadmap:true,
+   desc:"Biomarker testing pathways, NCCN/ESMO guideline tracking, line-of-therapy sequencing and pathway-committee behavior.",
+   artifacts:27, lift:"—", evalpct:"—"},
+  {id:"medical_affairs",ver:"0.1.0",domain:"Pharma · Medical",roadmap:true,
+   desc:"KOL engagement, evidence-gap mapping, MSL field-insight codification and publication-plan judgment.",
+   artifacts:22, lift:"—", evalpct:"—"},
+  {id:"financial_risk",ver:"0.1.0",domain:"Financial Services",roadmap:true,
+   desc:"Reference build for a different industry — credit-risk heuristics, covenant breach signals, scenario stress logic. Same engine.",
+   artifacts:34, lift:"—", evalpct:"—"},
+  {id:"claims_adjudication",ver:"0.1.0",domain:"Insurance",roadmap:true,
+   desc:"Fraud-pattern judgment, coverage-edge cases and adjudication exception rules. Proof the catalog is domain-agnostic.",
+   artifacts:29, lift:"—", evalpct:"—"}
+];
+
+/* ---------- role config ---------- */
+const ROLES = {
+  sme:{lens:"You see Forge missions and 'play to enrich' first — spar with the machine, supply dissent.", actions:["▶ Play to enrich","💬 Comment"]},
+  curator:{lens:"You see the governance trail and the review queue — approve, request changes, or reject Deltas.", actions:["✓ Review Deltas","💬 Comment"]},
+  builder:{lens:"You see install + slice serving — pin a version and subscribe an agent to one function.", actions:["⧉ Copy install","◷ Serve a slice"]},
+  manager:{lens:"You see coverage, agent-lift and contributor impact — where is the catalog thin, and who filled it?", actions:["▤ Coverage report","💬 Comment"]}
+};
+const AVATARS = {sme:["#2dd4bf","SM"],curator:["#f5c451","CU"],builder:["#5b9dff","BD"],manager:["#a78bfa","MG"]};
+
+const SAMPLE_COMMENTS = {
+  rule_competitor_lockout:[
+    {r:"sme",who:"Priya N. (Sr. Director, Access)",t:"Seen this exactly — the 'budget' line is almost always a lock-out tell when there's no audited distress. The anti-pattern is spot on."},
+    {r:"curator",who:"Tom R. (Governance)",t:"Approved Delta #D-1182 added the 'no hard evidence' clause. Lifecycle: ACTIVE."}
+  ],
+  rule_loe_erosion_curve:[
+    {r:"manager",who:"Dana K. (Knowledge Lead)",t:"This is the highest-value forecasting heuristic — flag it for a live eval case so we can measure lift on 0.3.0."},
+    {r:"builder",who:"Alex P. (Agent Dev)",t:"Pinned forecasting slice into the LOE-planning agent. Directory is ~4× leaner than the full pack."}
+  ]
+};
+
+/* ---------- rendering ---------- */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+let activeFn=null, curPack=null, curSlice="all", role="sme";
+
+function fnTag(fn){return `<span class="tg fn" data-fn="${fn}">${FUNCS[fn]?FUNCS[fn].label:fn}</span>`;}
+
+function renderChips(){
+  const c=$("#fnchips");
+  c.innerHTML = `<div class="chip ${!activeFn?'on':''}" data-fn="">All functions</div>` +
+    Object.keys(FUNCS).map(f=>`<div class="chip ${activeFn===f?'on':''}" data-fn="${f}">${FUNCS[f].label}</div>`).join("");
+  $$("#fnchips .chip").forEach(ch=>ch.onclick=()=>{activeFn=ch.dataset.fn||null;renderChips();renderGrid();});
+}
+function packMatchesFn(p,fn){
+  if(p.id!=="commercial_analytics") return !fn; // only flagship has live slices
+  return !fn || ART.some(a=>a.fn===fn);
+}
+function renderGrid(){
+  const q=$("#q").value.trim().toLowerCase();
+  const grid=$("#packgrid"); grid.innerHTML="";
+  PACKS.filter(p=>{
+    const hay=(p.id+" "+p.domain+" "+p.desc+" "+(p.id==="commercial_analytics"?ART.map(a=>a.id+a.name).join(" "):"")).toLowerCase();
+    return (!q||hay.includes(q)) && packMatchesFn(p,activeFn);
+  }).forEach(p=>{
+    const slices=p.id==="commercial_analytics"?Object.keys(FUNCS):[];
+    const el=document.createElement("div"); el.className="card"; el.onclick=()=>openPack(p.id);
+    el.innerHTML=`
+      ${p.flag?'<span class="badge flag">flagship</span>':p.roadmap?'<span class="badge road">roadmap</span>':''}
+      <div class="ver">${p.domain}</div>
+      <h3>${p.id} <span class="sub" style="font-size:13px">· v${p.ver}</span></h3>
+      <p class="desc">${p.desc}</p>
+      ${slices.length?`<div class="tags">${slices.map(fnTag).join("")}</div>`:""}
+      <div class="foot">
+        <span><b>${p.artifacts}</b> artifacts</span>
+        <span>lift <b>${p.lift}</b></span>
+        <span>eval <b>${p.evalpct}</b></span>
+        ${p.sealed?'<span class="badge sealed" style="position:static">● sealed</span>':''}
+      </div>`;
+    grid.appendChild(el);
+  });
+  if(!grid.children.length) grid.innerHTML=`<p class="sub">No packs match “${q}”.</p>`;
+}
+
+function openPack(id){
+  const p=PACKS.find(x=>x.id===id);
+  if(p.roadmap){ // roadmap packs: gentle notice, stay in list
+    flash(`${id} is a roadmap pack — illustrative of catalog breadth, not yet built.`);
+    return;
+  }
+  curPack=p; curSlice="all";
+  $("#mode-list").classList.add("hidden"); $("#mode-detail").classList.remove("hidden");
+  $("#d-domain").textContent=p.domain;
+  $("#d-name").textContent=`${p.id} · v${p.ver}`;
+  $("#d-desc").textContent=p.desc;
+  $("#d-install").textContent=`get_context(pack="${p.id}@${p.ver}")`;
+  $("#d-tags").innerHTML=Object.keys(FUNCS).map(fnTag).join("")+`<span class="tg" data-fn="oncology">oncology overlay</span>`;
+  renderKpis(); renderActions(); renderSlices(); renderArtifacts();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function renderKpis(){
+  $("#d-kpis").innerHTML=[
+    ["24","governed artifacts"],["4 + overlay","function slices"],["+0.308","agent-lift (26-case suite)"],
+    ["26 / 26","with-pack eval pass"],["0.692","blind baseline (Haiku 4.5)"],["19 / 23","heuristics with eval cases"],
+    ["SHA-256","integrity seal · verified"],["v0.1 → 0.3","governed version history"]
+  ].map(k=>`<div class="kpi"><div class="n">${k[0]}</div><div class="l">${k[1]}</div></div>`).join("");
+}
+function renderActions(){
+  $("#d-actions").innerHTML=ROLES[role].actions.map((a,i)=>
+    `<a class="btn ${i===0?'primary':'ghost'}">${a}</a>`).join("");
+}
+function renderSlices(){
+  const counts=fn=>ART.filter(a=>a.fn===fn).length;
+  const all=`<div class="slice ${curSlice==='all'?'on':''}" data-s="all">Full pack<span class="ct">${ART.length}</span></div>`;
+  const onc=`<div class="slice ${curSlice==='oncology'?'on':''}" data-s="oncology">oncology overlay<span class="ct">${ART.filter(a=>a.onc).length}</span></div>`;
+  $("#slicebar").innerHTML=all+Object.keys(FUNCS).map(f=>
+    `<div class="slice ${curSlice===f?'on':''}" data-s="${f}">${FUNCS[f].label}<span class="ct">${counts(f)}</span></div>`).join("")+onc;
+  $$("#slicebar .slice").forEach(s=>s.onclick=()=>{curSlice=s.dataset.s;renderSlices();renderArtifacts();
+    $("#slicenote").textContent = curSlice==='all'?"The whole pack. A builder can subscribe an agent to everything…"
+      : curSlice==='oncology'?"Therapy overlay — these rules carry therapy_area:oncology on top of their function."
+      : FUNCS[curSlice].note+" — serving this slice ships a materially leaner directory than the full pack.";});
+  $("#slicenote").textContent="The whole pack — or click a function to serve just that slice in isolation.";
+}
+function renderArtifacts(){
+  const list=curSlice==='all'?ART:curSlice==='oncology'?ART.filter(a=>a.onc):ART.filter(a=>a.fn===curSlice);
+  $("#artifacts").innerHTML=list.map(a=>{
+    const col=`var(${FUNCS[a.fn].color})`;
+    return `<div class="arow" data-id="${a.id}">
+      <span class="dot" style="background:${col}"></span>
+      <span><span class="nm">${a.name}</span> ${a.onc?'<span class="tg" data-fn="oncology" style="padding:1px 7px">onc</span>':''}
+        <div class="kd mono">${a.id} · ${(a.kind||'decision_heuristic')}</div></span>
+      <span class="rt">
+        <span class="pill ${a.served?'ok':'no'}">${a.served?'served':'gated'}</span>
+        <span class="pill ${a.eval?'ok':'no'}">${a.eval?'eval ✓':'no eval'}</span>
+      </span></div>`;
+  }).join("");
+  $$("#artifacts .arow").forEach(r=>r.onclick=()=>openArtifact(r.dataset.id));
+}
+
+/* ---------- artifact drawer ---------- */
+function yamlFor(a){
+  const onc=a.onc?`\n<span class="k">therapy_area</span>: <span class="s">oncology</span>`:"";
+  if(a.kind==="entity_registry") return `<span class="k">id</span>: ${a.id}
+<span class="k">kind</span>: <span class="s">entity_registry</span>
+<span class="k">lifecycle</span>: <span class="s">ACTIVE</span>
+<span class="k">tags</span>:
+  - {dimension: analytics_domain, value: commercial}
+  - {dimension: function, value: <span class="s">base</span>}
+<span class="k">entities</span>: <span class="c"># 16 — Brand, HCP, Payer, Formulary…</span>
+<span class="k">relationships</span>: <span class="c"># 17 governed edges</span>`;
+  return `<span class="k">id</span>: ${a.id}
+<span class="k">kind</span>: <span class="s">decision_heuristic</span>
+<span class="k">lifecycle</span>: <span class="s">ACTIVE</span>   <span class="c"># governed by delta_id</span>
+<span class="k">confidence</span>: ${a.conf.toFixed(2)}
+<span class="k">tags</span>:
+  - {dimension: analytics_domain, value: commercial}
+  - {dimension: function, value: <span class="s">${a.fn}</span>}${onc}
+<span class="k">typical_outcome</span>: >
+  ${a.verdict}` + (a.anti?`
+<span class="k">anti_patterns</span>:
+  - wrong_conclusion: "${a.anti[0]}"
+    why_wrong: "${a.anti[1].slice(0,72)}…"`:"");
+}
+function openArtifact(id){
+  const a=ART.find(x=>x.id===id); if(!a) return;
+  const col=`var(${FUNCS[a.fn].color})`;
+  const cmts=(SAMPLE_COMMENTS[id]||[]);
+  $("#drawer-inner").innerHTML=`
+    <div class="dh">
+      <span class="x" id="dx">✕</span>
+      <div class="kd mono" style="color:var(--mut)">${a.id}</div>
+      <h3 style="margin:.2em 0 .3em">${a.name}</h3>
+      <div class="tags">${fnTag(a.fn)} ${a.onc?'<span class="tg" data-fn="oncology">oncology overlay</span>':''}
+        <span class="pill ${a.served?'ok':'no'}">${a.served?'served':'gated'}</span>
+        <span class="pill ${a.eval?'ok':'no'}">${a.eval?'eval ✓':'no eval'}</span></div>
+    </div>
+    <div class="db">
+      <h4 style="margin:0 0 8px;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--mut)">What it concludes</h4>
+      <div class="verdict">${a.verdict}</div>
+      ${a.anti?`<div class="anti"><b>Not&nbsp;→</b> ${a.anti[0]}. ${a.anti[1]}</div>`:""}
+
+      <h4 style="margin:20px 0 8px;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--mut)">Provenance & governance</h4>
+      <div class="prov">
+        <div class="step"><span class="b"></span>Sourced from <b>&nbsp;commercial.yaml</b>&nbsp;→ seed import</div>
+        <div class="step"><span class="b"></span>Proposed Delta&nbsp;<span class="mono">#D-${1000+ART.indexOf(a)}</span></div>
+        <div class="step"><span class="b"></span>Approved → promoted to <b>&nbsp;ACTIVE</b>&nbsp;(carries delta_id)</div>
+        <div class="step"><span class="b"></span>Compiled into <span class="mono">&nbsp;commercial_analytics@0.3.0</span>, re-sealed</div>
+      </div>
+
+      <h4 style="margin:20px 0 8px;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--mut)">Browse the YAML</h4>
+      <pre class="yaml">${yamlFor(a)}</pre>
+
+      <h4 style="margin:22px 0 8px;font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--mut)">
+        Discussion <span class="sub" style="text-transform:none;letter-spacing:0">· ${cmts.length} comment${cmts.length!==1?'s':''}</span></h4>
+      <div id="cmts">${cmts.map(commentHtml).join("")||'<p class="sub" style="font-size:13px">No comments yet. Be the first — your role is attributed automatically.</p>'}</div>
+      <div class="cbox">
+        <input id="cin" placeholder="Add a comment as ${role.toUpperCase()}…"/>
+        <a class="btn primary" id="cadd">Post</a>
+      </div>
+    </div>`;
+  $("#dx").onclick=closeDrawer;
+  $("#cadd").onclick=()=>{
+    const v=$("#cin").value.trim(); if(!v) return;
+    const node=document.createElement("div"); node.innerHTML=commentHtml({r:role,who:"You",t:v});
+    $("#cmts").appendChild(node.firstElementChild); $("#cin").value="";
+  };
+  $("#scrim").classList.add("show"); $("#drawer").classList.add("show");
+}
+function commentHtml(c){
+  const [bg,ini]=AVATARS[c.r]||["#5b9dff","?"];
+  const rc={sme:"--fn-fc",curator:"--fn-ma",builder:"--fn-bp",manager:"--fn-onc"}[c.r]||"--blue";
+  return `<div class="cmt"><div class="av" style="background:${bg}">${ini}</div><div class="bd">
+    <div class="who"><b>${c.who}</b><span class="rolechip" style="color:#04121f;background:var(${rc})">${c.r}</span></div>
+    <div class="txt">${c.t}</div></div></div>`;
+}
+function closeDrawer(){$("#scrim").classList.remove("show");$("#drawer").classList.remove("show");}
+
+/* ---------- views & wiring ---------- */
+function setView(v){
+  $$(".tab").forEach(t=>t.classList.toggle("on",t.dataset.view===v));
+  ["catalog","evolve","sell"].forEach(x=>$("#view-"+x).classList.toggle("hidden",x!==v));
+  if(v==="catalog"){$("#mode-list").classList.remove("hidden");$("#mode-detail").classList.add("hidden");}
+  window.scrollTo({top:0});
+}
+function setRole(r){
+  role=r; document.body.dataset.role=r;
+  $("#rolelens-list").innerHTML=`<b style="color:var(--ink)">${r.toUpperCase()} lens:</b>&nbsp; ${ROLES[r].lens}`;
+  if(curPack && !$("#mode-detail").classList.contains("hidden")){renderActions(); if($("#drawer").classList.contains("show")){}}
+}
+let flashT;
+function flash(msg){
+  let f=$("#flash"); if(!f){f=document.createElement("div");f.id="flash";
+    f.style.cssText="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:80;background:var(--panel-2);border:1px solid var(--line-2);color:var(--ink);padding:12px 18px;border-radius:12px;box-shadow:var(--shadow);font-size:13.5px";
+    document.body.appendChild(f);}
+  f.textContent=msg; f.style.opacity=1; clearTimeout(flashT); flashT=setTimeout(()=>f.style.opacity=0,2600);
+}
+
+$$(".tab").forEach(t=>t.onclick=()=>setView(t.dataset.view));
+$$("[data-jump]").forEach(b=>b.onclick=()=>setView(b.dataset.jump));
+$("#role").onchange=e=>setRole(e.target.value);
+$("#q").oninput=renderGrid;
+$("#back").onclick=()=>{$("#mode-detail").classList.add("hidden");$("#mode-list").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});};
+$("#scrim").onclick=closeDrawer;
+document.onkeydown=e=>{if(e.key==="Escape")closeDrawer();};
+
+/* init */
+renderChips(); renderGrid(); setRole("sme");
+</script>
+</body>
+</html>

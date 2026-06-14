@@ -1,0 +1,19 @@
+id: "GOLD-009-biosimilar-entry"
+name: "Biosimilar Formulary Preference Erodes Originator Share"
+description: >
+  LungoFix (biosimilar) gains preferred formulary status at Hanover General
+  with automatic substitution mandate. OncoVance new starts drop to near zero.
+  Engine should detect biosimilar erosion pattern (rule_biosimilar_erosion)
+  driven by price-based formulary switching.
+
+input:
+  signal: "OncoVance new starts at Hanover collapsed after biosimilar gained preferred formulary status."
+  context:
+    account_id: "hanover_general"
+    brand_id: "brand_oncovance"
+
+expected:
+  min_confidence: 0.80
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "biosimilar"

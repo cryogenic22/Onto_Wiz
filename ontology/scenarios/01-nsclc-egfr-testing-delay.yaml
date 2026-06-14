@@ -1,0 +1,41 @@
+id: "onc-nsclc-egfr-testing-delay"
+name: "NSCLC EGFR+ Testing Delay Suppresses Targeted Therapy"
+description: >
+  EGFR-mutated NSCLC patients at a community oncology center are not receiving
+  timely NGS testing. TAT exceeds 14 days, causing oncologists to start empiric
+  carboplatin/pemetrexed rather than waiting for osimertinib eligibility confirmation.
+  Low reflex testing adoption at community sites compounds the problem.
+
+therapeutic_area: "oncology"
+indication: "NSCLC"
+molecular_subtype: "EGFR-mutated (exon 19 del, L858R)"
+line_of_therapy: "1L"
+
+brand_context:
+  brand: "OncoVance"
+  lifecycle: "launch"
+  asset_class: "biologic"
+  biomarkers_required: ["EGFR mutation (exon 19 del or L858R)"]
+  companion_diagnostic: "cobas EGFR Mutation Test v2"
+
+account_context:
+  type: "community_oncology"
+  potential: "high"
+  access_status: "open"
+  testing_infrastructure: "send-out only, no in-house NGS"
+
+trigger_signal:
+  metric: "NBRx"
+  direction: "decline"
+  magnitude: -0.25
+  description: "25% decline in new OncoVance starts despite stable NSCLC incidence"
+
+expected_hypothesis: "market_access"
+expected_drivers:
+  - driver: "biomarker_testing_gap"
+    inference_rule: "rule_biomarker_testing_gap"
+    confidence: 0.75
+  - driver: "awareness_gap"
+    confidence: 0.50
+
+complexity_level: "medium"

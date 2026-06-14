@@ -1,0 +1,16 @@
+id: "GOLD-014-supply-disruption"
+name: "Supply Chain Shortage Causes Volume Drop Independent of Demand"
+description: >
+  OncoVance API shortage at contract manufacturer. Augsburg received zero
+  shipments for 3 weeks. Volume dropped 80% due to stockout, not demand loss.
+  Engine should identify supply disruption as root cause, not commercial failure.
+input:
+  signal: "OncoVance volume at Augsburg collapsed after 3 weeks of zero shipments from manufacturer."
+  context:
+    account_id: "augsburg_regional_hospital"
+    brand_id: "brand_oncovance"
+expected:
+  min_confidence: 0.80
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "supply"

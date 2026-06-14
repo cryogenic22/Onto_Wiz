@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ontowiz-ctx"
+version = "0.1.0"
+description = "Onto_Wiz context engine (Tier A — ships to clients). Vendored CTX.ai: deterministic knowledge compiler + LLM-as-router hydration + MCP tools."
+requires-python = ">=3.10"
+# CTX core is zero-runtime-dependency by design. PyYAML is only needed by the
+# analytics domain-pack compiler module; mcp only by the MCP server.
+dependencies = []
+
+[project.optional-dependencies]
+packer = ["pyyaml>=6.0"]
+mcp = ["mcp>=1.0"]
+
+[project.scripts]
+ontowiz-ctx = "ontowiz_ctx.cli.main:main"
+
+[tool.setuptools.packages.find]
+include = ["ontowiz_ctx*"]

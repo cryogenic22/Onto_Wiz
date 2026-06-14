@@ -1,0 +1,55 @@
+id: rule_demand_sensing_divergence
+kind: decision_heuristic
+name: Demand Sensing Divergence
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 15e1534b-c0d6-4b9e-aa4a-ec4ce5fb50be
+  at: '2026-06-14T00:06:14.835668+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835668+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: forecasting
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835668+00:00'
+trigger_signals:
+- signal_name: has_leading_signal_shift
+  threshold: Demand:NBRxDecline | Demand:AwarenessGap
+  data_source: tag_match
+- signal_name: has_trend_divergence
+  threshold: Commercial:VolumeDrop | Commercial:ChannelShift
+  data_source: tag_match
+trigger_context:
+- "Leading demand indicators (new-patient starts, search/Rx intent, diagnosis rates)\
+  \ diverging from shipped volume signal a turning point ahead of the trended forecast\
+  \ \u2014 refresh the forecast off the leading signal.\n"
+decision_logic: "has_leading_signal_shift AND has_trend_divergence => Demand-sensing\
+  \ divergence. Leading indicators have decoupled from shipped volume \u2014 re-anchor\
+  \ the forecast on the leading signal, the trend line is stale."
+judgment_type: empirical
+exceptions: []
+anti_patterns: []
+evidence_required: []
+typical_outcome: "Demand-sensing divergence. Leading indicators have decoupled from\
+  \ shipped volume \u2014 re-anchor the forecast on the leading signal, the trend\
+  \ line is stale."
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '72'
+valid_for_days: 180

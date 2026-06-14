@@ -1,0 +1,167 @@
+name: "Medical Affairs"
+version: "1.0.0"
+description: >
+  Medical affairs operations: MSL engagement, publications strategy,
+  KOL management, medical information, advisory boards, and congress
+  presence. Bridge between clinical evidence and commercial execution.
+
+standards_referenced:
+  - SNOMED_CT
+  - MedDRA
+  - NCI_Thesaurus
+
+# =========================================================================
+# ENTITY TYPES
+# =========================================================================
+
+entity_types:
+
+  - name: MSL
+    description: "Medical Science Liaison — field-based medical affairs professional"
+    attributes:
+      - msl_id
+      - therapeutic_area
+      - territory       # Geographic coverage
+      - kol_portfolio   # List of KOLs managed
+      - call_activity   # Interactions per period
+      - specialization  # Clinical, HEOR, Regulatory Science
+
+  - name: KOL
+    description: "Key Opinion Leader — influential HCP in a therapeutic area"
+    attributes:
+      - kol_id
+      - name
+      - institution
+      - specialty
+      - influence_tier  # Tier 1 (national), Tier 2 (regional), Tier 3 (local)
+      - engagement_status  # Active, Developing, Inactive, Restricted
+      - publication_count
+      - trial_involvement  # PI, Sub-I, Steering Committee, DSMB
+      - speaker_bureau     # Boolean
+      - advisory_board     # Boolean
+      - sentiment          # Advocate, Neutral, Skeptic, Detractor
+
+  - name: Publication
+    description: "Scientific publication relevant to a brand or therapeutic area"
+    attributes:
+      - pmid            # PubMed ID
+      - doi
+      - title
+      - journal
+      - publication_date
+      - publication_type  # Original Research, Review, Meta-Analysis, Case Report, Letter, Editorial
+      - brand_relevant    # Boolean
+      - competitor_relevant  # Boolean
+      - impact_factor
+      - citation_count
+      - key_findings
+
+  - name: MedicalInquiry
+    description: "Unsolicited medical information request from an HCP or patient"
+    attributes:
+      - inquiry_id
+      - date
+      - requestor_type  # HCP, Patient, Caregiver, Pharmacist
+      - topic           # Efficacy, Safety, Dosing, Off-label, Drug Interaction, Pregnancy
+      - product
+      - response_type   # Standard Letter, Custom Response, Literature Search
+      - response_time_hours
+      - escalated       # Boolean — escalated to safety or regulatory
+
+  - name: AdvisoryBoard
+    description: "Expert panel convened for scientific input"
+    attributes:
+      - board_id
+      - topic
+      - date
+      - format          # In-person, Virtual, Hybrid
+      - participants    # List of KOL IDs
+      - key_insights    # Summary of actionable insights
+      - compliance_approved  # Boolean
+
+  - name: CongressPresence
+    description: "Company presence at a medical congress or conference"
+    attributes:
+      - congress_name   # e.g., "ASCO", "ESMO", "AAN", "ACR", "ASH"
+      - year
+      - therapeutic_area
+      - presentations   # Poster, Oral, Late-breaker, Symposium
+      - competitor_presentations  # Count of competitor data presentations
+      - key_takeaways
+
+# =========================================================================
+# RELATIONSHIPS
+# =========================================================================
+
+relationships:
+  - { source: MSL, target: KOL, type: engages }
+  - { source: KOL, target: Publication, type: authored }
+  - { source: KOL, target: AdvisoryBoard, type: participates_in }
+  - { source: Publication, target: Brand, type: references }
+  - { source: MedicalInquiry, target: Brand, type: concerns }
+  - { source: CongressPresence, target: Publication, type: presents }
+  - { source: CongressPresence, target: KOL, type: features }
+
+# =========================================================================
+# TAXONOMY
+# =========================================================================
+
+taxonomy:
+
+  msl_activities:
+    scientific_exchange:
+      - reactive_discussion    # Responding to HCP questions
+      - proactive_education    # Sharing approved data
+      - clinical_trial_support # Investigator identification, site support
+    kol_development:
+      - relationship_building
+      - advisory_board_recruitment
+      - speaker_identification
+      - publication_collaboration
+    field_intelligence:
+      - competitive_insight_capture
+      - treatment_pattern_observation
+      - unmet_need_identification
+      - formulary_landscape_input
+
+  major_congresses:
+    oncology: [ASCO, ESMO, AACR, ASH, WCLC, SABCS, GU_ASCO, GI_ASCO]
+    immunology: [ACR, EULAR, AAD, AAN]
+    cardiology: [AHA, ACC, ESC, TCT]
+    cns: [AAN, AES, APA, ECNP]
+    respiratory: [ATS, ERS, CHEST]
+    hematology: [ASH, EHA, ISTH]
+    rare_disease: [NORD, EURORDIS, WORLDSymposium]
+    cross_cutting: [ISPOR, DIA, BIO, JPM_Healthcare]
+
+  kol_engagement_tiers:
+    tier_1_national:
+      criteria: "Nationally recognized, guidelines author, major publication record"
+      typical_activities: [advisory_board, steering_committee, national_speaker]
+      msl_frequency: "Quarterly or more"
+    tier_2_regional:
+      criteria: "Regional influence, active researcher, institutional leader"
+      typical_activities: [advisory_board, regional_speaker, trial_investigator]
+      msl_frequency: "Every 2-3 months"
+    tier_3_local:
+      criteria: "High prescriber, local opinion shaper, community leader"
+      typical_activities: [peer_education, local_speaker]
+      msl_frequency: "Semi-annually"
+
+# =========================================================================
+# SIGNALS — Medical affairs events impacting commercial
+# =========================================================================
+
+signals_to_commercial:
+  - signal: "MedAffairs:KOLSentimentShift"
+    commercial_impact: "Key advocate becoming neutral/skeptic affects peer influence"
+    tags: ["Field:KOLDisengaged", "Demand:EngagementDrop"]
+  - signal: "MedAffairs:CompetitorPublication"
+    commercial_impact: "Competitor data presentation may shift prescribing preference"
+    tags: ["Competitor:Pipeline", "Clinical:Efficacy"]
+  - signal: "MedAffairs:SafetyInquirySpike"
+    commercial_impact: "Cluster of safety inquiries may signal emerging concern"
+    tags: ["Clinical:Safety"]
+  - signal: "MedAffairs:GuidelineChange"
+    commercial_impact: "Treatment guideline update may elevate or demote brand positioning"
+    tags: ["Clinical:Efficacy", "Commercial:MarketExpansion"]

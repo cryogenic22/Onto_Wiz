@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "name": "Onto_Wiz Quality Gate",
+  "paths": {
+    "include": [],
+    "extensions": [".py", ".ts", ".tsx", ".js", ".jsx"],
+    "exclude": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/__pycache__/**",
+      ".pytest_cache/**",
+      "**/.venv/**",
+      "**/.quality-reports/**",
+      "**/quality-gate/**",
+      "**/.next/**",
+      "**/cathedral-keeper/**"
+    ]
+  },
+  "prs": {
+    "enabled": true,
+    "min_score": 85,
+    "error_weight": 10,
+    "warning_weight": 2
+  },
+  "thresholds": {
+    "error_count": 0,
+    "warning_count": 30
+  }
+}

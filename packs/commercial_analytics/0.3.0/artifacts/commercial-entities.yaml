@@ -1,0 +1,274 @@
+id: commercial-entities
+kind: entity_registry
+name: Commercial Entities
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 7c49a290-fa3d-4bfe-9770-1b9cec07b587
+  at: '2026-06-14T00:06:14.835389+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835389+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: base
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 1.0
+created_at: null
+updated_at: '2026-06-14T00:06:14.835389+00:00'
+entities:
+- id: brand
+  entity_type: commercial
+  name: Brand
+  attributes:
+    fields:
+    - therapeutic_area
+    - lifecycle
+    - asset_class
+    - channel
+    - indications
+  aliases: []
+  relationships:
+  - type: treats
+    target: Indication
+    attributes: line, evidence_level
+  - type: competes_with
+    target: Competitor
+    attributes: overlap_indications, share_delta
+  - type: distributed_via
+    target: Channel
+    attributes: volume_share
+- id: hcp
+  entity_type: commercial
+  name: HCP
+  attributes:
+    fields:
+    - specialty
+    - prescribing_volume
+    - territory
+    - influence_tier
+  aliases: []
+  relationships:
+  - type: prescribes
+    target: Brand
+    attributes: volume, trend, loyalty
+  - type: affiliated_with
+    target: Account
+    attributes: role, primary
+- id: account
+  entity_type: commercial
+  name: Account
+  attributes:
+    fields:
+    - type
+    - potential
+    - access_status
+    - payer_mix
+  aliases: []
+  relationships:
+  - type: covered_by
+    target: Payer
+    attributes: lives_pct, contract_status
+- id: payer
+  entity_type: commercial
+  name: Payer
+  attributes:
+    fields:
+    - type
+    - formulary_status
+    - pa_requirements
+    - lives_covered
+  aliases: []
+  relationships:
+  - type: manages
+    target: Formulary
+    attributes: review_cycle, last_updated
+- id: territory
+  entity_type: commercial
+  name: Territory
+  attributes:
+    fields:
+    - region
+    - rep_assigned
+    - account_count
+    - market_potential
+  aliases: []
+  relationships: []
+- id: indication
+  entity_type: commercial
+  name: Indication
+  attributes:
+    fields:
+    - icd10_code
+    - prevalence
+    - line_of_therapy
+    - standard_of_care
+  aliases: []
+  relationships: []
+- id: competitor
+  entity_type: commercial
+  name: Competitor
+  attributes:
+    fields:
+    - brand_name
+    - company
+    - lifecycle
+    - price_index
+    - modality
+  aliases: []
+  relationships: []
+- id: formulary
+  entity_type: commercial
+  name: Formulary
+  attributes:
+    fields:
+    - payer_id
+    - tier
+    - pa_required
+    - step_edit
+    - quantity_limit
+  aliases: []
+  relationships:
+  - type: covers
+    target: Brand
+    attributes: tier, restrictions
+- id: contract
+  entity_type: commercial
+  name: Contract
+  attributes:
+    fields:
+    - payer_id
+    - brand_id
+    - rebate_pct
+    - effective_date
+    - term_months
+  aliases: []
+  relationships:
+  - type: governs_access
+    target: Payer
+    attributes: effective, terms
+- id: fieldforce
+  entity_type: commercial
+  name: FieldForce
+  attributes:
+    fields:
+    - role
+    - territory
+    - call_plan
+    - vacancy_status
+  aliases: []
+  relationships:
+  - type: covers
+    target: Territory
+    attributes: call_frequency, reach
+  - type: calls_on
+    target: HCP
+    attributes: frequency, last_call_date
+- id: kol
+  entity_type: commercial
+  name: KOL
+  attributes:
+    fields:
+    - specialty
+    - influence_tier
+    - engagement_status
+    - institution
+  aliases: []
+  relationships:
+  - type: advocates_for
+    target: Brand
+    attributes: sentiment, engagement_level
+- id: pipeline
+  entity_type: commercial
+  name: Pipeline
+  attributes:
+    fields:
+    - compound
+    - phase
+    - expected_approval
+    - threat_level
+  aliases: []
+  relationships:
+  - type: threatens
+    target: Brand
+    attributes: timeline, overlap_score
+- id: channel
+  entity_type: commercial
+  name: Channel
+  attributes:
+    fields:
+    - type
+    - volume_share
+    - trend
+    - specialty_pharmacy
+  aliases: []
+  relationships: []
+- id: signal
+  entity_type: commercial
+  name: Signal
+  attributes:
+    fields:
+    - metric
+    - direction
+    - magnitude
+    - time_period
+    - geography
+  aliases: []
+  relationships:
+  - type: observed_for
+    target: Brand
+    attributes: metric, magnitude
+- id: evidenceitem
+  entity_type: commercial
+  name: EvidenceItem
+  attributes:
+    fields:
+    - source
+    - confidence
+    - date
+    - tags
+    - account_id
+  aliases: []
+  relationships:
+  - type: supports
+    target: Signal
+    attributes: confidence, recency
+- id: forecast
+  entity_type: commercial
+  name: Forecast
+  attributes:
+    fields:
+    - brand_id
+    - horizon_months
+    - method
+    - base_case
+    - confidence_interval
+  aliases: []
+  relationships:
+  - type: projects
+    target: Brand
+    attributes: horizon, method
+- id: scenariodriver
+  entity_type: commercial
+  name: ScenarioDriver
+  attributes:
+    fields:
+    - name
+    - swing_low
+    - swing_high
+    - elasticity
+    - owner
+  aliases: []
+  relationships:
+  - type: sensitizes
+    target: Forecast
+    attributes: elasticity

@@ -1,0 +1,47 @@
+- id: fs-signal-001
+  task_type: signal_interpretation
+  input_text: "PA edit rate increased 20% in commercial payer segment for launch brand"
+  output_text: |
+    Signal: PA_Edit_Increase (severity: high)
+    Likely Cause: New formulary restrictions or step-edit requirement added
+    Impact: Will reduce NBRx in affected territories within 2-4 weeks
+    Urgency: High — requires immediate payer engagement
+  tags:
+    therapeutic_area: ["oncology", "immunology"]
+    signal_type: ["PA_Edit_Increase"]
+    lifecycle: ["launch"]
+  quality_score: 0.92
+  status: approved
+  created_at: "2025-11-10T10:00:00"
+  version: "1.0.0"
+
+- id: fs-signal-002
+  task_type: signal_interpretation
+  input_text: "Prescription abandonment rate up 8% in specialty pharmacy channel"
+  output_text: |
+    Signal: Abandonment_Rate_Up (severity: medium)
+    Likely Cause: Patient cost burden or hub enrollment friction
+    Impact: Direct NBRx and TRx loss from unfilled prescriptions
+    Urgency: Medium — check copay card utilization and hub TAT
+  tags:
+    therapeutic_area: ["oncology", "rare_disease"]
+    signal_type: ["Abandonment_Rate_Up"]
+  quality_score: 0.89
+  status: approved
+  created_at: "2025-11-25T10:00:00"
+  version: "1.0.0"
+
+- id: fs-signal-003
+  task_type: signal_interpretation
+  input_text: "Field call activity dropped 30% in Midwest territory"
+  output_text: |
+    Signal: Call_Activity_Low (severity: medium)
+    Likely Cause: Territory vacancy, rep turnover, or routing inefficiency
+    Impact: Expected NBRx decline in 4-8 weeks due to reduced HCP engagement
+    Urgency: Medium — verify staffing and call plan compliance
+  tags:
+    signal_type: ["Call_Activity_Low"]
+  quality_score: 0.85
+  status: approved
+  created_at: "2025-12-05T10:00:00"
+  version: "1.0.0"

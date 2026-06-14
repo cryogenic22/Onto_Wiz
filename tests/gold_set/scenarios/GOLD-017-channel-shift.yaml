@@ -1,0 +1,17 @@
+id: "GOLD-017-channel-shift"
+name: "Dispensing Channel Migration Distorts Volume Measurement"
+description: >
+  OncoVance oral formulation shifting from retail to specialty pharmacy at
+  Rostock. Retail volume down 60% but specialty pharmacy applying therapeutic
+  interchange. Engine should identify channel shift as the driver, not true
+  demand loss.
+input:
+  signal: "OncoVance retail volume at Rostock collapsing as prescriptions migrate to specialty pharmacy."
+  context:
+    account_id: "rostock_specialty_pharmacy"
+    brand_id: "brand_oncovance"
+expected:
+  min_confidence: 0.80
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "channel"

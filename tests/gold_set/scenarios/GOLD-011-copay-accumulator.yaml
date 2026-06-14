@@ -1,0 +1,17 @@
+id: "GOLD-011-copay-accumulator"
+name: "Copay Accumulator Policy Drives Patient Therapy Abandonment"
+description: >
+  HealthGuard adopted a copay accumulator policy for specialty drugs.
+  OncoVance copay card no longer counts toward out-of-pocket maximum.
+  28% of patients abandoned therapy in Q3 after copay card benefit exhausted.
+  Engine should identify copay accumulator barrier as root cause.
+input:
+  signal: "OncoVance patients at Dortmund abandoning therapy mid-year despite open formulary."
+  context:
+    account_id: "dortmund_infusion_center"
+    brand_id: "brand_oncovance"
+expected:
+  min_confidence: 0.80
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "accumulator"

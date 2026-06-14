@@ -1,0 +1,65 @@
+default_install_hook_types: [pre-commit, commit-msg]
+default_stages: [pre-commit]
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
+    hooks:
+      - id: ruff
+        args: [check, --fix]
+      - id: ruff-format
+        args: [--check]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.14.1
+    hooks:
+      - id: mypy
+        args: [--ignore-missing-imports]
+        additional_dependencies: [pydantic>=2.0, fastapi>=0.104.0]
+        files: ^src/
+
+  - repo: local
+    hooks:
+      - id: pytest-fast
+        name: pytest (fast subset)
+        entry: python -m pytest tests/ -x -q --no-header --tb=line
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+
+      - id: slop-checker
+        name: Slop Checker (anti-slop enforcement)
+        entry: python quality/slop_checker.py --config quality/config.yaml --root .
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: tier-boundary
+        name: Tier A→B IP Boundary (ADR-012)
+        entry: python tools/check_boundaries.py
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+
+      - id: quality-gate
+        name: Quality Gate (PRS >= 85)
+        entry: python quality-gate/quality_gate.py --staged --root .
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: commit-msg-format
+        name: Commit Message Format (Conventional Commits)
+        entry: python quality-gate/check_commit_msg.py
+        language: system
+        stages: [commit-msg]
+        always_run: true
+
+      - id: cathedral-keeper
+        name: Cathedral Keeper (Architecture Governance)
+        entry: python cathedral-keeper/ck.py analyze --root . --mode diff
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]

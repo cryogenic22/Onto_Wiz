@@ -1,0 +1,178 @@
+name: "Clinical Development"
+version: "1.0.0"
+description: >
+  Clinical trial lifecycle from protocol design through data submission.
+  Grounded in CDISC standards (CDASH, SDTM, ADaM), ICH guidelines
+  (E6 GCP, E8 study design, E9 statistical principles), and
+  ClinicalTrials.gov registration requirements.
+
+standards_referenced:
+  - CDISC_CDASH
+  - CDISC_SDTM
+  - CDISC_ADaM
+  - ICH_E6_GCP
+  - ICH_E8
+  - ICH_E9
+
+# =========================================================================
+# ENTITY TYPES
+# =========================================================================
+
+entity_types:
+
+  - name: ClinicalTrial
+    description: "A formal investigation of a drug in human subjects"
+    attributes:
+      - nct_id          # ClinicalTrials.gov identifier (NCT########)
+      - protocol_number # Sponsor's internal protocol ID
+      - phase           # Phase 1, 1/2, 2, 2/3, 3, 3b, 4
+      - status          # Planning, Recruiting, Active, Completed, Terminated
+      - design          # Randomized, Open-label, Double-blind, Crossover, Adaptive
+      - sponsor         # Pharma company or institution
+      - therapeutic_area
+      - indication
+      - start_date
+      - primary_completion_date
+      - estimated_enrollment
+
+  - name: StudyArm
+    description: "A treatment group within a trial"
+    attributes:
+      - arm_name        # e.g., "Treatment A", "Placebo", "Active Comparator"
+      - arm_type        # Experimental, Active Comparator, Placebo, Sham
+      - intervention    # Drug + dose + schedule
+      - n_subjects      # Number of subjects assigned
+
+  - name: Endpoint
+    description: "A measurable outcome used to evaluate treatment effect"
+    attributes:
+      - name            # e.g., "Overall Survival", "Progression-Free Survival"
+      - type            # Primary, Secondary, Exploratory, Safety
+      - measure         # What is measured (time, rate, score, change from baseline)
+      - timepoint       # When measured (e.g., "Week 24", "End of Treatment")
+      - statistical_method  # e.g., "Log-rank test", "ANCOVA", "Mixed model"
+
+  - name: StudyPopulation
+    description: "Defined patient population for a trial"
+    attributes:
+      - population_type # ITT, mITT, Per-Protocol, Safety
+      - inclusion_criteria   # Key inclusion criteria
+      - exclusion_criteria   # Key exclusion criteria
+      - age_range
+      - biomarker_selected   # Boolean — is population biomarker-selected?
+
+  - name: Site
+    description: "A clinical trial investigator site"
+    attributes:
+      - site_id
+      - institution
+      - country
+      - principal_investigator
+      - enrollment_target
+      - enrollment_actual
+      - status          # Active, Closed, Suspended
+
+  - name: ClinicalResult
+    description: "Outcome data from a completed or interim analysis"
+    attributes:
+      - endpoint_name
+      - treatment_arm
+      - comparator_arm
+      - effect_size     # HR, OR, difference, etc.
+      - confidence_interval
+      - p_value
+      - statistical_significance  # Boolean
+      - clinical_significance     # Interpretation
+
+# =========================================================================
+# RELATIONSHIPS
+# =========================================================================
+
+relationships:
+  - { source: ClinicalTrial, target: StudyArm, type: contains }
+  - { source: ClinicalTrial, target: Endpoint, type: measures }
+  - { source: ClinicalTrial, target: StudyPopulation, type: enrolls }
+  - { source: ClinicalTrial, target: Site, type: conducted_at }
+  - { source: ClinicalTrial, target: ClinicalResult, type: produces }
+  - { source: Endpoint, target: ClinicalResult, type: evaluated_by }
+  - { source: StudyArm, target: ClinicalResult, type: generates }
+
+# =========================================================================
+# TAXONOMY — Trial phases and design types
+# =========================================================================
+
+taxonomy:
+
+  trial_phases:
+    preclinical:
+      description: "In vitro and animal studies before human dosing"
+      typical_duration_months: 12-36
+      regulatory_gate: "IND/CTA filing"
+    phase_1:
+      description: "First-in-human, safety and pharmacokinetics"
+      typical_enrollment: 20-80
+      primary_focus: "safety, tolerability, PK/PD"
+      subtypes: [SAD, MAD, food_effect, drug_interaction]
+    phase_1b_2:
+      description: "Dose expansion with early efficacy signals"
+      typical_enrollment: 50-200
+      primary_focus: "dose selection, preliminary efficacy"
+    phase_2:
+      description: "Proof of concept and dose-ranging"
+      typical_enrollment: 100-500
+      primary_focus: "efficacy signal, dose-response, safety profile"
+      subtypes: [dose_finding, proof_of_concept, biomarker_enriched]
+    phase_3:
+      description: "Confirmatory trials for registration"
+      typical_enrollment: 300-3000
+      primary_focus: "efficacy confirmation, safety in broader population"
+      subtypes: [pivotal, confirmatory, superiority, non_inferiority]
+    phase_3b:
+      description: "Supplemental studies supporting registration or label expansion"
+      typical_enrollment: 200-2000
+      primary_focus: "additional indications, special populations, long-term safety"
+    phase_4:
+      description: "Post-marketing studies and commitments"
+      typical_enrollment: 1000-10000
+      primary_focus: "real-world safety, effectiveness, REMS commitments"
+
+  study_designs:
+    randomized_controlled: "Gold standard; subjects randomly assigned to arms"
+    double_blind: "Neither subject nor investigator knows treatment assignment"
+    open_label: "Treatment assignment known to all parties"
+    crossover: "Subjects receive all treatments in sequence"
+    adaptive: "Protocol allows modifications based on interim data"
+    basket: "Single drug tested across multiple tumor types (oncology)"
+    umbrella: "Single disease with multiple drugs matched to biomarkers"
+    platform: "Master protocol with multiple sub-studies sharing infrastructure"
+    real_world: "Observational or pragmatic design using routine clinical data"
+
+  # Standard endpoint categories (CDISC-aligned)
+  endpoint_categories:
+    efficacy_time_to_event: [overall_survival, progression_free_survival, disease_free_survival, event_free_survival, time_to_progression]
+    efficacy_response: [objective_response_rate, complete_response_rate, duration_of_response, clinical_benefit_rate]
+    efficacy_continuous: [change_from_baseline, percent_change, area_under_curve]
+    safety: [adverse_events, serious_adverse_events, treatment_related_mortality, dose_limiting_toxicity]
+    patient_reported: [quality_of_life, symptom_burden, patient_global_impression, EQ5D]
+    biomarker: [ctDNA_clearance, PSA_response, HbA1c_reduction, viral_load_suppression]
+
+# =========================================================================
+# SIGNALS — What clinical development events mean for commercial
+# =========================================================================
+
+signals_to_commercial:
+  - signal: "Trial:PositiveReadout"
+    commercial_impact: "Strengthens brand positioning, may accelerate launch timeline"
+    tags: ["Clinical:Efficacy", "Pipeline:PhaseAdvance"]
+  - signal: "Trial:SafetyHold"
+    commercial_impact: "May delay launch, trigger safety review, affect prescriber confidence"
+    tags: ["Clinical:Safety", "Regulatory:Hold"]
+  - signal: "Trial:MissedEndpoint"
+    commercial_impact: "Weakens value story, may reduce payer confidence, competitive vulnerability"
+    tags: ["Clinical:Efficacy", "Pipeline:Setback"]
+  - signal: "Trial:IndicationExpansion"
+    commercial_impact: "Expands addressable market, new patient populations"
+    tags: ["Pipeline:IndicationExpansion", "Commercial:MarketExpansion"]
+  - signal: "Competitor:BreakthroughData"
+    commercial_impact: "May shift standard of care, requiring competitive response"
+    tags: ["Competitor:Pipeline", "Clinical:Efficacy"]

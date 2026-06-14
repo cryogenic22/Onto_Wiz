@@ -1,0 +1,19 @@
+id: "GOLD-006-biomarker-testing-gap"
+name: "Biomarker Testing Gap Suppresses Targeted Therapy Uptake"
+description: >
+  Low NGS testing rates at Münster University Oncology mean EGFR+ NSCLC patients
+  are not being identified for targeted therapy. Eligible patients default to
+  empiric chemotherapy. The engine should detect this as a biomarker testing gap
+  (rule_biomarker_testing_gap), not a demand or access issue.
+
+input:
+  signal: "OncoVance utilization below expected at Münster despite strong efficacy data and open formulary."
+  context:
+    account_id: "muenster_oncology"
+    brand_id: "brand_oncovance"
+
+expected:
+  min_confidence: 0.80
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "testing"

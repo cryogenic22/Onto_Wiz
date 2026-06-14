@@ -1,0 +1,41 @@
+id: "onc-nsclc-wildtype-io-access"
+name: "NSCLC Wild-Type IO Access Barrier — PD-L1 Testing Cutoff"
+description: >
+  Wild-type NSCLC patients with PD-L1 TPS 1-49% face access barriers for
+  IO+chemo combination at a community hospital. Payer requires PD-L1 >=50%
+  for IO monotherapy approval, creating confusion and PA rejections for the
+  combination regimen which is appropriate at lower PD-L1 levels.
+
+therapeutic_area: "oncology"
+indication: "NSCLC"
+molecular_subtype: "wild-type (no actionable driver)"
+line_of_therapy: "1L"
+
+brand_context:
+  brand: "OncoVance"
+  lifecycle: "growth"
+  asset_class: "biologic"
+  biomarkers_required: ["PD-L1 TPS (22C3 pharmDx)"]
+
+account_context:
+  type: "community_hospital"
+  potential: "medium"
+  access_status: "restricted"
+  payer_mix: "60% commercial, 30% Medicare, 10% Medicaid"
+
+trigger_signal:
+  metric: "PA_reject_rate"
+  direction: "increase"
+  magnitude: 0.35
+  description: "35% PA rejection rate for IO+chemo in PD-L1 1-49% patients"
+
+expected_hypothesis: "market_access"
+expected_drivers:
+  - driver: "access_barrier"
+    inference_rule: "rule_pa_access_barrier"
+    confidence: 0.80
+  - driver: "formulary_exclusion"
+    inference_rule: "rule_formulary_exclusion"
+    confidence: 0.55
+
+complexity_level: "high"

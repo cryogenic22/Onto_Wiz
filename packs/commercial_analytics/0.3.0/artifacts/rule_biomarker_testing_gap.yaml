@@ -1,0 +1,56 @@
+id: rule_biomarker_testing_gap
+kind: decision_heuristic
+name: Biomarker Testing Gap
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 2e799b73-b0ad-458a-8ffc-6a43a07926a6
+  at: '2026-06-14T00:06:14.835641+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835641+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: brand_performance
+  parent: null
+- dimension: therapy_area
+  value: oncology
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835641+00:00'
+trigger_signals:
+- signal_name: has_testing_gap
+  threshold: Demand:AwarenessGap | Demand:NBRxDecline
+  data_source: tag_match
+- signal_name: has_biomarker_context
+  threshold: Clinical:Efficacy | Commercial:MarketExpansion
+  data_source: tag_match
+trigger_context:
+- Low biomarker testing rates reduce eligible patient identification for targeted
+  therapies.
+decision_logic: has_testing_gap AND has_biomarker_context => Biomarker testing gap
+  detected. Low testing rates are suppressing patient identification for the targeted
+  therapy.
+judgment_type: empirical
+exceptions: []
+anti_patterns: []
+evidence_required: []
+typical_outcome: Biomarker testing gap detected. Low testing rates are suppressing
+  patient identification for the targeted therapy.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '62'
+valid_for_days: 180

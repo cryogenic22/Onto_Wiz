@@ -1,0 +1,23 @@
+id: "ONC-010"
+name: "Melanoma LAG-3 Combination Disrupts PD-1 Monotherapy Standard"
+description: >
+  Nivolumab+relatlimab (LAG-3 inhibitor) RELATIVITY-047 data establishes
+  dual checkpoint blockade as new 1L melanoma option. This disrupts
+  pembrolizumab monotherapy as default 1L choice. Physicians at academic
+  centers shift rapidly; community adoption slower due to infusion logistics
+  and familiarity with existing regimen.
+therapeutic_area: "oncology"
+indication: "Melanoma — advanced/metastatic"
+molecular_context: "BRAF V600E status determines targeted therapy option; LAG-3 benefit independent of BRAF"
+brand_context:
+  brand: "Anti-PD-1 monotherapy"
+  lifecycle: "maturity"
+  channel: "buy_and_bill"
+account_context:
+  type: "Academic Melanoma Center"
+  biomarker_testing: "BRAF V600 testing at diagnosis; PD-L1 less predictive in melanoma"
+trigger_signal: "PD-1 monotherapy 1L share drops 30% at academic melanoma centers after LAG-3 combo approval"
+expected_hypothesis: "competitive_pressure"
+expected_drivers: ["superior_pfs_dual_checkpoint", "novel_mechanism_excitement", "kol_early_adoption"]
+inference_rules_exercised: ["rule_competitive_displacement"]
+complexity_level: "medium"

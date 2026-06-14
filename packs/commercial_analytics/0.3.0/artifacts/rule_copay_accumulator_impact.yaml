@@ -1,0 +1,51 @@
+id: rule_copay_accumulator_impact
+kind: decision_heuristic
+name: Copay Accumulator Impact
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 06edf160-b19a-4031-8220-83da831b5574
+  at: '2026-06-14T00:06:14.835525+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835525+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: market_access
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835525+00:00'
+trigger_signals:
+- signal_name: has_accumulator_policy
+  threshold: Access:CopayAccumulator
+  data_source: tag_match
+- signal_name: has_patient_abandonment
+  threshold: Demand:PatientAbandonment | Demand:NBRxDecline
+  data_source: tag_match
+trigger_context:
+- Copay accumulator/maximizer policy causing patient therapy abandonment mid-year.
+decision_logic: has_accumulator_policy AND has_patient_abandonment => Copay accumulator
+  barrier detected. Patient abandonment correlates with copay card benefit exhaustion.
+judgment_type: empirical
+exceptions: []
+anti_patterns: []
+evidence_required: []
+typical_outcome: Copay accumulator barrier detected. Patient abandonment correlates
+  with copay card benefit exhaustion.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '83'
+valid_for_days: 180

@@ -1,0 +1,51 @@
+id: rule_pa_access_barrier
+kind: decision_heuristic
+name: Pa Access Barrier
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 4a93b888-cad0-49bb-b23e-ecc98649282f
+  at: '2026-06-14T00:06:14.835501+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835501+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: market_access
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835501+00:00'
+trigger_signals:
+- signal_name: has_access_rejection
+  threshold: Access:PAReject | Access:StepEdit
+  data_source: tag_match
+- signal_name: has_formulary_change
+  threshold: Access:FormularyChange | Access:Restricted
+  data_source: tag_match
+trigger_context:
+- Prior authorization rejections or formulary edits creating access friction.
+decision_logic: has_access_rejection AND has_formulary_change => Access barrier detected.
+  PA rejections correlate with recent formulary policy change.
+judgment_type: empirical
+exceptions: []
+anti_patterns: []
+evidence_required: []
+typical_outcome: Access barrier detected. PA rejections correlate with recent formulary
+  policy change.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '85'
+valid_for_days: 180

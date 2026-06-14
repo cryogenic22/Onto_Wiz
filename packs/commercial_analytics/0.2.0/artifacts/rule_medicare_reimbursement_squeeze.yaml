@@ -1,0 +1,50 @@
+id: rule_medicare_reimbursement_squeeze
+kind: decision_heuristic
+name: Medicare Reimbursement Squeeze
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 80dd339c-fee3-4ae7-93b1-18075719daf0
+  at: '2026-06-12T00:05:45.715297+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-12T00:05:45.715297+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-12T00:05:45.715297+00:00'
+trigger_signals:
+- signal_name: has_reimbursement_pressure
+  threshold: Access:ReimbursementPressure
+  data_source: tag_match
+- signal_name: has_channel_or_volume_shift
+  threshold: Commercial:ChannelShift | Commercial:VolumeDrop
+  data_source: tag_match
+trigger_context:
+- ASP-based reimbursement pressure or site-of-care policy shifting physician-administered
+  drug volume.
+decision_logic: has_reimbursement_pressure AND has_channel_or_volume_shift => Reimbursement
+  squeeze detected. Buy-and-bill margin compression is driving site-of-care or volume
+  shifts.
+judgment_type: empirical
+exceptions: []
+anti_patterns: []
+evidence_required: []
+typical_outcome: Reimbursement squeeze detected. Buy-and-bill margin compression is
+  driving site-of-care or volume shifts.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '76'
+valid_for_days: 180

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onto_Wiz — Pharma Domain Intelligence Ontology</title>
+<style>
+  :root{
+    --bg:#0b1020;--bg2:#0e1428;--panel:#141b30;--panel2:#1a2238;--line:#27304a;
+    --ink:#e8ecf5;--mut:#94a0bb;--dim:#5d6883;
+    --tealv:#2dd4bf;--blue:#5b9dff;--gold:#e6b450;--coral:#ff7a8a;--violet:#b48cff;--green:#46d18a;
+    --rx:#5b9dff;--access:#e6b450;--field:#46d18a;--med:#b48cff;--safety:#ff7a8a;--supply:#2dd4bf;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:radial-gradient(1200px 600px at 70% -10%, #15203f 0%, var(--bg) 55%);color:var(--ink);
+    font-family:'Inter','Segoe UI',system-ui,sans-serif;line-height:1.5;min-height:100vh}
+  .wrap{max-width:1320px;margin:0 auto;padding:0 30px}
+  header{padding:34px 0 14px}
+  .brand{display:flex;align-items:center;gap:13px}
+  .logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--tealv),var(--blue));
+    display:flex;align-items:center;justify-content:center;font-weight:800;color:#06122a;font-size:1.15rem;box-shadow:0 8px 30px rgba(45,212,191,.25)}
+  h1{font-size:1.55rem;font-weight:700;letter-spacing:-.4px}
+  .sub{color:var(--mut);font-size:.93rem;margin-top:5px;max-width:880px}
+  .meta{margin-top:12px;font-size:.74rem;color:var(--dim);display:flex;gap:14px;flex-wrap:wrap}
+  .meta b{color:var(--mut);font-weight:600}
+  /* tabs */
+  .tabs{display:flex;gap:4px;margin:22px 0 4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .tab{padding:11px 18px;font-size:.86rem;font-weight:600;color:var(--mut);cursor:pointer;border:none;background:none;
+    border-bottom:2px solid transparent;transition:.15s;white-space:nowrap}
+  .tab:hover{color:var(--ink)}
+  .tab.on{color:var(--ink);border-bottom-color:var(--tealv)}
+  .view{display:none;padding:22px 0 70px;animation:fade .25s ease}
+  .view.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
+  h2{font-size:1.18rem;margin:6px 0 4px;font-weight:700}
+  h3{font-size:1rem;margin:24px 0 8px;color:var(--gold);font-weight:600}
+  p{margin:9px 0;color:var(--ink)}.lead{font-size:1rem;color:var(--mut)}
+  .muted{color:var(--mut)}
+  /* graph layout */
+  .stage{display:grid;grid-template-columns:1fr 340px;gap:18px;margin-top:14px}
+  @media(max-width:1000px){.stage{grid-template-columns:1fr}}
+  .canvas{background:linear-gradient(180deg,var(--bg2),#0c1124);border:1px solid var(--line);border-radius:16px;
+    padding:8px;overflow:hidden;position:relative}
+  svg{width:100%;height:auto;display:block;user-select:none}
+  .hint{position:absolute;top:12px;left:16px;font-size:.72rem;color:var(--dim)}
+  /* svg nodes */
+  .node{cursor:pointer}
+  .node rect{transition:.18s}
+  .node text{font-size:12px;font-weight:600;fill:var(--ink);pointer-events:none}
+  .node .sublabel{font-size:9px;font-weight:500;fill:var(--mut)}
+  .node:hover rect{filter:brightness(1.25)}
+  .edge{stroke:var(--line);stroke-width:1.6;fill:none;transition:.18s}
+  .edge.dash{stroke-dasharray:5 4}
+  .elabel{font-size:8.5px;fill:var(--dim);pointer-events:none}
+  .faded{opacity:.16}
+  .hl rect{stroke:#fff;stroke-width:2}
+  .edge.hl{stroke:var(--tealv);stroke-width:2.6;opacity:1}
+  /* detail panel */
+  .detail{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 18px;min-height:300px}
+  .detail .dt{font-size:1.05rem;font-weight:700}
+  .detail .dk{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.5px;padding:2px 9px;border-radius:99px;margin-top:8px}
+  .detail .db{font-size:.85rem;color:var(--mut);margin:11px 0}
+  .detail h4{font-size:.7rem;text-transform:uppercase;letter-spacing:.7px;color:var(--dim);margin:14px 0 6px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:.72rem;padding:3px 9px;border-radius:7px;background:var(--panel2);border:1px solid var(--line);color:var(--mut)}
+  .chip.rx{border-color:rgba(91,157,255,.4);color:#a9c8ff}
+  .rel{font-size:.8rem;color:var(--ink);padding:4px 0;border-top:1px solid var(--line)}
+  .rel:first-of-type{border-top:none}
+  .rel .v{color:var(--tealv);font-weight:600}
+  .placeholder{color:var(--dim);font-size:.85rem;display:flex;align-items:center;height:240px;justify-content:center;text-align:center}
+  /* cards / grids */
+  .grid{display:grid;gap:14px;margin:16px 0}
+  .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:1000px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px 18px}
+  .card h4{font-size:.95rem;margin-bottom:7px;font-weight:600}
+  .card.tl{border-top:3px solid var(--tealv)}.card.bl{border-top:3px solid var(--blue)}
+  .card.gd{border-top:3px solid var(--gold)}.card.vi{border-top:3px solid var(--violet)}
+  .card.co{border-top:3px solid var(--coral)}.card.gn{border-top:3px solid var(--green)}
+  .card ul{margin:8px 0 0 17px;font-size:.84rem;color:var(--mut)}.card li{margin:4px 0}.card li b{color:var(--ink)}
+  table{width:100%;border-collapse:collapse;font-size:.83rem;margin:12px 0}
+  th{text-align:left;padding:9px 11px;background:var(--panel2);color:var(--gold);font-weight:600;border-bottom:1px solid var(--line)}
+  td{padding:8px 11px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink)}
+  td:first-child{font-weight:600;white-space:nowrap}
+  code{background:#0c1227;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.82em;font-family:'JetBrains Mono',Consolas,monospace;color:var(--tealv)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.74rem;color:var(--mut);margin-top:10px}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .dot{width:10px;height:10px;border-radius:99px}
+  .layerstack{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+  .layer{padding:9px 14px;border-radius:9px;font-size:.84rem;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line)}
+  .layer b{font-weight:600}.layer .t{font-size:.72rem;color:var(--dim)}
+  .flow{font-family:'JetBrains Mono',Consolas,monospace;font-size:.78rem;color:var(--tealv);background:#0a0f20;border:1px solid var(--line);border-radius:11px;padding:16px 18px;overflow-x:auto;white-space:pre;line-height:1.6}
+  .callout{background:linear-gradient(135deg,rgba(45,212,191,.08),rgba(91,157,255,.06));border:1px solid rgba(45,212,191,.3);border-radius:13px;padding:18px 22px;margin:18px 0;font-size:.96rem}
+  .callout b{color:var(--tealv)}
+  .note{font-size:.78rem;color:var(--dim);margin-top:8px}
+  footer{padding:22px 0 50px;color:var(--dim);font-size:.76rem;border-top:1px solid var(--line);margin-top:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand">
+    <div class="logo">◇</div>
+    <div>
+      <h1>Pharma Domain Intelligence Ontology</h1>
+      <div class="sub">The semantic backbone that makes consulting &amp; commercial judgement reusable, governed and machine-consumable. This is the structure that organizes our knowledge library, drives the Domain Forge, and compiles into the packs any agent consumes.</div>
+    </div>
+  </div>
+  <div class="meta">
+    <span><b>For:</b> functional SME review (Commercial, Market Access, Medical, HEOR, Safety)</span>
+    <span><b>Grounded in:</b> commercial.yaml · 14 entities · 15 relationships · 19 inference rules · 11 domains</span>
+    <span><b>Status:</b> v1 for review</span>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab on" data-v="vs">① Value Stream</button>
+  <button class="tab" data-v="arch">② Ontology Architecture</button>
+  <button class="tab" data-v="comm">③ Commercial (deep dive)</button>
+  <button class="tab" data-v="strat">④ Domain &amp; Graph Strategy</button>
+  <button class="tab" data-v="cons">⑤ How it guides Forge &amp; Library</button>
+</div>
+
+<!-- ========================= TAB 1: VALUE STREAM ========================= -->
+<section class="view on" id="vs">
+  <h2>The pharma value stream as one connected graph</h2>
+  <p class="lead">Every domain is a stage that creates and hands off decision-grade intelligence — molecule to patient. Safety and evidence cut across everything. <b>Click any domain</b> to see what it contributes, the entities it owns, and how it connects.</p>
+  <div class="stage">
+    <div class="canvas">
+      <div class="hint">click a domain ·  ⟶ value flow   ⤍ cross-cutting</div>
+      <svg id="svg-vs" viewBox="0 0 1400 480"></svg>
+    </div>
+    <div class="detail" id="det-vs">
+      <div class="placeholder">Select a domain in the graph to inspect it.</div>
+    </div>
+  </div>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--blue)"></i> Discover → Develop → Approve</span>
+    <span><i class="dot" style="background:var(--supply)"></i> Make &amp; Supply</span>
+    <span><i class="dot" style="background:var(--access)"></i> Access &amp; Evidence</span>
+    <span><i class="dot" style="background:var(--rx)"></i> Commercialize</span>
+    <span><i class="dot" style="background:var(--med)"></i> Medical &amp; Patient</span>
+    <span><i class="dot" style="background:var(--safety)"></i> Safety (cross-cutting)</span>
+  </div>
+</section>
+
+<!-- ========================= TAB 2: ARCHITECTURE ========================= -->
+<section class="view" id="arch">
+  <h2>How the ontology is organized</h2>
+  <p class="lead">Not one giant ontology — a <b>meta-model</b> instantiated by <b>11 domain ontologies</b>, sliced into <b>layered, governed packs</b>. This is what prevents the classic failure: everyone re-discovering "payer policy" and "pull-through" in slightly different ways.</p>
+
+  <div class="grid g3">
+    <div class="card tl"><h4>① Meta-model (the schema)</h4><p class="muted" style="font-size:.85rem">A small, stable vocabulary every domain reuses: <b>EntityType</b>, <b>RelationshipType</b>, <b>Metric</b>, <b>Signal</b>, <b>EvidenceItem</b>. Defining it once is what makes domains interoperable.</p></div>
+    <div class="card bl"><h4>② Domain ontologies (11)</h4><p class="muted" style="font-size:.85rem">Each domain instantiates the meta-model with its own entities, metrics, signals and inference rules. They connect through cross-domain edges (the Value Stream tab).</p></div>
+    <div class="card gd"><h4>③ Layered packs (the product)</h4><p class="muted" style="font-size:.85rem">A shippable pack is a <b>governed slice</b> of the graph, stacked by precedence so client/engagement specifics override the base without forking it.</p></div>
+  </div>
+
+  <h3>The layer stack — higher layers override lower (resolution is traceable)</h3>
+  <div class="layerstack">
+    <div class="layer" style="background:rgba(255,122,138,.10)"><b>Engagement overlay</b> <span class="t">e.g. "Launch readiness, Q3" — 1 override</span></div>
+    <div class="layer" style="background:rgba(230,180,80,.10)"><b>Client overlay</b> <span class="t">e.g. "Merck: pull-through includes patient-support starts"</span></div>
+    <div class="layer" style="background:rgba(180,140,255,.10)"><b>Therapy-area overlay</b> <span class="t">e.g. Oncology — line-of-therapy, biomarker logic</span></div>
+    <div class="layer" style="background:rgba(70,209,138,.10)"><b>Function overlay</b> <span class="t">Commercial / Market Access / Medical …</span></div>
+    <div class="layer" style="background:rgba(91,157,255,.10)"><b>Commercial-analytics base</b> <span class="t">TRx/NBRx, share decomposition, the 19 inference rules</span></div>
+    <div class="layer" style="background:rgba(45,212,191,.10)"><b>Pharma base</b> <span class="t">value-chain entities &amp; relationships shared by all</span></div>
+  </div>
+  <p class="note">"Why did the agent use <i>this</i> definition of pull-through?" → the pack answers: which layer defined it, what overrode what, the SME and the eval behind it.</p>
+
+  <h3>The 11 domains &amp; how they connect</h3>
+  <div class="grid g4" id="domain-grid"></div>
+</section>
+
+<!-- ========================= TAB 3: COMMERCIAL ========================= -->
+<section class="view" id="comm">
+  <h2>Commercial ontology — the entity model</h2>
+  <p class="lead">14 entity types, 15 typed relationships, 19 inference rules. <b>Click any entity</b> to see its attributes, its relationships, and which decision rules reason over it. This is the structure a Commercial or Market-Access SME should sanity-check first.</p>
+  <div class="stage">
+    <div class="canvas">
+      <div class="hint">click an entity · lines = relationships from commercial.yaml</div>
+      <svg id="svg-comm" viewBox="0 0 1400 600"></svg>
+    </div>
+    <div class="detail" id="det-comm">
+      <div class="placeholder">Select an entity to inspect its attributes, relationships and rules.</div>
+    </div>
+  </div>
+  <h3>Inference rules — situated judgement, encoded</h3>
+  <p class="muted" style="font-size:.88rem">The 19 rules are grouped by what they protect against. Each becomes a governed <code>DecisionHeuristic</code> in the pack. This is where the "Brand X lost share" question gets decomposed correctly — safety and supply are evaluated <i>before</i> demand.</p>
+  <div class="grid g3" id="rule-grid"></div>
+</section>
+
+<!-- ========================= TAB 4: STRATEGY ========================= -->
+<section class="view" id="strat">
+  <h2>Domain &amp; graph strategy — how we build it</h2>
+  <p class="lead">The ontology is a <b>property graph</b>: typed nodes, typed edges, every edge carrying confidence, provenance and a governed lifecycle. Here is the node/edge taxonomy and how edges get created.</p>
+
+  <div class="grid g2">
+    <div class="card tl">
+      <h4>Node types (what becomes a node)</h4>
+      <ul>
+        <li><b>Entity</b> — Brand, HCP, Payer, Territory… (real-world things)</li>
+        <li><b>Metric</b> — TRx, NBRx, market share, PA rate</li>
+        <li><b>Signal</b> — an observed change ("volume down 8%")</li>
+        <li><b>Observation / Evidence</b> — the data point + its source</li>
+        <li><b>Hypothesis</b> — a candidate driver of a signal</li>
+        <li><b>Constraint (Guardrail)</b> — what NOT to conclude</li>
+        <li><b>Action</b> — recommended cross-functional move</li>
+        <li><b>Pattern</b> — a reusable judgement abstraction</li>
+      </ul>
+    </div>
+    <div class="card bl">
+      <h4>Edge types (how nodes connect)</h4>
+      <ul>
+        <li><b>Structural</b> — treats, competes_with, covered_by (the entity model)</li>
+        <li><b>LEADS_TO</b> — Signal → Hypothesis → Action</li>
+        <li><b>SUPPORTS / CONTRADICTS</b> — Evidence → Hypothesis</li>
+        <li><b>REQUIRES_EVIDENCE</b> — Hypothesis → Evidence needed</li>
+        <li><b>BLOCKED_BY</b> — Action → Constraint</li>
+        <li><b>HAS_SOURCE</b> — Signal → contributing Entity</li>
+        <li>every edge: <b>confidence</b> · <b>provenance</b> · <b>lifecycle</b></li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>How edges are created — four sources, one governance gate</h3>
+  <div class="flow">  SEED          ontology YAML (entities, relationships, 19 rules)  ──┐
+  MINE          decks / code / SQL / transcripts → candidate edges  ──┤
+  ELICIT        Domain Forge — SME confirms/ranks/repairs/dissents   ──┼──►  DELTA  ──►  governed graph
+  REASON        agent run-time: new Signal→Hypothesis→Action edges   ──┘     (proposed → reviewed → active)
+
+  nothing reaches the live graph by direct write — every edge is the effect of a merged Delta</div>
+
+  <div class="grid g3" style="margin-top:18px">
+    <div class="card gd"><h4>Confidence</h4><p class="muted" style="font-size:.84rem">Each node/edge carries [0–1] confidence + reliability (HARD / SOFT / RUMOR). Low-confidence, high-impact edges become Forge missions.</p></div>
+    <div class="card vi"><h4>Provenance</h4><p class="muted" style="font-size:.84rem">Every edge points back to its source (slide, code line, SME, eval). "Searchable rubbish is still rubbish" — provenance is what makes it trustworthy.</p></div>
+    <div class="card co"><h4>Lifecycle</h4><p class="muted" style="font-size:.84rem">candidate → proposed → reviewed → active → evaluated → superseded. Decks never jump straight to active.</p></div>
+  </div>
+
+  <h3>Domain creation playbook (repeatable for any new domain)</h3>
+  <table>
+    <tr><th>Step</th><th>What we do</th><th>Output</th></tr>
+    <tr><td>1 · Frame</td><td>Pick the function + first flagship question (e.g. "why did share decline?")</td><td>scope + success metric</td></tr>
+    <tr><td>2 · Meta-map</td><td>Map domain to the shared meta-model (reuse EntityType/Metric/Signal)</td><td>domain entity &amp; metric list</td></tr>
+    <tr><td>3 · Seed</td><td>Import existing ontology YAML + mine a baseline from decks/code</td><td>candidate graph</td></tr>
+    <tr><td>4 · Elicit</td><td>Forge missions on the weak / high-impact spots</td><td>deltas + gold evals</td></tr>
+    <tr><td>5 · Govern</td><td>Delta review → consensus → confidence</td><td>active subgraph</td></tr>
+    <tr><td>6 · Compile</td><td>Slice into a layered pack + CTX context layer</td><td>shippable pack</td></tr>
+    <tr><td>7 · Prove</td><td>Eval gate: with-pack vs without-pack agent lift</td><td>measured value</td></tr>
+  </table>
+</section>
+
+<!-- ========================= TAB 5: CONSOLIDATION ========================= -->
+<section class="view" id="cons">
+  <h2>How the ontology guides the Forge, the Library &amp; the packs</h2>
+  <div class="callout"><b>The unifying idea:</b> the ontology is the backbone. The <b>Library</b> encodes its elements as typed artifacts, the <b>Domain Forge</b> elicits and repairs its edges through play, and a <b>Pack</b> is just a governed, compiled <i>subgraph</i>. One structure — three surfaces over it.</p></div>
+
+  <h3>Library artifact types ⇄ ontology elements</h3>
+  <table>
+    <tr><th>Ontology element</th><th>Library artifact</th><th>Example</th></tr>
+    <tr><td>Entity node</td><td>EntityRegistry</td><td>Brand, Payer, Formulary (+ aliases)</td></tr>
+    <tr><td>Metric node</td><td>MetricDefinition</td><td>pull-through = …, with caveats &amp; trusted sources</td></tr>
+    <tr><td>Signal→Hypothesis→Action path</td><td>JudgmentPattern / DecisionHeuristic</td><td>"if PA reject &gt; 30%, escalate to MSL"</td></tr>
+    <tr><td>Constraint node</td><td>Guardrail / OverrideRule</td><td>"don't read stocking as demand"</td></tr>
+    <tr><td>Data caveat on a source</td><td>DataQuirk</td><td>"IQVIA claims lag ~6 weeks"</td></tr>
+    <tr><td>Source trust</td><td>SourceContract</td><td>"IQVIA for TRx, not net price"</td></tr>
+    <tr><td>Question decomposition</td><td>QuestionPlaybook</td><td>"why is share declining?" → 8 lenses</td></tr>
+    <tr><td>Testable consequence</td><td>EvalCase</td><td>a good answer must contain access + competitor + caveats</td></tr>
+  </table>
+
+  <h3>Forge missions ⇄ ontology operations (what each game actually edits)</h3>
+  <table>
+    <tr><th>Forge mission</th><th>Graph operation</th><th>Produces</th></tr>
+    <tr><td>Same or Different</td><td>resolve / merge Entity nodes + aliases</td><td>EntityRegistry edit + eval</td></tr>
+    <tr><td>Rank what matters</td><td>weight Signal → Driver edges</td><td>QuestionPlaybook + eval</td></tr>
+    <tr><td>What evidence would you trust</td><td>set Evidence → source trust</td><td>SourceContract + eval</td></tr>
+    <tr><td>Name the caveat</td><td>attach a caveat to a Metric/Source node</td><td>DataQuirk + guard eval</td></tr>
+    <tr><td>Spot the bad insight</td><td>mark a disallowed Hypothesis edge</td><td>AntiPattern + negative eval</td></tr>
+    <tr><td>What would change your mind</td><td>set thresholds on a Hypothesis</td><td>DecisionHeuristic threshold + eval</td></tr>
+    <tr><td>Red-team the answer</td><td>add a Constraint (BLOCKED_BY) edge</td><td>Guardrail + adversarial eval</td></tr>
+    <tr><td>Resolve disagreement</td><td>reconcile conflicting edges → exception</td><td>ExceptionRule + consensus eval</td></tr>
+  </table>
+
+  <div class="grid g2" style="margin-top:6px">
+    <div class="card gn"><h4>A pack = a governed subgraph</h4><p class="muted" style="font-size:.85rem">Compiling <code>commercial_analytics</code> walks the active commercial subgraph, serializes it into a CTX context layer + manifest. The agent hydrates only the slice a query needs — governance gate first, so a draft edge is never even offered.</p></div>
+    <div class="card co"><h4>Why this matters for SMEs</h4><p class="muted" style="font-size:.85rem">You're not "filling in YAML." You're confirming, ranking and red-teaming the firm's brain — and you can see your judgement become a live edge, then a measurable agent improvement. The ontology makes every contribution land somewhere specific.</p></div>
+  </div>
+
+  <h3>What we'd like SMEs to review</h3>
+  <div class="grid g3">
+    <div class="card"><h4>Commercial entity model</h4><p class="muted" style="font-size:.83rem">Are the 14 entities &amp; 15 relationships right? Missing anything structural (e.g. GPO, SP, hub)?</p></div>
+    <div class="card"><h4>The 19 inference rules</h4><p class="muted" style="font-size:.83rem">Is the priority order right? Safety/supply before demand? Any rule that fails in your therapy area?</p></div>
+    <div class="card"><h4>Cross-domain edges</h4><p class="muted" style="font-size:.83rem">Do the value-stream handoffs match how your function actually consumes upstream intelligence?</p></div>
+  </div>
+</section>
+
+<footer>Onto_Wiz · Pharma Domain Intelligence Ontology · grounded in ontology/commercial.yaml &amp; the 11-domain architecture · v1 for functional SME review</footer>
+</div>
+
+<script>
+/* ---------------- tab switching ---------------- */
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on'); document.getElementById(t.dataset.v).classList.add('on');
+});
+
+const SVGNS='http://www.w3.org/2000/svg';
+function el(tag,attrs){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+
+/* ---------------- generic graph renderer ---------------- */
+function renderGraph(svg, data, onSelect){
+  svg.innerHTML='';
+  const byId={}; data.nodes.forEach(n=>byId[n.id]=n);
+  const edgeEls=[];
+  data.edges.forEach(ed=>{
+    const a=byId[ed.from], b=byId[ed.to]; if(!a||!b)return;
+    const p=el('path',{class:'edge'+(ed.dash?' dash':''),d:`M ${a.x} ${a.y} L ${b.x} ${b.y}`});
+    p.dataset.from=ed.from; p.dataset.to=ed.to; svg.appendChild(p); edgeEls.push(p);
+    if(ed.label){
+      const mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+      const t=el('text',{class:'elabel',x:mx,y:my-3,'text-anchor':'middle'}); t.textContent=ed.label;
+      t.dataset.from=ed.from; t.dataset.to=ed.to; svg.appendChild(t); edgeEls.push(t);
+    }
+  });
+  const nodeEls=[];
+  data.nodes.forEach(n=>{
+    const w=n.w||118, h=n.h||40;
+    const g=el('g',{class:'node'}); g.dataset.id=n.id;
+    const r=el('rect',{x:n.x-w/2,y:n.y-h/2,width:w,height:h,rx:10,fill:n.color||'#1a2238',stroke:'var(--line)','stroke-width':1.4});
+    g.appendChild(r);
+    const t=el('text',{x:n.x,y:n.y+(n.sub?-1:4),'text-anchor':'middle'}); t.textContent=n.label; g.appendChild(t);
+    if(n.sub){const s=el('text',{class:'sublabel',x:n.x,y:n.y+11,'text-anchor':'middle'}); s.textContent=n.sub; g.appendChild(s);}
+    g.onclick=()=>{
+      nodeEls.forEach(x=>x.classList.remove('hl'));
+      svg.querySelectorAll('.faded').forEach(x=>x.classList.remove('faded'));
+      g.classList.add('hl');
+      const linked=new Set([n.id]);
+      edgeEls.forEach(e=>{const on=e.dataset.from===n.id||e.dataset.to===n.id;
+        if(on){e.classList.add('hl'); linked.add(e.dataset.from); linked.add(e.dataset.to);} else {e.classList.remove('hl'); e.classList.add('faded');}});
+      nodeEls.forEach(x=>{ if(!linked.has(x.dataset.id)) x.classList.add('faded'); });
+      onSelect(n);
+    };
+    svg.appendChild(g); nodeEls.push(g);
+  });
+}
+
+/* ---------------- VALUE STREAM data ---------------- */
+const VS={
+  nodes:[
+    {id:'research',label:'Research',sub:'Discovery',x:110,y:240,color:'#16223f'},
+    {id:'clinical',label:'Clinical Dev',sub:'Trials',x:300,y:240,color:'#16223f'},
+    {id:'regulatory',label:'Regulatory',sub:'Approval',x:490,y:240,color:'#16223f'},
+    {id:'mfg',label:'Manufacturing',sub:'Make & Supply',x:690,y:240,color:'#142a2c'},
+    {id:'heor',label:'HEOR',sub:'Value evidence',x:560,y:90,color:'#2a2616'},
+    {id:'access',label:'Market Access',sub:'Payer / Pricing',x:760,y:90,color:'#2a2616'},
+    {id:'commercial',label:'Commercial',sub:'Brand / Marketing',x:930,y:240,color:'#162540',w:140},
+    {id:'field',label:'Field Operations',sub:'Sales force',x:1130,y:240,color:'#15281d'},
+    {id:'medical',label:'Medical Affairs',sub:'MSL / KOL',x:930,y:390,color:'#21193a'},
+    {id:'pv',label:'Pharmacovigilance',sub:'Safety',x:490,y:390,color:'#2a1820',w:140},
+    {id:'patient',label:'Patient Services',sub:'Hub / adherence',x:1290,y:390,color:'#21193a',w:140},
+  ],
+  edges:[
+    {from:'research',to:'clinical',label:'feeds pipeline'},
+    {from:'clinical',to:'regulatory',label:'submission'},
+    {from:'regulatory',to:'mfg',label:'enables supply'},
+    {from:'regulatory',to:'access',label:'label → access'},
+    {from:'mfg',to:'commercial',label:'supply'},
+    {from:'heor',to:'access',label:'value story'},
+    {from:'access',to:'commercial',label:'formulary access'},
+    {from:'commercial',to:'field',label:'brand strategy'},
+    {from:'field',to:'patient',label:'enrollment'},
+    {from:'commercial',to:'patient',label:'copay/hub'},
+    {from:'medical',to:'commercial',label:'scientific exchange',dash:true},
+    {from:'clinical',to:'medical',label:'data → KOL',dash:true},
+    {from:'pv',to:'clinical',label:'safety',dash:true},
+    {from:'pv',to:'commercial',label:'signal',dash:true},
+  ]
+};
+const VS_DETAIL={
+  research:{k:'Upstream',c:'var(--blue)',b:'Target discovery and early science. Generates the pipeline threats and opportunities the commercial team must anticipate.',owns:['Compound','Target','Mechanism'],signals:['pipeline threat level','phase transition']},
+  clinical:{k:'Upstream',c:'var(--blue)',b:'Trials produce the efficacy/safety evidence that becomes the label — and the data KOLs care about.',owns:['Trial','Endpoint','Investigator'],signals:['readout','enrollment rate']},
+  regulatory:{k:'Upstream',c:'var(--blue)',b:'Approval and label. The label is the boundary condition for every downstream claim and access negotiation.',owns:['Submission','Label','Indication'],signals:['approval','label change']},
+  mfg:{k:'Make & Supply',c:'var(--supply)',b:'API sourcing and distribution. Supply disruption causes volume drops that look commercial but are not — rule_supply_disruption fires first.',owns:['Supply','Channel','Inventory'],signals:['shortage','fulfillment delay']},
+  heor:{k:'Access & Evidence',c:'var(--access)',b:'Health-economic evidence that powers the payer value story. Feeds Market Access, not Commercial directly.',owns:['Evidence','Outcome','Model'],signals:['budget impact','CER']},
+  access:{k:'Access & Evidence',c:'var(--access)',b:'Payer, formulary and pricing. The single biggest swing factor in "why did share move" — evaluated before demand.',owns:['Payer','Formulary','Contract','PA'],signals:['formulary exclusion','PA barrier','rebate']},
+  commercial:{k:'Commercialize',c:'var(--rx)',b:'The hub. Brand strategy, marketing, competitive dynamics. Consumes upstream intelligence and orchestrates field, medical and patient. → see the Commercial tab.',owns:['Brand','Competitor','Signal','Segment'],signals:['TRx/NBRx','share','competitive displacement']},
+  field:{k:'Commercialize',c:'var(--field)',b:'Sales force execution. Where brand strategy meets the territory — call plans, reach, vacancies.',owns:['FieldForce','Territory','CallPlan'],signals:['field execution gap','reach/frequency']},
+  medical:{k:'Medical & Patient',c:'var(--med)',b:'Scientific exchange via MSLs and KOLs. The escalation path when access barriers need clinical air-cover.',owns:['KOL','MSL','Publication'],signals:['KOL sentiment','peer-to-peer']},
+  pv:{k:'Safety (cross-cutting)',c:'var(--safety)',b:'Pharmacovigilance. Safety signals masquerade as preference or volume drops — rule_safety_signal evaluates first, across every domain.',owns:['AdverseEvent','SafetySignal','Case'],signals:['emerging safety signal','clinical inquiry']},
+  patient:{k:'Medical & Patient',c:'var(--med)',b:'Hub services, copay, adherence. Where pull-through actually completes — patient starts and continuation.',owns:['PatientProgram','Copay','Adherence'],signals:['copay accumulator','start/continuation']},
+};
+
+/* ---------------- COMMERCIAL data (from commercial.yaml) ---------------- */
+const COMM={
+  nodes:[
+    {id:'Brand',label:'Brand',x:700,y:300,color:'#1c2f54',w:120,h:46},
+    {id:'Indication',label:'Indication',x:700,y:120,color:'#16223f'},
+    {id:'Competitor',label:'Competitor',x:470,y:170,color:'#2a1820'},
+    {id:'Channel',label:'Channel',x:470,y:430,color:'#142a2c'},
+    {id:'HCP',label:'HCP',x:940,y:175,color:'#15281d'},
+    {id:'Account',label:'Account',x:1120,y:255,color:'#15281d'},
+    {id:'Payer',label:'Payer',x:1150,y:400,color:'#2a2616'},
+    {id:'Formulary',label:'Formulary',x:940,y:455,color:'#2a2616'},
+    {id:'Contract',label:'Contract',x:1150,y:520,color:'#2a2616'},
+    {id:'Territory',label:'Territory',x:1010,y:90,color:'#15281d'},
+    {id:'FieldForce',label:'FieldForce',x:760,y:480,color:'#15281d'},
+    {id:'KOL',label:'KOL',x:500,y:300,color:'#21193a'},
+    {id:'Pipeline',label:'Pipeline',x:260,y:240,color:'#16223f'},
+    {id:'Signal',label:'Signal',x:300,y:370,color:'#1c2f54'},
+    {id:'EvidenceItem',label:'Evidence',x:160,y:430,color:'#2a2616'},
+  ],
+  edges:[
+    {from:'Brand',to:'Indication',label:'treats'},
+    {from:'Brand',to:'Competitor',label:'competes'},
+    {from:'Brand',to:'Channel',label:'via'},
+    {from:'HCP',to:'Brand',label:'prescribes'},
+    {from:'HCP',to:'Account',label:'affiliated'},
+    {from:'Account',to:'Payer',label:'covered by'},
+    {from:'Payer',to:'Formulary',label:'manages'},
+    {from:'Formulary',to:'Brand',label:'covers'},
+    {from:'FieldForce',to:'Territory',label:'covers'},
+    {from:'FieldForce',to:'HCP',label:'calls on'},
+    {from:'KOL',to:'Brand',label:'advocates'},
+    {from:'Signal',to:'Brand',label:'observed for'},
+    {from:'EvidenceItem',to:'Signal',label:'supports'},
+    {from:'Pipeline',to:'Brand',label:'threatens'},
+    {from:'Contract',to:'Payer',label:'governs access'},
+  ]
+};
+const COMM_DETAIL={
+  Brand:{a:['therapeutic_area','lifecycle','asset_class','channel','indications'],b:'The focal entity — everything resolves to share and pull-through of the brand.',rules:['competitive_displacement','launch_stall','demand_erosion']},
+  Indication:{a:['icd10_code','prevalence','line_of_therapy','standard_of_care'],b:'What the brand treats; line-of-therapy gates much of the oncology logic.',rules:['biomarker_testing_gap','guideline_driven_shift']},
+  Competitor:{a:['brand_name','company','lifecycle','price_index','modality'],b:'Rival brands; competitive lockout and displacement are first-order share drivers.',rules:['competitive_displacement','competitor_lockout','biosimilar_erosion']},
+  Channel:{a:['type','volume_share','trend','specialty_pharmacy'],b:'Distribution path; channel shift can mask true demand.',rules:['channel_shift']},
+  HCP:{a:['specialty','prescribing_volume','territory','influence_tier'],b:'Prescribers; the unit of field targeting and the source of TRx.',rules:['field_execution_gap']},
+  Account:{a:['type','potential','access_status','payer_mix'],b:'Organized customers (IDNs, clinics) bridging HCPs and payers.',rules:['pathway_exclusion']},
+  Payer:{a:['type','formulary_status','pa_requirements','lives_covered'],b:'Controls access; the biggest non-demand swing factor in share.',rules:['genuine_budget_crisis','medicare_reimbursement_squeeze']},
+  Formulary:{a:['payer_id','tier','pa_required','step_edit','quantity_limit'],b:'The access rulebook; exclusions and step edits throttle pull-through.',rules:['formulary_exclusion','pa_access_barrier']},
+  Contract:{a:['payer_id','brand_id','rebate_pct','effective_date','term_months'],b:'Rebate economics; the rebate trap erodes net price for gross access.',rules:['rebate_trap','340b_contract_erosion']},
+  Territory:{a:['region','rep_assigned','account_count','market_potential'],b:'Field geography; vacancies create execution gaps.',rules:['field_execution_gap']},
+  FieldForce:{a:['role','territory','call_plan','vacancy_status'],b:'The sales engine; reach and frequency drive activation.',rules:['field_execution_gap','launch_stall']},
+  KOL:{a:['specialty','influence_tier','engagement_status','institution'],b:'Key opinion leaders; the medical air-cover for access battles.',rules:['guideline_driven_shift']},
+  Pipeline:{a:['compound','phase','expected_approval','threat_level'],b:'Future threats; anticipated entrants reshape positioning.',rules:['biosimilar_erosion']},
+  Signal:{a:['metric','direction','magnitude','time_period','geography'],b:'An observed change — the entry point to every diagnosis.',rules:['safety_signal','supply_disruption','demand_erosion']},
+  EvidenceItem:{a:['source','confidence','date','tags','account_id'],b:'The grounding for a signal; hard evidence trumps rumor.',rules:['genuine_budget_crisis']},
+};
+
+/* 19 inference rules grouped */
+const RULES=[
+  {g:'Safety & Supply (evaluate first)',c:'var(--safety)',items:['safety_signal — volume drop is clinical, not commercial','supply_disruption — supply-driven, not demand or access']},
+  {g:'Access & Payer',c:'var(--access)',items:['genuine_budget_crisis — hard evidence trumps rumor','formulary_exclusion','pa_access_barrier','rebate_trap','copay_accumulator_impact','medicare_reimbursement_squeeze','340b_contract_erosion','pathway_exclusion','competitor_lockout']},
+  {g:'Competitive & Demand',c:'var(--rx)',items:['competitive_displacement','biosimilar_erosion','demand_erosion','launch_stall']},
+  {g:'Channel, Field & Clinical',c:'var(--field)',items:['channel_shift','field_execution_gap','guideline_driven_shift','biomarker_testing_gap']},
+];
+
+/* ---------------- detail panel writers ---------------- */
+function vsDetail(n){
+  const d=VS_DETAIL[n.id]; const el=document.getElementById('det-vs');
+  el.innerHTML=`<div class="dt">${n.label}</div>
+    <span class="dk" style="background:${d.c}22;color:${d.c}">${d.k}</span>
+    <div class="db">${d.b}</div>
+    <h4>Owns (entities)</h4><div class="chips">${d.owns.map(x=>`<span class="chip">${x}</span>`).join('')}</div>
+    <h4>Signals it emits</h4><div class="chips">${d.signals.map(x=>`<span class="chip rx">${x}</span>`).join('')}</div>`;
+}
+function commDetail(n){
+  const d=COMM_DETAIL[n.id]; const el=document.getElementById('det-comm');
+  const rels=COMM.edges.filter(e=>e.from===n.id||e.to===n.id).map(e=>{
+    const other=e.from===n.id?e.to:e.from; const dir=e.from===n.id?'→':'←';
+    return `<div class="rel">${dir} <span class="v">${e.label}</span> · ${other}</div>`;}).join('');
+  el.innerHTML=`<div class="dt">${n.label}</div>
+    <span class="dk" style="background:#5b9dff22;color:#a9c8ff">ENTITY</span>
+    <div class="db">${d.b}</div>
+    <h4>Attributes</h4><div class="chips">${d.a.map(x=>`<span class="chip">${x}</span>`).join('')}</div>
+    <h4>Relationships</h4>${rels}
+    <h4>Reasoned over by rules</h4><div class="chips">${d.rules.map(x=>`<span class="chip rx">${x}</span>`).join('')}</div>`;
+}
+
+/* ---------------- build everything ---------------- */
+renderGraph(document.getElementById('svg-vs'),VS,vsDetail);
+renderGraph(document.getElementById('svg-comm'),COMM,commDetail);
+
+/* domain grid (tab 2) */
+const DOMAINS=[
+  ['Commercial','Brand, field, competitive, signals','var(--rx)'],
+  ['Market Access','Payer, formulary, pricing, PA','var(--access)'],
+  ['Medical Affairs','MSL, KOL, publications','var(--med)'],
+  ['HEOR','Value evidence, outcomes models','var(--access)'],
+  ['Clinical Development','Trials, endpoints, readouts','var(--blue)'],
+  ['Regulatory','Submissions, label, approval','var(--blue)'],
+  ['Manufacturing','API, supply, distribution','var(--supply)'],
+  ['Pharmacovigilance','Safety signals, cases','var(--safety)'],
+  ['Research','Targets, mechanisms, pipeline','var(--blue)'],
+  ['Patient Services','Hub, copay, adherence','var(--med)'],
+  ['Oncology (TA overlay)','Line-of-therapy, biomarkers','var(--violet)'],
+];
+document.getElementById('domain-grid').innerHTML=DOMAINS.map(d=>
+  `<div class="card" style="border-top:3px solid ${d[2]}"><h4>${d[0]}</h4><p class="muted" style="font-size:.82rem">${d[1]}</p></div>`).join('');
+
+/* rule grid (tab 3) */
+document.getElementById('rule-grid').innerHTML=RULES.map(r=>
+  `<div class="card" style="border-top:3px solid ${r.c}"><h4>${r.g}</h4><ul>${r.items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`).join('');
+
+/* preselect the hubs for a populated first impression */
+setTimeout(()=>{
+  const c=document.querySelector('#svg-vs .node[data-id="commercial"]'); if(c)c.dispatchEvent(new Event('click'));
+  const b=document.querySelector('#svg-comm .node[data-id="Brand"]'); if(b)b.dispatchEvent(new Event('click'));
+},60);
+</script>
+</body>
+</html>

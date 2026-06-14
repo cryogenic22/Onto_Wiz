@@ -1,0 +1,23 @@
+id: "ONC-009"
+name: "RCC IO+TKI Combination — Payer Step-Edit Barrier"
+description: >
+  Multiple IO+TKI combinations approved for RCC 1L (pembrolizumab+lenvatinib,
+  nivolumab+cabozantinib). Payer imposes step-edit requiring single-agent IO
+  failure before combination approval. Patients receive suboptimal monotherapy,
+  and some progress before combination access is granted. Brand (IO+TKI combo)
+  faces systematic access barrier at key payer.
+therapeutic_area: "oncology"
+indication: "Renal Cell Carcinoma (RCC) — intermediate/poor risk"
+molecular_context: "IMDC risk score (intermediate or poor); sarcomatoid features favor IO"
+brand_context:
+  brand: "IO+TKI combination regimen"
+  lifecycle: "growth"
+  channel: "buy_and_bill (IO component) + specialty_pharmacy (TKI component)"
+account_context:
+  type: "IDN with major commercial payer contract"
+  biomarker_testing: "IMDC risk scoring at diagnosis"
+trigger_signal: "PA rejection rate 35% for IO+TKI combo; patients defaulting to IO monotherapy"
+expected_hypothesis: "market_access"
+expected_drivers: ["payer_step_edit_policy", "cost_containment_pressure", "competitor_mono_io_preferred"]
+inference_rules_exercised: ["rule_pa_access_barrier"]
+complexity_level: "medium"

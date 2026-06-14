@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onto_Wiz — Foundation Design &amp; The Move</title>
+<style>
+  :root{--bg:#0d1117;--panel:#161b22;--panel2:#1c2330;--border:#2d3748;--text:#d7dde6;--muted:#8b97a8;--accent:#58a6ff;--gold:#e3b341;--green:#3fb950;--red:#f85149;--purple:#bc8cff;--orange:#ffa657;--teal:#39d2c0}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.55;padding:0 0 80px}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+  header{padding:54px 0 34px;background:linear-gradient(180deg,#11182a,var(--bg));border-bottom:1px solid var(--border);margin-bottom:36px}
+  h1{font-size:2.05rem;font-weight:700;letter-spacing:-.5px}
+  h1 .a{color:var(--accent)}
+  .sub{color:var(--muted);font-size:1.04rem;margin-top:10px;max-width:900px}
+  .pills{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+  .pill{font-size:.74rem;padding:4px 12px;border-radius:99px;border:1px solid var(--border);color:var(--muted);background:var(--panel)}
+  h2{font-size:1.4rem;margin:50px 0 6px;color:#fff;display:flex;align-items:center;gap:12px}
+  h2 .num{font-size:.8rem;color:var(--accent);border:1px solid var(--accent);border-radius:6px;padding:2px 9px;font-weight:600}
+  h3{font-size:1.05rem;margin:22px 0 8px;color:var(--gold)}
+  p{margin:10px 0}.lead{font-size:1.02rem}.muted{color:var(--muted)}
+  .grid{display:grid;gap:16px;margin:18px 0}
+  .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:900px){.g2,.g3{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
+  .card h4{font-size:.96rem;margin-bottom:8px}
+  .card ul{margin:8px 0 0 18px;font-size:.87rem;color:var(--muted)}.card li{margin:4px 0}.card li b{color:var(--text);font-weight:600}
+  pre.d{background:#0a0e14;border:1px solid var(--border);border-radius:10px;padding:22px 24px;overflow-x:auto;font-size:.83rem;line-height:1.5;font-family:'Cascadia Code',Consolas,monospace;color:#c9d4e3;margin:18px 0}
+  pre.d .hl{color:var(--accent);font-weight:600}.gd{color:var(--gold)}.gn{color:var(--green)}.pp{color:var(--purple)}.or{color:var(--orange)}.tl{color:var(--teal)}.rd{color:var(--red)}.dim{color:#4d5a6e}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.86rem}
+  th{text-align:left;padding:9px 11px;background:var(--panel2);color:var(--gold);font-weight:600;border-bottom:2px solid var(--border)}
+  td{padding:8px 11px;border-bottom:1px solid var(--border);vertical-align:top}
+  td:first-child{font-weight:600;white-space:nowrap}
+  code{background:#21283587;border:1px solid #2d374866;border-radius:4px;padding:1px 6px;font-size:.83em;font-family:Consolas,monospace;color:var(--teal)}
+  .tierA{border-left:4px solid var(--green)}.tierB{border-left:4px solid var(--red)}
+  .badge{font-size:.68rem;padding:2px 8px;border-radius:4px;font-weight:700;letter-spacing:.4px}
+  .badge.ship{background:rgba(63,185,80,.15);color:var(--green)}
+  .badge.secret{background:rgba(248,81,73,.15);color:var(--red)}
+  .badge.data{background:rgba(227,179,65,.15);color:var(--gold)}
+  .callout{background:linear-gradient(135deg,rgba(88,166,255,.08),rgba(188,140,255,.06));border:1px solid rgba(88,166,255,.35);border-radius:12px;padding:20px 24px;margin:22px 0;font-size:1.0rem}
+  .callout b{color:var(--accent)}
+  .decision{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:10px 0}
+  .decision h4{color:var(--orange);font-size:.95rem;margin-bottom:4px}
+  .decision .rec{color:var(--green);font-size:.85rem;margin-top:6px}.decision .rec::before{content:"✓ ";font-weight:700}
+  .step{display:grid;grid-template-columns:96px 1fr;gap:16px;padding:14px 0;border-bottom:1px solid var(--border)}.step:last-child{border:none}
+  .step .l{font-weight:700;color:var(--accent);font-size:.92rem}.step .l small{display:block;color:var(--muted);font-weight:400;font-size:.72rem;margin-top:2px}
+  .step p{margin:3px 0;font-size:.9rem}.step .dv{font-size:.8rem;color:var(--green)}
+  .done{color:var(--green);font-weight:700}
+  footer{margin-top:54px;padding-top:18px;border-top:1px solid var(--border);color:var(--muted);font-size:.8rem}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Foundations &amp; <span class="a">The Move</span></h1>
+  <div class="sub">How we consolidate four codebases into one governed monorepo, split it into shippable vs. secret-sauce tiers, wire <b>CTX</b> as the context engine, and expose everything headless through <b>library + REST + MCP</b> — so any agent, ours or a client's, gets the right domain knowledge on every query without ever seeing how it was made.</div>
+  <div class="pills"><span class="pill">Foundation Design v1</span><span class="pill">10 June 2026</span><span class="pill">supersedes nothing — extends the Vision doc</span></div>
+</div></header>
+
+<div class="wrap">
+
+<div class="callout">
+  <b>The governing idea:</b> one monorepo, two tiers. <b>Tier A (the SDK)</b> is what a client ever touches — contracts, the CTX context engine, the runtime, and the headless server. <b>Tier B (the factory)</b> is the secret sauce — governance, mining, the Forge, the loops, the compiler — and it <b>never leaves our infrastructure</b>. The product that crosses the boundary is neither code nor source: it's a <b>compiled, signed, license-gated Domain Pack</b>. The compiler runs in Tier B; the runtime in Tier A only consumes its output.
+</div>
+
+<!-- 1 -->
+<h2><span class="num">01</span> Package topology — six packages, one boundary that matters</h2>
+<p class="lead">Everything lands under <code>Onto_Wiz/packages/</code> as independently-buildable wheels sharing the <code>ontowiz_*</code> prefix. The single load-bearing rule, enforced in CI exactly like your existing ADR-007 boundary check: <b>Tier A must never import Tier B.</b> Break that, and the secret sauce leaks into a client wheel.</p>
+
+<div class="grid g2">
+  <div class="card tierA">
+    <span class="badge ship">SHIPS TO CLIENTS · TIER A · "the SDK"</span>
+    <ul style="margin-top:10px">
+      <li><b>ontowiz-spec</b> — pure data contracts: the unified artifact model, pack manifest schema, CTX types. Zero logic, safe to ship. Everything depends on this; it depends on nothing.</li>
+      <li><b>ontowiz-ctx</b> — the CTX engine (vendored from CTX.ai): parser, serializer, validator, hydrator, packer, guard. Zero runtime deps. <b>This is the context-management engine.</b></li>
+      <li><b>ontowiz-runtime</b> — pack loading + <code>LayeredStore</code> + the context assembler + <code>get_context()</code>. What a consumer agent imports directly. Reads compiled packs; contains <b>no</b> extraction or governance logic.</li>
+      <li><b>ontowiz-serve</b> — the headless layer: FastAPI REST + MCP server. Thin adapters over runtime. Shippable as a container.</li>
+    </ul>
+  </div>
+  <div class="card tierB">
+    <span class="badge secret">INTERNAL ONLY · TIER B · "the factory"</span>
+    <ul style="margin-top:10px">
+      <li><b>ontowiz-core</b> — the governance brain: Delta model, blast radius, HITL routing, JudgmentPattern/Guardrail, Evidence, GraphStore, SemanticStore. (Onto_Wiz <code>src/core</code> today.)</li>
+      <li><b>ontowiz-factory</b> — the secret sauce, as submodules:<br>
+        · <code>mining/</code> — SpecOmagic's 9 extractors + new code/SQL rule miner<br>
+        · <code>forge/</code> — Domain Forge missions, scoring, InterviewAgent<br>
+        · <code>steward/</code> — the loops (ported from market_zero)<br>
+        · <code>evals/</code> — eval gate, agent-lift benchmark<br>
+        · <code>compiler/</code> — turns governed artifacts → compiled CTX packs</li>
+    </ul>
+    <p class="muted" style="font-size:.82rem;margin-top:10px">Starts as one wheel with submodules; split into separate wheels only if we ever need to. The boundary that matters is A↔B, not the seams inside B.</p>
+  </div>
+</div>
+
+<div class="card" style="border-left:4px solid var(--gold);margin-top:4px">
+  <span class="badge data">THE PRODUCT · neither tier · data not code</span>
+  <p class="muted" style="font-size:.88rem;margin-top:8px"><b>Compiled Domain Packs</b> — versioned YAML sources + a compiled <code>.ctx</code> context layer + a signed manifest. The compiler (Tier B) produces them; the runtime (Tier A) consumes them. This is what gets licensed, signed, and optionally encrypted per client. <code>commercial_analytics@1.3</code> is pinned by an agent the way you pin a pip dependency.</p>
+</div>
+
+<pre class="d">
+  <span class="hl">Onto_Wiz/</span>  <span class="dim"># the monorepo — "code in one place"</span>
+  ├── packages/
+  │   ├── <span class="gn">ontowiz-spec/</span>        <span class="dim">A · contracts — artifact model, pack manifest, CTX types</span>
+  │   ├── <span class="gn">ontowiz-ctx/</span>         <span class="dim">A · vendored CTX engine + ctx/hydrate MCP tool</span>
+  │   ├── <span class="gn">ontowiz-runtime/</span>     <span class="dim">A · get_context(), LayeredStore, assembler, registry</span>
+  │   ├── <span class="gn">ontowiz-serve/</span>       <span class="dim">A · FastAPI REST + MCP server (headless)</span>
+  │   ├── <span class="rd">ontowiz-core/</span>        <span class="dim">B · Delta governance, graph, evidence, judgment</span>
+  │   └── <span class="rd">ontowiz-factory/</span>     <span class="dim">B · mining · forge · steward · evals · compiler</span>
+  ├── packs/                  <span class="dim">the product — compiled domain packs (YAML + .ctx)</span>
+  ├── frontend/               <span class="dim">grows: Workbench · Forge · Pack Registry</span>
+  ├── scheduler/              <span class="dim">loop runner (market_zero pattern) — internal ops</span>
+  ├── harness/                <span class="dim">generate.py + measure.py — dev anti-slop & health</span>
+  ├── docs/adr/               <span class="dim">+ 3 new ADRs (this doc's decisions)</span>
+  └── pyproject.toml          <span class="dim">workspace root</span>
+
+  <span class="dim">Dependency rule (CI-enforced):  A → A only.   B → A + B.   never  A → B.</span>
+</pre>
+
+<!-- 2 -->
+<h2><span class="num">02</span> The move — source → destination mapping</h2>
+<p class="lead">You wanted code in one place to build upon. Here is exactly what moves where. Wholesale copy for self-contained engines (CTX), surgical port for the rest so we don't drag four idioms into one repo.</p>
+<table>
+  <tr><th>From</th><th>What</th><th>→ Destination</th><th>How</th></tr>
+  <tr><td>market_zero/ctxpack</td><td>CTX engine + MCP + hydrator</td><td><span style="color:var(--green)">ontowiz-ctx</span></td><td>vendor (copy) — zero deps</td></tr>
+  <tr><td>SpecOmagic models/*</td><td>10 artifact types incl. DecisionHeuristic, DataQuirk, ProcessPlaybook</td><td><span style="color:var(--green)">ontowiz-spec</span></td><td>port + merge</td></tr>
+  <tr><td>Onto_Wiz src/core/models</td><td>Delta, Judgment, Guardrail, Evidence (data shapes)</td><td><span style="color:var(--green)">ontowiz-spec</span> (shapes) + <span style="color:var(--red)">ontowiz-core</span> (logic)</td><td>split</td></tr>
+  <tr><td>SpecOmagic store + context</td><td>KnowledgeStore, LayeredStore, ContextAssembler</td><td><span style="color:var(--green)">ontowiz-runtime</span></td><td>port</td></tr>
+  <tr><td>SpecOmagic extraction + ingestion</td><td>6 pattern + 3 LLM extractors, 6 parsers</td><td><span style="color:var(--red)">factory/mining</span></td><td>port</td></tr>
+  <tr><td>SpecOmagic eval/*</td><td>rubrics, LLMJudge, BatchEval, consistency</td><td><span style="color:var(--red)">factory/evals</span></td><td>port</td></tr>
+  <tr><td>market_zero data_steward, feedback_loops, learning_service</td><td>signal→action loops, EWMA</td><td><span style="color:var(--red)">factory/steward</span></td><td>port + re-target to packs</td></tr>
+  <tr><td>market_zero scheduler/runner</td><td>idempotent loop runner</td><td>Onto_Wiz/scheduler</td><td>port</td></tr>
+  <tr><td>aura.ai packs + pack_registry + quality-gate</td><td>pack.yaml pattern, registry, CI eval thresholds</td><td><span style="color:var(--red)">factory/compiler</span> + <span style="color:var(--green)">runtime/registry</span></td><td>pattern, not code</td></tr>
+  <tr><td>Onto_Wiz src/core graph_store, semantic_store</td><td>NetworkX graph, synonyms</td><td><span style="color:var(--red)">ontowiz-core</span></td><td>stays, re-homed</td></tr>
+  <tr><td>market_zero harness/*</td><td>generate.py, measure.py</td><td>Onto_Wiz/harness</td><td>vendor (copy)</td></tr>
+  <tr><td>Onto_Wiz frontend</td><td>Situation Room, Curator</td><td>frontend (grows)</td><td>stays</td></tr>
+</table>
+
+<!-- 3 -->
+<h2><span class="num">03</span> Context management = CTX, with governance in front</h2>
+<p class="lead">Your requirement — "every query, the right domain details are leveraged" — is exactly CTX's job, but we put a <b>governance + relevance gate in front of the hydrator</b> so an agent can only ever pull <i>active, verified, in-domain</i> knowledge. The pipeline fuses SpecOmagic's deterministic filter with CTX's LLM-as-router hydration:</p>
+<pre class="d">
+  query + agent_type + pinned pack(s) + token budget
+        <span class="dim">│</span>
+        ▼   <span class="gd">① GOVERNANCE + RELEVANCE GATE</span>  <span class="dim">(runtime — deterministic)</span>
+   tag match · lifecycle gate (ACTIVE+VERIFIED only) · layer-stack resolve · budget
+        <span class="dim">│   → the set of *eligible* sections, nothing more</span>
+        ▼   <span class="tl">② CTX L3 DIRECTORY</span>  <span class="dim">(ctx — ~50 tokens, lives in system prompt)</span>
+   one line per eligible entity/section — the agent's map of what it may ask for
+        <span class="dim">│</span>
+        ▼   <span class="pp">③ LLM-AS-ROUTER HYDRATION</span>  <span class="dim">(ctx/hydrate — agent pulls only what it needs)</span>
+   ctx/hydrate(section=...) → focused prose, ~3.9k tokens/query vs 92k stuffed
+        <span class="dim">│</span>
+        ▼   <span class="or">④ TRUST ENVELOPE</span>  <span class="dim">(runtime — aura pattern)</span>
+   assembled context + provenance + confidence + pack@version + which deltas backed it
+</pre>
+<div class="grid g3">
+  <div class="card"><h4>Why this beats RAG here</h4><p class="muted" style="font-size:.85rem">CTX matches RAG fidelity (~87%) at <b>24× lower cost</b> by eliminating proactive interference — the agent never sees competing/irrelevant knowledge. For governed domain packs where precision and provenance matter more than recall over a vast corpus, that's the right trade.</p></div>
+  <div class="card"><h4>Governance can't be bypassed</h4><p class="muted" style="font-size:.85rem">Step ① runs in the runtime before any section is even <i>listed</i> in the L3 directory. A draft or deprecated artifact is invisible to the agent — not filtered after the fact, just never offered. Safety/override layers are always-included.</p></div>
+  <div class="card"><h4>Same engine, three surfaces</h4><p class="muted" style="font-size:.85rem"><code>ctx/hydrate</code> is already an MCP tool. The REST API wraps the same call. A direct library consumer calls <code>get_context()</code> which runs the whole pipeline server-side. One context engine, three doors.</p></div>
+</div>
+
+<!-- 4 -->
+<h2><span class="num">04</span> Headless — one core, three doors</h2>
+<p class="lead">Everything sits behind <code>ontowiz-runtime</code>. The three consumption modes are thin adapters; no business logic lives in any of them.</p>
+<pre class="d">
+                         <span class="hl">ontowiz-runtime</span>  <span class="dim">get_context() · query_pack() · resolve()</span>
+                                 ▲          ▲          ▲
+            <span class="gn">① DIRECT LIBRARY</span>          <span class="gn">② REST API</span>          <span class="gn">③ MCP</span>
+   from ontowiz import       POST /v1/context     ctx/hydrate, pack/list,
+   get_context              (ontowiz-serve)       pack/query  (ontowiz-serve)
+        <span class="dim">│</span>                         <span class="dim">│</span>                    <span class="dim">│</span>
+   trusted internal agents   networked / any       Claude & LLM-native
+   (MarketZero, copilots)    language consumer      agents, IDEs, desktop
+</pre>
+<p class="muted">Direct-library is for your own trusted agents (lowest latency, in-process). REST is the polyglot door. MCP is the LLM-native door — and because CTX already ships an MCP server, we extend it with pack-aware tools (<code>pack/list</code>, <code>pack/query</code>, <code>context/get</code>) rather than build one from scratch.</p>
+
+<!-- 5 -->
+<h2><span class="num">05</span> Protecting the IP — defense in depth for client deployments</h2>
+<p class="lead">Four independent layers. Even if one is bypassed, the secret sauce holds.</p>
+<div class="grid g2">
+  <div class="card"><h4>① Architectural <span class="muted">(primary)</span></h4><p class="muted" style="font-size:.86rem">The factory (Tier B) is never packaged into a client artifact. The client receives Tier A wheels + licensed packs only. The extraction engine, the Forge, the loops, the compiler — the things that <i>create</i> intelligence — physically don't ship. This is 90% of the protection and it's free, because it's just the dependency boundary.</p></div>
+  <div class="card"><h4>② Packaging <span class="muted">(for embedded runtime)</span></h4><p class="muted" style="font-size:.86rem">When a client must run Tier A on-prem, ship built wheels; for the most sensitive runtime logic compile to native extensions (Cython/Nuitka) so there's no readable source. The <code>.py</code> stays internal; the client gets a binary.</p></div>
+  <div class="card"><h4>③ Pack protection <span class="muted">(the product itself)</span></h4><p class="muted" style="font-size:.86rem">Compiled packs are <b>signed</b> (tamper-evident provenance) and optionally <b>encrypted at rest</b>, decrypted by the runtime with a per-client license key bound to deployment. Even the shipped YAML/.ctx isn't trivially liftable to a competitor's stack.</p></div>
+  <div class="card"><h4>④ Deployment mode <span class="muted">(strongest)</span></h4><p class="muted" style="font-size:.86rem">Headless makes <b>SaaS</b> possible: the client never receives packs <i>or</i> runtime — only an API/MCP endpoint we host. They consume intelligence; they hold nothing. Same core also supports on-prem container (query-only) and licensed-embed. One architecture, three commercial models.</p></div>
+</div>
+<table>
+  <tr><th>Client posture</th><th>Gets</th><th>Holds our IP?</th><th>Mode</th></tr>
+  <tr><td>SaaS</td><td>API / MCP endpoint</td><td style="color:var(--green)">None</td><td>we host Tier A + B + packs</td></tr>
+  <tr><td>On-prem container</td><td>container exposing REST/MCP; packs encrypted inside</td><td style="color:var(--gold)">Encrypted packs only, no factory</td><td>Tier A + licensed packs, query-only</td></tr>
+  <tr><td>Licensed embed</td><td>Tier A wheels (compiled) + encrypted packs + license key</td><td style="color:var(--orange)">Compiled runtime + encrypted packs</td><td>in-process library</td></tr>
+</table>
+
+<!-- 6 -->
+<h2><span class="num">06</span> Persistence — YAML for the product, Postgres for the machine</h2>
+<div class="grid g2">
+  <div class="card"><h4>YAML / files <span class="badge data">the product</span></h4><ul>
+    <li><b>Pack sources</b> — artifact YAML, git-versionable, diffable, review-as-code</li>
+    <li><b>Compiled <code>.ctx</code> layer</b> — L2/L3 per pack version</li>
+    <li><b>Signed manifest</b> — version, deps, eval scores, provenance</li>
+    <li class="muted">Why: knowledge-as-code. A pack diff is a reviewable PR. This is also what ships to clients.</li>
+  </ul></div>
+  <div class="card"><h4>Postgres <span class="badge secret">the machine</span></h4><ul>
+    <li><b>Deltas + audit</b> — governance ledger, HITL queues</li>
+    <li><b>Telemetry</b> — which artifacts used, hit/miss, confidence (Loop 5)</li>
+    <li><b>Eval runs</b> — agent-lift benchmarks, history</li>
+    <li><b>Forge sessions</b> — SME rounds, consensus, scores</li>
+    <li class="muted">Per your call: Postgres, not SQLite. Supersedes ADR-005 (in-memory). pgvector available if we want semantic alias search later.</li>
+  </ul></div>
+</div>
+
+<!-- 7 -->
+<h2><span class="num">07</span> Decisions locked for this foundation <span class="muted" style="font-size:.85rem;font-weight:400">(your direction, encoded)</span></h2>
+<div class="decision"><h4>D1 · Consolidate, don't depend</h4><p class="muted">You want code in one place. We <b>vendor/port</b> SpecOmagic + CTX + market_zero loops into the monorepo rather than pip-depend across repos.</p><p class="rec">Monorepo with 6 packages. Original repos become upstream reference, not runtime dependencies.</p></div>
+<div class="decision"><h4>D2 · Postgres for state, YAML for packs</h4><p class="rec">Packs = YAML + .ctx on disk. Deltas/telemetry/evals/forge = Postgres. New ADR supersedes ADR-005.</p></div>
+<div class="decision"><h4>D3 · CTX is the context engine</h4><p class="rec">Vendor CTX.ai into <code>ontowiz-ctx</code>; governance gate runs in front of the hydrator; MCP server extended with pack tools.</p></div>
+<div class="decision"><h4>D4 · Triple-door headless, library included</h4><p class="rec">Direct library import for trusted agents + REST + MCP, all over one runtime. No logic in the adapters.</p></div>
+<div class="decision"><h4>D5 · IP via the A/B boundary first</h4><p class="rec">Architectural separation is the primary protection; signing/encryption/compilation are additive for embedded/on-prem modes.</p></div>
+
+<!-- 8 -->
+<h2><span class="num">08</span> Foundation build order <span class="muted" style="font-size:.85rem;font-weight:400">— what I'm doing now vs. next</span></h2>
+<div class="card" style="padding:6px 22px">
+  <div class="step"><div class="l">F0 <span class="done">▶ now</span><small>this turn</small></div><div>
+    <p><b>Scaffold the monorepo + vendor CTX + write the contracts seam.</b> Create <code>packages/</code> with 6 manifests, copy the CTX engine in, write <code>ontowiz-spec</code> unified artifact contracts, stub <code>get_context()</code> proving the A-tier wiring, lay the 3 ADRs + the A↔B boundary rule.</p>
+    <p class="dv">✓ The skeleton physically exists; CTX is in-repo; the boundary is documented and checkable.</p></div></div>
+  <div class="step"><div class="l">F1<small>next</small></div><div><p><b>Port the artifact model + Delta bridge.</b> Finish <code>ontowiz-spec</code> (merge SpecOmagic 10 + judgment types + new EvalCase/MetricDefinition/SourceContract/QuestionPlaybook/AntiPattern/ExceptionRule). Re-home <code>src/core</code> → <code>ontowiz-core</code>. Build <code>bridge.py</code>: lifecycle transitions happen only via Deltas.</p></div></div>
+  <div class="step"><div class="l">F2<small></small></div><div><p><b>Runtime + registry + compiler skeleton.</b> Port KnowledgeStore/LayeredStore/Assembler → runtime; wire CTX compile into <code>factory/compiler</code>; pack.yaml manifest + PackRegistry; first <code>commercial_analytics@0.1</code> compiles from the existing <code>ontology/commercial.yaml</code>.</p></div></div>
+  <div class="step"><div class="l">F3<small></small></div><div><p><b>Headless serve + first consumer.</b> <code>ontowiz-serve</code> REST + extended MCP; <code>get_context()</code> end-to-end; MarketZero (or a thin test agent) consumes <code>commercial_analytics</code> and we measure with-pack vs without-pack lift on "Why did Brand X lose share?"</p></div></div>
+  <div class="step"><div class="l">F4+<small></small></div><div><p><b>Port the loops.</b> mining → steward → Forge missions → eval gate → feedback, in that order, each a thin adaptation of code that already runs in market_zero/SpecOmagic.</p></div></div>
+</div>
+
+<div class="callout">
+  <b>What "set the foundations" means concretely:</b> after F0 the repo has a real two-tier skeleton, the CTX context engine living in-tree, the single contracts package every other package will import, an enforceable A↔B boundary, and three ADRs recording why. From there every later port has a correct home to land in — no re-architecting, just filling the boxes.
+</div>
+
+<footer>Onto_Wiz Foundation Design · consolidates Onto_Wiz + SpecOmagic + market_zero + aura.ai · CTX.ai as context engine · 10 June 2026</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,105 @@
+name: Quality Gate
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compute changed files
+        id: changed
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE=${{ github.event.pull_request.base.sha }}
+          else
+            BASE=${{ github.event.before }}
+          fi
+          git diff --name-only --diff-filter=ACMR "$BASE" HEAD > /tmp/changed.txt || true
+          echo "count=$(wc -l < /tmp/changed.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Run Quality Gate (changed files only)
+        if: steps.changed.outputs.count != '0'
+        run: |
+          python quality-gate/quality_gate.py \
+            --root . \
+            --paths-from /tmp/changed.txt \
+            --json \
+            --report
+        continue-on-error: true
+
+      - name: Upload quality report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-gate-report
+          path: .quality-gate.report.json
+          if-no-files-found: ignore
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -e ".[dev]"
+
+      - name: Run tests with coverage
+        run: |
+          python -m pytest tests/ -v --tb=short --cov=src --cov-report=term-missing --cov-report=xml:coverage.xml
+
+      - name: Check coverage threshold
+        run: |
+          python -m pytest tests/ --cov=src --cov-fail-under=70 -q
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+          if-no-files-found: ignore
+
+  cathedral-keeper:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run Cathedral Keeper
+        run: |
+          python cathedral-keeper/ck.py analyze --root . --out-md .quality-reports/cathedral-keeper/report.md --out-json .quality-reports/cathedral-keeper/report.json
+        continue-on-error: true
+
+      - name: Upload architecture report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: architecture-report
+          path: .quality-reports/
+          if-no-files-found: ignore

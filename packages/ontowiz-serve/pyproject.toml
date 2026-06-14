@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ontowiz-serve"
+version = "0.1.0"
+description = "Onto_Wiz headless layer (Tier A — ships to clients). FastAPI REST + MCP server over the runtime. No business logic."
+requires-python = ">=3.10"
+dependencies = [
+    "ontowiz-runtime",
+    "fastapi>=0.110",
+    "uvicorn>=0.27",
+]
+
+[project.optional-dependencies]
+mcp = ["mcp>=1.0"]
+
+[project.scripts]
+ontowiz-serve = "ontowiz_serve.api:main"
+ontowiz-mcp = "ontowiz_serve.mcp:main"
+
+[tool.setuptools.packages.find]
+include = ["ontowiz_serve*"]

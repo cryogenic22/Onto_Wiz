@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onto_Wiz — Loop Backlog &amp; Delivery Dashboard</title>
+<style>
+  :root{--bg:#0d1117;--panel:#161b22;--panel2:#1c2330;--border:#2d3748;--text:#d7dde6;--muted:#8b97a8;--accent:#58a6ff;--gold:#e3b341;--green:#3fb950;--red:#f85149;--purple:#bc8cff;--orange:#ffa657;--teal:#39d2c0;--pink:#f778ba}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.5;padding:0 0 70px}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 28px}
+  header{padding:34px 0 22px;background:linear-gradient(180deg,#10182b,var(--bg));border-bottom:1px solid var(--border);margin-bottom:24px}
+  h1{font-size:1.7rem;font-weight:700;letter-spacing:-.4px}h1 .a{color:var(--accent)}
+  .sub{color:var(--muted);font-size:.92rem;margin-top:6px}
+  .updated{margin-top:10px;font-size:.74rem;color:var(--muted)}
+  .updated b{color:var(--green)}
+  h2{font-size:1.12rem;margin:34px 0 12px;color:#fff;display:flex;align-items:center;gap:10px}
+  h2 .ic{font-size:.95rem}
+  /* KPI strip */
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:18px}
+  @media(max-width:960px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:13px 15px}
+  .kpi .n{font-size:1.5rem;font-weight:700}
+  .kpi .l{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+  .kpi.good .n{color:var(--green)}.kpi.warn .n{color:var(--orange)}.kpi.info .n{color:var(--accent)}
+  /* legend */
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0 0;font-size:.76rem;color:var(--muted)}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .sw.done{background:var(--green)}.sw.mid{background:var(--accent)}.sw.pend{background:#3a4555}.sw.risk{background:var(--orange)}
+  /* timeline */
+  .timeline{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+  .tnode{flex:1;min-width:120px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:10px 12px;position:relative}
+  .tnode.done{border-color:var(--green)}.tnode.mid{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .tnode .ph{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .tnode .ti{font-size:.82rem;font-weight:600;margin-top:3px}
+  .tnode .st{font-size:.7rem;margin-top:5px}
+  .st.done{color:var(--green)}.st.mid{color:var(--accent)}.st.pend{color:var(--muted)}
+  /* loop cards */
+  .loops{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:960px){.loops{grid-template-columns:1fr}}
+  .loop{background:var(--panel);border:1px solid var(--border);border-radius:11px;padding:15px 17px;border-left:4px solid var(--border)}
+  .loop.done{border-left-color:var(--green)}.loop.mid{border-left-color:var(--accent)}.loop.pend{border-left-color:#3a4555}
+  .loop .lh{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  .loop .lt{font-size:1rem;font-weight:700}
+  .loop .lt small{color:var(--muted);font-weight:400;font-size:.74rem}
+  .badge{font-size:.66rem;padding:2px 9px;border-radius:99px;font-weight:700;letter-spacing:.4px}
+  .badge.done{background:rgba(63,185,80,.16);color:var(--green)}
+  .badge.mid{background:rgba(88,166,255,.16);color:var(--accent)}
+  .badge.pend{background:rgba(139,151,168,.14);color:var(--muted)}
+  .meter{height:6px;background:#1c2330;border-radius:99px;overflow:hidden;margin:8px 0 11px}
+  .meter i{display:block;height:100%;border-radius:99px}
+  .meter i.done{background:var(--green)}.meter i.mid{background:var(--accent)}
+  .epics{list-style:none;font-size:.83rem}
+  .epics li{padding:4px 0 4px 22px;position:relative;color:var(--text);border-top:1px solid #21283766}
+  .epics li:first-child{border-top:none}
+  .epics li::before{position:absolute;left:0;top:4px;font-size:.8rem}
+  .epics li.done::before{content:"✅"}.epics li.mid::before{content:"🔄"}.epics li.pend::before{content:"⬜"}.epics li.risk::before{content:"⚠️"}
+  .epics li .ev{display:block;color:var(--muted);font-size:.74rem;margin-top:1px}
+  /* product loops */
+  .ploops{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  @media(max-width:960px){.ploops{grid-template-columns:1fr 1fr}}
+  .ploop{background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:12px;border-top:3px solid var(--purple)}
+  .ploop .pn{font-size:.82rem;font-weight:700;color:var(--purple)}
+  .ploop .pd{font-size:.73rem;color:var(--muted);margin-top:4px;line-height:1.45}
+  .ploop .pst{font-size:.68rem;margin-top:7px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:.83rem;margin-top:6px}
+  th{text-align:left;padding:8px 10px;background:var(--panel2);color:var(--gold);font-weight:600;border-bottom:2px solid var(--border)}
+  td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+  .risk-sev{font-size:.66rem;padding:1px 8px;border-radius:99px;font-weight:700}
+  .risk-sev.mit{background:rgba(63,185,80,.16);color:var(--green)}
+  .risk-sev.deb{background:rgba(255,166,87,.16);color:var(--orange)}
+  .risk-sev.open{background:rgba(248,81,73,.16);color:var(--red)}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:11px;padding:16px 18px}
+  .plan-steps{list-style:none;counter-reset:s;font-size:.85rem;margin-top:8px}
+  .plan-steps li{counter-increment:s;padding:5px 0 5px 30px;position:relative;color:var(--muted)}
+  .plan-steps li::before{content:counter(s);position:absolute;left:0;top:4px;width:20px;height:20px;border-radius:99px;background:var(--panel2);border:1px solid var(--border);color:var(--accent);font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .plan-steps li.done{color:var(--text)}.plan-steps li.done::before{background:rgba(63,185,80,.18);border-color:var(--green);color:var(--green);content:"✓"}
+  .log{font-size:.8rem}
+  .log .e{padding:8px 0;border-bottom:1px solid #21283766;display:flex;gap:12px}
+  .log .d{color:var(--accent);font-family:Consolas,monospace;font-size:.74rem;white-space:nowrap;padding-top:1px}
+  .log .t{color:var(--muted)}.log .t b{color:var(--text)}
+  footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--border);color:var(--muted);font-size:.76rem}
+  .flowline{font-family:Consolas,monospace;font-size:.72rem;color:var(--teal);text-align:center;margin:6px 0 0}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Onto_Wiz — <span class="a">Loop Backlog</span> &amp; Delivery Dashboard</h1>
+  <div class="sub">Live status board for the Domain Intelligence Factory build · themes → loops → epics · paired with <code>docs/PROJECT_STATUS.md</code> (the text source of truth)</div>
+  <div class="updated">⟳ Last updated: <b>2026-06-11</b> · <b>ALL 6 DELIVERY LOOPS COMPLETE</b> (10 core + UX-1..4) + <b>3 red-team rounds</b> (factory now composes end-to-end; pack signing real; CTX data-loss fixed) · <b>verify-audit: PASS</b> (6/6 gates · 137+308 tests) · this dashboard is updated on request</div>
+</div></header>
+
+<div class="wrap">
+
+  <!-- KPI STRIP -->
+  <div class="kpis">
+    <div class="kpi good"><div class="n">95%</div><div class="l">Build complete</div></div>
+    <div class="kpi good"><div class="n">6/6</div><div class="l">Delivery loops complete</div></div>
+    <div class="kpi good"><div class="n">445</div><div class="l">Tests green (137+308)</div></div>
+    <div class="kpi good"><div class="n">6/6</div><div class="l">Audit gates green</div></div>
+    <div class="kpi good"><div class="n">≥98%</div><div class="l">New-code coverage</div></div>
+    <div class="kpi warn"><div class="n">2</div><div class="l">Tracked debt items</div></div>
+  </div>
+  <div class="legend">
+    <span><i class="sw done"></i> Complete (verified)</span>
+    <span><i class="sw mid"></i> In progress / midway</span>
+    <span><i class="sw pend"></i> Pending</span>
+    <span><i class="sw risk"></i> Risk / debt (tracked)</span>
+  </div>
+
+  <!-- DELIVERY SEQUENCE -->
+  <h2><span class="ic">🧭</span> Delivery sequence — how it ships</h2>
+  <div class="timeline">
+    <div class="tnode done"><div class="ph">Loop 0</div><div class="ti">Foundation</div><div class="st done">✅ done</div></div>
+    <div class="tnode done"><div class="ph">Harden</div><div class="ti">Harness + gates</div><div class="st done">✅ done</div></div>
+    <div class="tnode done"><div class="ph">Loop 1 · F1</div><div class="ti">Contracts + Governance</div><div class="st done">✅ done</div></div>
+    <div class="tnode done"><div class="ph">Loop 2 · F2</div><div class="ti">Pack Factory</div><div class="st done">✅ done</div></div>
+    <div class="tnode done"><div class="ph">Loop 3 · F3</div><div class="ti">Headless (REST+MCP)</div><div class="st done">✅ done</div></div>
+    <div class="tnode done"><div class="ph">Loop 4 · F4</div><div class="ti">5 Product Loops</div><div class="st done">✅ done</div></div>
+    <div class="tnode done"><div class="ph">Loop 5 · UX</div><div class="ti">Forge + Registry UI</div><div class="st done">✅ UX-1..4 complete</div></div>
+  </div>
+  <div class="flowline">each loop = mini-spec → reuse-first → TDD red → build → gates → verify-audit → record</div>
+
+  <!-- LOOP BACKLOG BOARD -->
+  <h2><span class="ic">🗂️</span> Loop backlog — themes &amp; epics</h2>
+  <div class="loops">
+
+    <div class="loop done">
+      <div class="lh"><div class="lt">Loop 0 — Foundation &amp; IP Tiering <small>theme: packaging</small></div><span class="badge done">COMPLETE</span></div>
+      <div class="meter"><i class="done" style="width:100%"></i></div>
+      <ul class="epics">
+        <li class="done">Two-tier monorepo + 6 packages <span class="ev">ADR-012 · A↛B boundary enforced (pytest + pre-commit)</span></li>
+        <li class="done">Vendor CTX engine → ontowiz-ctx <span class="ev">89 files, imports renamed, smoke-tested</span></li>
+        <li class="done">Harden delivery harness for packages/ <span class="ev">CK include, Make targets, coverage gate</span></li>
+        <li class="done">Adopt loop-driven harness <span class="ev">ADR-015 (from CMH ADR-0001): verify-audit.sh, PROJECT_STATUS.md, CLAUDE.md gates</span></li>
+        <li class="done">Persistence + headless ADRs <span class="ev">ADR-013 (Postgres+YAML), ADR-014 (CTX + REST/MCP)</span></li>
+      </ul>
+    </div>
+
+    <div class="loop done">
+      <div class="lh"><div class="lt">Loop 1 — Knowledge Contracts &amp; Governance <small>F1</small></div><span class="badge done">COMPLETE</span></div>
+      <div class="meter"><i class="done" style="width:100%"></i></div>
+      <ul class="epics">
+        <li class="done">#2 Unified artifact model — 19 kinds <span class="ev">50 tests, 98.5% cov, YAML round-trip per kind; SpecOmagic 10 + judgment 3 + 6 new</span></li>
+        <li class="done">#3 Re-home src/core → ontowiz-core <span class="ev">move+shim; 308 src tests intact; 931 ruff fixes; verify-audit PASS</span></li>
+        <li class="done">#4 Delta bridge — transitions only via Deltas <span class="ev">8 tests, bridge.py 100% cov; transition only via APPROVED/MERGED Delta; GovernanceError on ungoverned</span></li>
+      </ul>
+    </div>
+
+    <div class="loop done">
+      <div class="lh"><div class="lt">Loop 2 — Pack Factory <small>F2</small></div><span class="badge done">COMPLETE</span></div>
+      <div class="meter"><i class="done" style="width:100%"></i></div>
+      <ul class="epics">
+        <li class="done">Pack compiler — artifacts → CTX L2/L3 + manifest <span class="ev">section per artifact; ACTIVE-only (governance at compile time)</span></li>
+        <li class="done">Pack writer + PackRegistry + loader <span class="ev">write→load round-trip; list/load by name@version</span></li>
+        <li class="done">First pack: commercial_analytics@0.1.0 <span class="ev">20 artifacts from ontology/commercial.yaml → packs/</span></li>
+        <li class="pend">Overlay stacking (LayeredStore) <span class="ev">future enhancement — base→client precedence</span></li>
+      </ul>
+    </div>
+
+    <div class="loop done">
+      <div class="lh"><div class="lt">Loop 3 — Headless (REST + MCP) <small>F3</small></div><span class="badge done">COMPLETE</span></div>
+      <div class="meter"><i class="done" style="width:100%"></i></div>
+      <ul class="epics">
+        <li class="done">get_context() over a real pack, end-to-end <span class="ev">governance gate → CTX L3 directory → trust envelope</span></li>
+        <li class="done">REST door <span class="ev">POST /v1/context · GET /v1/packs · /v1/packs/{name}/{version}</span></li>
+        <li class="done">MCP door <span class="ev">context/get · pack/list · pack/query, extending CTX's ctx/hydrate</span></li>
+        <li class="pend">Live MarketZero consumer benchmark <span class="ev">future — eval + agent-lift harness ready (Loop 9)</span></li>
+      </ul>
+    </div>
+
+    <div class="loop done">
+      <div class="lh"><div class="lt">Loop 4 — The Product Loops <small>F4</small></div><span class="badge done">COMPLETE</span></div>
+      <div class="meter"><i class="done" style="width:100%"></i></div>
+      <ul class="epics">
+        <li class="done">Mining — text → candidates → PROPOSED Deltas <span class="ev">pattern MVP (if/then + data-lag); governed before serving</span></li>
+        <li class="done">Steward — signals → missions + pack-quality score <span class="ev">low-confidence/missing-eval ranked; market_zero pattern</span></li>
+        <li class="done">Eval — gate + agent-lift <span class="ev">must-contain/not judge; with-pack vs without delta</span></li>
+        <li class="done">Feedback — EWMA reliability + corrections → Deltas/EvalCases <span class="ev">one correction becomes a gold eval</span></li>
+      </ul>
+    </div>
+
+    <div class="loop done">
+      <div class="lh"><div class="lt">Loop 5 — UX Surfaces <small>UX-1..4</small></div><span class="badge done">COMPLETE · verify-audit PASS</span></div>
+      <div class="meter"><i class="done" style="width:100%"></i></div>
+      <ul class="epics">
+        <li class="done">Mission framework — submit contract + daily feed <span class="ev">UX-1 · missions.daily_missions()/submit_mission() enforce delta+eval+confidence (6 tests). Tier-B IP.</span></li>
+        <li class="done">Pack Registry detail — artifact explorer + gaps <span class="ev">UX-2 · runtime.pack_detail() served/eval flags + gaps; GET /v1/packs/{}/{}/detail (4 tests).</span></li>
+        <li class="done">Knowledge Workbench lineage — "explain this definition" <span class="ev">UX-3 · runtime.explain_concept() provenance trace; GET /v1/packs/{}/{}/explain (4 tests).</span></li>
+        <li class="done">ForgeRating + multiplayer consensus <span class="ev">UX-4 · forge.forge_rating() 5-signal Elo (dissent highest); resolve_consensus()→ExceptionRule (5 tests). Tier-B.</span></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- THE 5 PRODUCT LOOPS (end-goal architecture) -->
+  <h2><span class="ic">♻️</span> The 5 product loops — the factory being built (Loop 4 target)</h2>
+  <div class="ploops">
+    <div class="ploop"><div class="pn">1 · Mining</div><div class="pd">Sources → candidate artifacts as proposed Deltas.</div><div class="pst" style="color:var(--green)">✅ built (Loop 7)</div></div>
+    <div class="ploop"><div class="pn">2 · Steward</div><div class="pd">Signals → ranked curation actions &amp; Forge missions.</div><div class="pst" style="color:var(--green)">✅ built (Loop 8)</div></div>
+    <div class="ploop"><div class="pn">3 · Forge</div><div class="pd">SME judgement → delta + gold eval + confidence.</div><div class="pst" style="color:var(--green)">✅ contract built (UX-1) · UI pending</div></div>
+    <div class="ploop"><div class="pn">4 · Eval</div><div class="pd">Pack change → proof of agent lift (CI gate).</div><div class="pst" style="color:var(--green)">✅ built (Loop 9)</div></div>
+    <div class="ploop"><div class="pn">5 · Feedback</div><div class="pd">Agent usage + corrections → better packs.</div><div class="pst" style="color:var(--green)">✅ built (Loop 10)</div></div>
+  </div>
+
+  <!-- CURRENT LOOP PLAN -->
+  <h2><span class="ic">🎯</span> Core complete — next loop: UX surfaces (Loop 5)</h2>
+  <div class="panel">
+    <p style="font-size:.88rem;color:var(--muted)">The full factory pipeline is built and verified: <b style="color:var(--text)">mine → govern → compile → serve</b>, with steward / eval / feedback loops. The remaining loop is the human layer — the <b style="color:var(--text)">Domain Forge</b> missions (grow the Situation Room), the <b style="color:var(--text)">Pack Registry</b> UI, and the Workbench — per the UX spec.</p>
+    <ol class="plan-steps">
+      <li class="done">F1 governance · F2 pack factory · F3 headless (REST+MCP) · F4 product loops</li>
+      <li class="done">UX-1 Mission framework — generalise Situation Room → missions; enforce delta+eval+confidence ✅ verify-audit PASS</li>
+      <li>UX-2 Pack Registry UI — grid + overlay stack + lineage + install</li>
+      <li>UX-3 Knowledge Workbench + SME Impact (re-pointed to impact)</li>
+      <li>UX-4 Weekly / multiplayer + ForgeRating + Loop-D correction cards</li>
+      <li>(also queued) Task #5 — pay down re-homed ontowiz-core PRS debt</li>
+    </ol>
+  </div>
+
+  <!-- RISKS & DEBT -->
+  <h2><span class="ic">⚠️</span> Risks &amp; debt</h2>
+  <table>
+    <tr><th>Item</th><th>Type</th><th>Status / mitigation</th></tr>
+    <tr><td>Re-homed ontowiz-core PRS debt (6 files)</td><td><span class="risk-sev deb">DEBT</span></td><td>Readability (fn length/complexity) on relocated legacy. Ruff-clean; tracked; <b>Task #5</b> to pay down. Excluded from new-code gate by name (visible in CK).</td></tr>
+    <tr><td>Pre-existing src/** quality-gate debt</td><td><span class="risk-sev deb">DEBT</span></td><td>~8 legacy app files below PRS. Predates monorepo. Tracked; out of owned-gate scope.</td></tr>
+    <tr><td>src/core re-home blast radius (live app)</td><td><span class="risk-sev mit">MITIGATED</span></td><td>Move+shim kept 308 src tests green; verify-audit gate 6 guards regressions.</td></tr>
+    <tr><td>Two artifact models drifting (spec vs core)</td><td><span class="risk-sev mit">MITIGATED</span></td><td>Delta bridge (#4, active) unifies them via governance.</td></tr>
+    <tr><td>Integration sprawl across 4 repos</td><td><span class="risk-sev mit">MITIGATED</span></td><td>A↛B boundary + Cathedral Keeper + slop checker + verify-audit.</td></tr>
+    <tr><td>mypy-strict not yet applied to Tier B (ontowiz-core)</td><td><span class="risk-sev open">OPEN</span></td><td>Folded into Task #5; Tier A is mypy-clean.</td></tr>
+  </table>
+
+  <!-- UPDATE LOG -->
+  <h2><span class="ic">🧾</span> Update log</h2>
+  <div class="panel log">
+    <div class="e"><div class="d">2026-06-11</div><div class="t"><b>Red-team round 3 — engine / IP / end-to-end</b> — fixed: <b>CRITICAL CTX data-loss</b> (an unbalanced <code>[</code> in a value silently swallowed following sections); <b>the factory now composes end-to-end</b> (new <code>mine_govern_compile</code> weld + e2e test: raw text→mined→governed→ACTIVE→compiled→served — previously only the seed path worked); <b>pack signing is now real</b> (SHA-256 integrity seal + tamper test; encryption/license honestly marked roadmap); query-relevance ranking (was query-blind); <code>backing_deltas</code> populated (was always empty); path-guard + reserved-id hardening. 137 package + 308 src tests; verify-audit PASS.</div></div>
+    <div class="e"><div class="d">2026-06-11</div><div class="t"><b>Red-team round 2 — deep engine + security audit</b> — fixed: <b>path traversal</b> in pack loading (REST+MCP); CTX compiler shipped <b>no knowledge</b> (now emits a BODY of content); gate/directory <b>decoupling</b> (gated-out artifacts were still hydratable); section-collision/field-injection; <code>transition()</code> constructor/stale-YAML bypass (+pack regenerated); <b>agent-lift now gateable</b> (was computed, never gated — doc corrected); word-boundary eval judge; MCP error boundary + dev-gate parity; REST 422 on bad tag. 131 package + 308 src tests; verify-audit PASS.</div></div>
+    <div class="e"><div class="d">2026-06-11</div><div class="t"><b>Red-team hardening pass</b> — 4 code-grounded reviewers (boundary · governance · test-honesty · correctness). Fixed: governance invariant now enforced at the <code>transition()</code> primitive (<code>UngovernedTransitionError</code> — no promotion to ACTIVE/VERIFIED without a delta); seed activation routed through a system Delta; <code>dev_mode</code> gated server-side; ForgeRating signal clamping; EvalCase id collision; 2 mutation-surviving forge tests rewritten. 119 package + 308 src tests; verify-audit PASS.</div></div>
+    <div class="e"><div class="d">2026-06-11</div><div class="t"><b>Loop 5 COMPLETE — UX-1..4 shipped</b> — UX-2 Pack Registry detail (<code>pack_detail</code> + <code>/detail</code>, artifact explorer + gaps) · UX-3 Workbench lineage (<code>explain_concept</code> + <code>/explain</code>) · UX-4 <code>forge_rating</code> 5-signal Elo + <code>resolve_consensus</code>→ExceptionRule. 113 package + 308 src tests; 6/6 gates; verify-audit PASS. All 6 delivery loops now complete.</div></div>
+    <div class="e"><div class="d">2026-06-11</div><div class="t"><b>UX-1 — Mission framework shipped</b> — <code>ontowiz_factory.missions</code>: <code>daily_missions()</code> (steward-ranked 5-min feed, reuses Loop-8 steward) + <code>submit_mission()</code> enforcing the Forge contract <i>delta + eval + confidence</i> ("no artifact+eval ⇒ doesn't ship"). Tier-B IP — kept off the Tier-A read API by the A↛B boundary. 6 new tests; 100 package + 308 src tests; coverage 98.78%; verify-audit PASS.</div></div>
+    <div class="e"><div class="d">2026-06-11</div><div class="t"><b>Loops 1–10 COMPLETE</b> — F2 pack factory (real <code>commercial_analytics@0.1.0</code>, 20 artifacts in packs/) · F3 headless REST+MCP · F4 mining→Deltas / steward signals+missions / eval gate+agent-lift / feedback EWMA+corrections. 94 package + 308 src tests; coverage 98.72%; verify-audit PASS.</div></div>
+    <div class="e"><div class="d">2026-06-11</div><div class="t"><b>F1 #4 verified — F1 COMPLETE</b> — Delta bridge: lifecycle transitions only via APPROVED/MERGED Deltas; 8 tests, bridge.py 100% cov; GovernanceError on ungoverned/mismatched; verify-audit PASS.</div></div>
+    <div class="e"><div class="d">2026-06-10</div><div class="t"><b>F1 #3 verified</b> — re-home src/core → ontowiz-core; move+shim; 308 src + 4 core tests green; 931 ruff fixes; verify-audit PASS. Task #5 logged for PRS debt.</div></div>
+    <div class="e"><div class="d">2026-06-10</div><div class="t"><b>Loop-driven harness adopted</b> — ADR-015 + scripts/verify-audit.sh + docs/PROJECT_STATUS.md + CLAUDE.md (from CMH ADR-0001).</div></div>
+    <div class="e"><div class="d">2026-06-10</div><div class="t"><b>F1 #2 verified</b> — unified artifact model, 19 kinds, 50 tests, 98.5% cov, YAML round-trip.</div></div>
+    <div class="e"><div class="d">2026-06-10</div><div class="t"><b>Phase 0 verified</b> — harness hardened for packages/; boundary + coverage gates wired.</div></div>
+    <div class="e"><div class="d">2026-06-10</div><div class="t"><b>F0 verified</b> — monorepo scaffold, CTX vendored, contracts seam smoke-tested.</div></div>
+  </div>
+
+  <footer>Onto_Wiz Loop Dashboard · visual companion to docs/PROJECT_STATUS.md · status reflects last verify-audit run · updated on request</footer>
+</div>
+</body>
+</html>

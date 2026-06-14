@@ -1,0 +1,229 @@
+name: "Oncology Indications — Deep Taxonomy"
+version: "1.0.0"
+description: >
+  Detailed indication-level taxonomy for major oncology indications.
+  Each indication includes molecular subtypes, treatment sequencing,
+  standard of care, and key unmet needs. Aligned with NCCN guidelines,
+  SEER epidemiology data, and NCI Thesaurus classification.
+
+standards_referenced:
+  - NCI_Thesaurus
+  - ICD_10
+  - NCCN_Guidelines
+
+# =========================================================================
+# NSCLC — Aligns with OncoVance synthetic data (compelizumab, 1L NSCLC)
+# =========================================================================
+
+indications:
+
+  nsclc:
+    full_name: "Non-Small Cell Lung Cancer"
+    icd10: "C34"
+    us_incidence: "~200,000/year (85% of lung cancers)"
+    global_incidence: "~1.8M/year"
+    five_year_survival_all_stages: "~28%"
+    five_year_survival_metastatic: "~8%"
+
+    molecular_subtypes:
+      - name: "EGFR-mutated"
+        prevalence: "~15% (Caucasian), ~50% (East Asian)"
+        key_mutations: [exon_19_deletion, L858R, T790M, exon_20_insertion, C797S]
+        soc_1l: "osimertinib (ADAURA adjuvant; FLAURA 1L metastatic)"
+        soc_2l: "platinum-doublet chemo ± bevacizumab after osimertinib"
+        emerging: "amivantamab + lazertinib, patritumab deruxtecan"
+      - name: "ALK-rearranged"
+        prevalence: "~5%"
+        soc_1l: "alectinib or lorlatinib"
+        soc_2l: "lorlatinib (if not used 1L), or brigatinib"
+        emerging: "NVL-655, TPX-0131"
+      - name: "KRAS G12C"
+        prevalence: "~13%"
+        soc_2l: "sotorasib or adagrasib"
+        emerging: "combinations with SHP2, SOS1, or checkpoint inhibitors"
+      - name: "ROS1-rearranged"
+        prevalence: "~1-2%"
+        soc_1l: "crizotinib, entrectinib"
+        soc_2l: "lorlatinib, repotrectinib"
+      - name: "BRAF V600E"
+        prevalence: "~2%"
+        soc: "dabrafenib + trametinib"
+      - name: "MET exon 14 skipping"
+        prevalence: "~3%"
+        soc: "capmatinib, tepotinib"
+      - name: "RET-rearranged"
+        prevalence: "~1-2%"
+        soc: "selpercatinib, pralsetinib"
+      - name: "NTRK fusion"
+        prevalence: "<1%"
+        soc: "larotrectinib, entrectinib (tumor-agnostic)"
+      - name: "No actionable driver (wild-type)"
+        prevalence: "~40-50%"
+        treatment_by_pdl1:
+          pdl1_gte_50: "pembrolizumab monotherapy or pembrolizumab + chemo"
+          pdl1_1_to_49: "pembrolizumab + platinum-doublet chemo"
+          pdl1_lt_1: "nivolumab + ipilimumab + chemo, or platinum-doublet + IO"
+
+    treatment_sequencing:
+      first_line_driver_positive: "Matched TKI (EGFR→osimertinib, ALK→alectinib/lorlatinib)"
+      first_line_driver_negative: "IO ± chemo (based on PD-L1 expression)"
+      second_line: "Docetaxel ± ramucirumab, or matched targeted (if not used 1L)"
+      third_line_plus: "Clinical trial, tumor-agnostic agents (if biomarker+)"
+      key_decisions: ["NGS before treatment start", "PD-L1 TPS to guide IO selection", "brain_met_management"]
+
+  # =========================================================================
+  # BREAST CANCER
+  # =========================================================================
+
+  breast_cancer:
+    full_name: "Breast Cancer"
+    icd10: "C50"
+    us_incidence: "~310,000/year"
+    five_year_survival_all_stages: "~91%"
+
+    molecular_subtypes:
+      - name: "HR+/HER2- (Luminal)"
+        prevalence: "~70%"
+        soc_1l_metastatic: "CDK4/6 inhibitor + endocrine therapy (palbociclib/ribociclib/abemaciclib + AI or fulvestrant)"
+        soc_2l: "fulvestrant + alpelisib (if PIK3CA-mutated), or capecitabine"
+        emerging: "capivasertib + fulvestrant (AKT inhibitor), elacestrant (oral SERD)"
+      - name: "HER2+ (Amplified)"
+        prevalence: "~15-20%"
+        soc_1l: "taxane + trastuzumab + pertuzumab (CLEOPATRA)"
+        soc_2l: "trastuzumab deruxtecan (T-DXd, DESTINY-Breast03)"
+        soc_3l: "tucatinib + trastuzumab + capecitabine (HER2CLIMB)"
+        emerging: "T-DXd in HER2-low, margetuximab"
+      - name: "Triple-Negative (TNBC)"
+        prevalence: "~10-15%"
+        soc_1l_metastatic: "pembrolizumab + chemo (if PD-L1 CPS ≥10)"
+        soc_2l: "sacituzumab govitecan (Trodelvy)"
+        emerging: "datopotamab deruxtecan, PARP if BRCA+"
+        biomarkers: ["PD-L1 CPS", "BRCA1/2", "gBRCA"]
+
+  # =========================================================================
+  # COLORECTAL CANCER
+  # =========================================================================
+
+  colorectal_cancer:
+    full_name: "Colorectal Cancer"
+    icd10: "C18-C20"
+    us_incidence: "~153,000/year"
+    five_year_survival_metastatic: "~15%"
+
+    molecular_subtypes:
+      - name: "MSI-H/dMMR"
+        prevalence: "~5% metastatic, ~15% early-stage"
+        soc_1l_metastatic: "pembrolizumab monotherapy (KEYNOTE-177)"
+        significance: "Strong checkpoint inhibitor response; tumor-agnostic approval"
+      - name: "KRAS/NRAS wild-type, left-sided"
+        soc_1l: "FOLFOX/FOLFIRI + anti-EGFR (cetuximab/panitumumab) + bevacizumab"
+      - name: "KRAS/NRAS mutated"
+        soc_1l: "FOLFOX/FOLFIRI + bevacizumab"
+        note: "Anti-EGFR agents NOT effective in RAS-mutated"
+      - name: "BRAF V600E"
+        prevalence: "~8-10%"
+        soc_2l: "encorafenib + cetuximab (BEACON)"
+      - name: "HER2-amplified"
+        prevalence: "~3-5%"
+        soc: "trastuzumab + pertuzumab or trastuzumab deruxtecan"
+
+  # =========================================================================
+  # RENAL CELL CARCINOMA
+  # =========================================================================
+
+  renal_cell_carcinoma:
+    full_name: "Renal Cell Carcinoma"
+    icd10: "C64"
+    us_incidence: "~82,000/year"
+
+    treatment_landscape:
+      soc_1l_favorable: "pembrolizumab + lenvatinib, or active surveillance"
+      soc_1l_intermediate_poor: "nivolumab + cabozantinib (CheckMate-9ER), or pembrolizumab + lenvatinib (CLEAR)"
+      soc_2l: "cabozantinib, or nivolumab (if not used 1L)"
+      key_biomarkers: ["IMDC risk score", "sarcomatoid features", "PD-L1 (less predictive than in NSCLC)"]
+
+  # =========================================================================
+  # MELANOMA
+  # =========================================================================
+
+  melanoma:
+    full_name: "Melanoma"
+    icd10: "C43"
+    us_incidence: "~100,000/year"
+
+    molecular_subtypes:
+      - name: "BRAF V600E/K"
+        prevalence: "~50%"
+        soc_1l: "nivolumab + relatlimab (LAG-3), or pembrolizumab, or nivo + ipi"
+        targeted_option: "dabrafenib + trametinib (especially if rapid response needed)"
+      - name: "NRAS-mutated"
+        prevalence: "~15-20%"
+        soc: "checkpoint inhibitors (no targeted therapy approved)"
+      - name: "Wild-type"
+        prevalence: "~30%"
+        soc: "checkpoint inhibitors (nivo ± ipi, pembro)"
+
+  # =========================================================================
+  # HEMATOLOGIC MALIGNANCIES
+  # =========================================================================
+
+  acute_myeloid_leukemia:
+    full_name: "Acute Myeloid Leukemia"
+    icd10: "C92.0"
+    us_incidence: "~20,000/year"
+    median_age: 68
+
+    treatment_by_fitness:
+      fit_intensive:
+        induction: "7+3 (cytarabine + daunorubicin) ± midostaurin (if FLT3+) or gemtuzumab (if CD33+)"
+        consolidation: "HiDAC or allogeneic stem cell transplant"
+      unfit_non_intensive:
+        soc: "venetoclax + azacitidine (VIALE-A)"
+        emerging: "ivosidenib + azacitidine (if IDH1+), olutasidenib (IDH1), enasidenib (IDH2)"
+    key_mutations: ["FLT3-ITD", "IDH1", "IDH2", "NPM1", "TP53", "RUNX1", "ASXL1"]
+
+  multiple_myeloma:
+    full_name: "Multiple Myeloma"
+    icd10: "C90.0"
+    us_incidence: "~35,000/year"
+
+    treatment_sequencing:
+      transplant_eligible_1l: "VRd (bortezomib + lenalidomide + dex) → ASCT → lenalidomide maintenance"
+      transplant_ineligible_1l: "DRd (daratumumab + lenalidomide + dex) or VRd"
+      relapsed_2l: "DPd (daratumumab + pomalidomide + dex) or KRd (carfilzomib + len + dex)"
+      relapsed_3l_plus: "teclistamab (bispecific), belantamab mafodotin (ADC), ide-cel or cilta-cel (CAR-T)"
+    key_biomarkers: ["cytogenetics (t(4;14), del(17p), t(14;16))", "MRD status", "R-ISS stage"]
+
+  diffuse_large_bcell_lymphoma:
+    full_name: "Diffuse Large B-Cell Lymphoma"
+    icd10: "C83.3"
+    us_incidence: "~25,000/year"
+
+    treatment_sequencing:
+      first_line: "R-CHOP (rituximab + cyclophosphamide + doxorubicin + vincristine + prednisone) × 6"
+      first_line_high_risk: "pola-R-CHP (polatuzumab vedotin substitution, POLARIX)"
+      relapsed_2l_transplant_eligible: "salvage chemo → ASCT"
+      relapsed_2l_transplant_ineligible: "axi-cel or liso-cel (CAR-T), or tafasitamab + lenalidomide"
+      relapsed_3l: "glofitamab (bispecific), epcoritamab, loncastuximab tesirine"
+
+  chronic_lymphocytic_leukemia:
+    full_name: "Chronic Lymphocytic Leukemia"
+    icd10: "C91.1"
+    us_incidence: "~20,000/year"
+
+    treatment_landscape:
+      first_line: "ibrutinib, acalabrutinib, or venetoclax + obinutuzumab"
+      first_line_del17p_tp53: "ibrutinib or venetoclax-based (avoid chemoimmunotherapy)"
+      relapsed: "switch BTK/BCL2 class; pirtobrutinib (if prior BTKi resistance)"
+      key_biomarkers: ["del(17p)", "TP53 mutation", "IGHV mutation status", "del(11q)"]
+
+# =========================================================================
+# ONCOLOGY MARKET SIZING — Treatment-eligible populations
+# =========================================================================
+
+market_sizing_notes:
+  addressable_vs_diagnosed: "Not all diagnosed patients are treatment-eligible (performance status, comorbidities)"
+  biomarker_gating: "Companion diagnostic requirement reduces addressable population (e.g., EGFR+ is ~15% of NSCLC)"
+  line_therapy_funnel: "Patient attrition: ~60% reach 2L, ~30% reach 3L in metastatic solid tumors"
+  duration_of_therapy: "IO maintenance (until progression) creates long revenue tail vs fixed-cycle chemo"
+  combination_economics: "Multi-drug regimens increase per-patient cost but may expand total market"

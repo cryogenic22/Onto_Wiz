@@ -1,0 +1,375 @@
+name: "Onto_Wiz Pharma Knowledge Architecture"
+version: "1.0.0"
+description: >
+  Master map of all knowledge domains in the Onto_Wiz platform.
+  Each domain has its own subdirectory under ontology/domains/ and
+  references industry-standard classifications where applicable.
+  This file defines the domain boundaries, inter-domain relationships,
+  and the standards each domain draws from.
+
+# =========================================================================
+# DOMAIN REGISTRY — All knowledge domains in the platform
+# =========================================================================
+
+domains:
+
+  commercial:
+    name: "Commercial Operations"
+    status: "active"
+    path: "ontology/commercial.yaml"
+    owner: "ATLAS"
+    description: "Brand lifecycle, field operations, competitive dynamics, signal detection"
+    standards_referenced: [ATC, ICD-10]
+    entity_count: 15
+    rule_count: 12
+    related_domains: [market_access, medical_affairs, supply_chain]
+
+  clinical_development:
+    name: "Clinical Development"
+    status: "seed"
+    path: "ontology/domains/clinical_development.yaml"
+    owner: "ATLAS"
+    description: "Trial design, phases, endpoints, study populations, regulatory submissions"
+    standards_referenced: [CDISC_CDASH, CDISC_SDTM, CDISC_ADaM, ICH_E6, ICH_E8, ICH_E9]
+    related_domains: [regulatory, pharmacovigilance, research]
+
+  regulatory:
+    name: "Regulatory Affairs"
+    status: "seed"
+    path: "ontology/domains/regulatory.yaml"
+    owner: "ATLAS"
+    description: "Approval pathways, submission types, labeling, post-marketing commitments"
+    standards_referenced: [ICH_CTD, ICH_eCTD, FDA_OrangeBook, EMA_EPAR]
+    related_domains: [clinical_development, pharmacovigilance, manufacturing]
+
+  manufacturing:
+    name: "Manufacturing & Supply Chain"
+    status: "seed"
+    path: "ontology/domains/manufacturing.yaml"
+    owner: "ATLAS"
+    description: "API sourcing, formulation, packaging, distribution, serialization, cold chain"
+    standards_referenced: [GS1_GTIN, GS1_GLN, FDA_DSCSA, ICH_Q7, ICH_Q8, ICH_Q10, GDP]
+    related_domains: [commercial, regulatory]
+
+  medical_affairs:
+    name: "Medical Affairs"
+    status: "seed"
+    path: "ontology/domains/medical_affairs.yaml"
+    owner: "ATLAS"
+    description: "MSL engagement, publications, KOL management, medical information, congresses"
+    standards_referenced: [SNOMED_CT, MedDRA, NCI_Thesaurus]
+    related_domains: [commercial, clinical_development, pharmacovigilance]
+
+  pharmacovigilance:
+    name: "Pharmacovigilance & Drug Safety"
+    status: "seed"
+    path: "ontology/domains/pharmacovigilance.yaml"
+    owner: "ATLAS"
+    description: "Adverse event reporting, signal detection, REMS, risk management, CIOMS"
+    standards_referenced: [MedDRA, ICH_E2B, ICH_E2E, WHO_DD, CIOMS]
+    related_domains: [clinical_development, regulatory, medical_affairs]
+
+  research:
+    name: "Research & Discovery"
+    status: "seed"
+    path: "ontology/domains/research.yaml"
+    owner: "ATLAS"
+    description: "Target identification, lead optimization, preclinical, translational science"
+    standards_referenced: [UniProt, ChEMBL, Gene_Ontology, NCI_Thesaurus]
+    related_domains: [clinical_development]
+
+  heor:
+    name: "Health Economics & Outcomes Research"
+    status: "seed"
+    path: "ontology/domains/heor.yaml"
+    owner: "ATLAS"
+    description: "Cost-effectiveness, pricing strategy, HTA submissions, RWE, PROs"
+    standards_referenced: [CHEERS, ISPOR, EQ5D, QALY, ICER]
+    related_domains: [market_access, clinical_development, regulatory]
+
+  market_access:
+    name: "Market Access & Reimbursement"
+    status: "seed"
+    path: "ontology/domains/market_access.yaml"
+    owner: "ATLAS"
+    description: "Payer landscape, formulary management, contracting, patient assistance"
+    standards_referenced: [ICD-10, NDC, HCPCS, CMS_formulary]
+    related_domains: [commercial, heor]
+
+  patient_services:
+    name: "Patient Services & Support"
+    status: "seed"
+    path: "ontology/domains/patient_services.yaml"
+    owner: "ATLAS"
+    description: "Hub operations, copay assistance, adherence programs, nurse support, REMS"
+    standards_referenced: [NCPDP, SNOMED_CT]
+    related_domains: [commercial, market_access, pharmacovigilance]
+
+# --- THERAPEUTIC AREA TAXONOMIES ---
+
+  oncology:
+    name: "Oncology Therapeutic Area"
+    status: "active"
+    path: "ontology/therapeutic_areas/oncology.yaml"
+    sub_files:
+      - "ontology/therapeutic_areas/oncology_indications.yaml"
+      - "ontology/therapeutic_areas/oncology_biomarkers.yaml"
+    owner: "ATLAS"
+    description: "Deep oncology taxonomy: tumor classification, indications, biomarkers, treatment sequencing, companion diagnostics"
+    standards_referenced: [NCI_Thesaurus, ICD_10, ATC, NCCN_Guidelines, ESMO_Guidelines]
+    entity_count: 10
+    related_domains: [commercial, clinical_development, research, pharmacovigilance, medical_affairs]
+
+# =========================================================================
+# INTER-DOMAIN RELATIONSHIPS — How domains connect
+# =========================================================================
+
+cross_domain_edges:
+
+  # Pipeline feeds commercial planning
+  - source: research
+    target: clinical_development
+    relationship: "feeds_pipeline"
+    description: "Discovery candidates advance to clinical trials"
+
+  - source: clinical_development
+    target: regulatory
+    relationship: "generates_submission"
+    description: "Trial data packaged into regulatory submissions"
+
+  - source: regulatory
+    target: commercial
+    relationship: "enables_launch"
+    description: "Approval triggers commercial launch planning"
+
+  - source: regulatory
+    target: manufacturing
+    relationship: "authorizes_production"
+    description: "Marketing authorization enables commercial manufacturing"
+
+  # Safety loop
+  - source: pharmacovigilance
+    target: regulatory
+    relationship: "triggers_action"
+    description: "Safety signals may require label changes or REMS"
+
+  - source: pharmacovigilance
+    target: commercial
+    relationship: "constrains_promotion"
+    description: "Safety findings restrict promotional claims"
+
+  - source: medical_affairs
+    target: pharmacovigilance
+    relationship: "reports_signals"
+    description: "Medical inquiries and field observations feed safety monitoring"
+
+  # Value and access
+  - source: heor
+    target: market_access
+    relationship: "supports_value_story"
+    description: "Economic evidence underpins payer negotiations"
+
+  - source: market_access
+    target: commercial
+    relationship: "enables_access"
+    description: "Formulary placement enables prescription volume"
+
+  - source: patient_services
+    target: commercial
+    relationship: "supports_adherence"
+    description: "Patient support programs improve persistence and refill rates"
+
+  # Supply
+  - source: manufacturing
+    target: commercial
+    relationship: "supplies_product"
+    description: "Manufacturing capacity enables commercial distribution"
+
+  - source: manufacturing
+    target: patient_services
+    relationship: "enables_fulfillment"
+    description: "Supply chain feeds specialty pharmacy and hub operations"
+
+# =========================================================================
+# STANDARDS REGISTRY — Public ontologies and classifications referenced
+# =========================================================================
+
+standards:
+
+  # --- Clinical & Medical ---
+  SNOMED_CT:
+    full_name: "Systematized Nomenclature of Medicine — Clinical Terms"
+    body: "SNOMED International (IHTSDO)"
+    domain: "Clinical terminology"
+    use: "Standardized clinical concepts for diagnoses, procedures, findings"
+    url: "https://www.snomed.org/"
+
+  MedDRA:
+    full_name: "Medical Dictionary for Regulatory Activities"
+    body: "ICH / MedDRA MSSO"
+    domain: "Adverse event and medical condition coding"
+    use: "Hierarchical coding of adverse events in safety reporting (SOC → HLGT → HLT → PT → LLT)"
+    url: "https://www.meddra.org/"
+
+  ICD_10:
+    full_name: "International Classification of Diseases, 10th Revision"
+    body: "WHO"
+    domain: "Disease and condition classification"
+    use: "Diagnosis coding for epidemiology, reimbursement, and clinical research"
+
+  ICD_11:
+    full_name: "International Classification of Diseases, 11th Revision"
+    body: "WHO"
+    domain: "Disease classification (successor to ICD-10)"
+    use: "Updated disease taxonomy with digital-native structure"
+
+  NCI_Thesaurus:
+    full_name: "NCI Thesaurus (NCIt)"
+    body: "National Cancer Institute"
+    domain: "Cancer-specific terminology"
+    use: "Standardized vocabulary for oncology research, trials, and treatment"
+    url: "https://ncithesaurus.nci.nih.gov/"
+
+  LOINC:
+    full_name: "Logical Observation Identifiers Names and Codes"
+    body: "Regenstrief Institute"
+    domain: "Laboratory and clinical observations"
+    use: "Universal codes for lab tests, measurements, clinical documents"
+
+  # --- Drug Classification ---
+  ATC:
+    full_name: "Anatomical Therapeutic Chemical Classification"
+    body: "WHO Collaborating Centre for Drug Statistics Methodology"
+    domain: "Drug classification by organ system and therapeutic use"
+    use: "5-level hierarchy: anatomical group → therapeutic → pharmacological → chemical → substance"
+
+  WHO_DD:
+    full_name: "WHO Drug Dictionary"
+    body: "Uppsala Monitoring Centre"
+    domain: "Drug identification and coding"
+    use: "Links drug names to ATC codes for safety reporting and pharmacovigilance"
+
+  NDC:
+    full_name: "National Drug Code"
+    body: "FDA"
+    domain: "US drug product identification"
+    use: "Unique 10-digit code identifying labeler, product, and package"
+
+  FDA_OrangeBook:
+    full_name: "Approved Drug Products with Therapeutic Equivalence Evaluations"
+    body: "FDA"
+    domain: "Approved drugs, patents, exclusivity"
+    use: "Reference for generic substitution, patent expiry, exclusivity periods"
+
+  # --- Clinical Data Standards ---
+  CDISC_CDASH:
+    full_name: "Clinical Data Acquisition Standards Harmonization"
+    body: "CDISC"
+    domain: "Clinical data collection"
+    use: "Standard fields for CRFs (Case Report Forms) in clinical trials"
+
+  CDISC_SDTM:
+    full_name: "Study Data Tabulation Model"
+    body: "CDISC"
+    domain: "Clinical data tabulation for regulatory submission"
+    use: "Standard structure for submitting patient-level data to FDA/EMA"
+
+  CDISC_ADaM:
+    full_name: "Analysis Data Model"
+    body: "CDISC"
+    domain: "Analysis-ready clinical datasets"
+    use: "Standard structure for statistical analysis datasets derived from SDTM"
+
+  # --- Regulatory ---
+  ICH_CTD:
+    full_name: "Common Technical Document"
+    body: "ICH"
+    domain: "Regulatory submission structure"
+    use: "5-module structure for drug approval applications globally (Module 1-5)"
+
+  ICH_eCTD:
+    full_name: "Electronic Common Technical Document"
+    body: "ICH"
+    domain: "Electronic regulatory submission format"
+    use: "XML-based electronic version of CTD for FDA, EMA, PMDA submissions"
+
+  # --- Safety Reporting ---
+  ICH_E2B:
+    full_name: "ICH E2B(R3) — Individual Case Safety Report"
+    body: "ICH"
+    domain: "Safety case reporting format"
+    use: "Standardized XML format for transmitting ICSRs between organizations and regulators"
+
+  CIOMS:
+    full_name: "Council for International Organizations of Medical Sciences"
+    body: "CIOMS / WHO"
+    domain: "Safety reporting forms and guidelines"
+    use: "CIOMS I form for expedited AE reporting; CIOMS working group guidelines"
+
+  # --- Manufacturing & Supply Chain ---
+  GS1_GTIN:
+    full_name: "Global Trade Item Number"
+    body: "GS1"
+    domain: "Product identification"
+    use: "Unique identifier for trade items (drug packages) in supply chain"
+
+  GS1_GLN:
+    full_name: "Global Location Number"
+    body: "GS1"
+    domain: "Location identification"
+    use: "Unique identifier for physical locations (warehouses, pharmacies, hospitals)"
+
+  FDA_DSCSA:
+    full_name: "Drug Supply Chain Security Act"
+    body: "FDA"
+    domain: "Drug serialization and traceability"
+    use: "Mandates unique serial numbers on prescription drug packages for track-and-trace"
+
+  GDP:
+    full_name: "Good Distribution Practice"
+    body: "EU / WHO"
+    domain: "Pharmaceutical distribution quality"
+    use: "Guidelines for proper storage, transport, and handling of medicines"
+
+  ICH_Q7:
+    full_name: "ICH Q7 — Good Manufacturing Practice for APIs"
+    body: "ICH"
+    domain: "Active Pharmaceutical Ingredient manufacturing"
+    use: "Quality standards for API production"
+
+  ICH_Q8:
+    full_name: "ICH Q8(R2) — Pharmaceutical Development"
+    body: "ICH"
+    domain: "Drug product development and design space"
+    use: "Quality by Design (QbD) framework for formulation development"
+
+  ICH_Q10:
+    full_name: "ICH Q10 — Pharmaceutical Quality System"
+    body: "ICH"
+    domain: "Quality management throughout product lifecycle"
+    use: "Framework for continuous improvement in pharma manufacturing"
+
+  # --- Health Economics ---
+  CHEERS:
+    full_name: "Consolidated Health Economic Evaluation Reporting Standards"
+    body: "ISPOR"
+    domain: "Health economic study reporting"
+    use: "Checklist for reporting cost-effectiveness and budget impact analyses"
+
+  ISPOR:
+    full_name: "International Society for Pharmacoeconomics and Outcomes Research"
+    body: "ISPOR"
+    domain: "Health economics and outcomes research methodology"
+    use: "Good practice guidelines for economic modeling, RWE, PROs"
+
+  EQ5D:
+    full_name: "EuroQol 5-Dimension"
+    body: "EuroQol Group"
+    domain: "Health-related quality of life measurement"
+    use: "Standard instrument for measuring health utility values for QALY calculation"
+
+  HCPCS:
+    full_name: "Healthcare Common Procedure Coding System"
+    body: "CMS"
+    domain: "Medical procedure and service coding"
+    use: "Billing codes for drugs, procedures, and services in US healthcare"

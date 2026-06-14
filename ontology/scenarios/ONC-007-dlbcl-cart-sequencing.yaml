@@ -1,0 +1,23 @@
+id: "ONC-007"
+name: "DLBCL CAR-T vs Bispecific Antibody Sequencing Disruption"
+description: >
+  CAR-T (axi-cel, liso-cel) established as 2L R/R DLBCL standard for
+  transplant-eligible patients. Bispecific antibodies (glofitamab, epcoritamab)
+  now entering 2L+ as off-the-shelf alternatives. CAR-T referral patterns shift
+  as community oncologists adopt bispecifics to avoid CAR-T manufacturing delays
+  and toxicity management complexity.
+therapeutic_area: "oncology"
+indication: "Diffuse Large B-Cell Lymphoma (DLBCL) — relapsed/refractory"
+molecular_context: "CD20+, with GCB vs ABC subtype consideration"
+brand_context:
+  brand: "CAR-T cell therapy"
+  lifecycle: "growth"
+  channel: "buy_and_bill (hospital-administered)"
+account_context:
+  type: "CAR-T Certified Treatment Center"
+  biomarker_testing: "CD20 IHC, cell of origin by IHC (Hans algorithm)"
+trigger_signal: "CAR-T referral volume declining as bispecific antibodies capture 2L+ share"
+expected_hypothesis: "competitive_pressure"
+expected_drivers: ["off_the_shelf_convenience", "lower_toxicity_profile", "no_manufacturing_wait"]
+inference_rules_exercised: ["rule_competitive_displacement"]
+complexity_level: "medium"

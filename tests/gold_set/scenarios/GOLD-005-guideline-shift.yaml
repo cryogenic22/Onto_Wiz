@@ -1,0 +1,20 @@
+id: "GOLD-005-guideline-shift"
+name: "Oncology Guideline-Driven Prescribing Shift"
+description: >
+  NCCN guideline update elevates competitor regimen to Category 1 preferred
+  in NSCLC 1L. Bavaria Lung Center tumor board follows guideline change,
+  resulting in rapid share loss for OncoVance. The engine should detect
+  this as a guideline-driven shift (rule_guideline_driven_shift), not
+  a generic competitive displacement or demand erosion.
+
+input:
+  signal: "OncoVance volume at Bavaria Lung Center dropped sharply after NCCN guideline update."
+  context:
+    account_id: "bavaria_lung_center"
+    brand_id: "brand_oncovance"
+
+expected:
+  min_confidence: 0.85
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "guideline"

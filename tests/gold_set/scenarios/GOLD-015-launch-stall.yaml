@@ -1,0 +1,17 @@
+id: "GOLD-015-launch-stall"
+name: "New Indication Launch Stalls Due to Awareness Gap"
+description: >
+  OncoVance 2L NSCLC indication launched 8 weeks ago but only 3 patients
+  started at Würzburg despite 40+ eligible. Physicians unaware of 2L data,
+  no speaker programs, MSL visit overdue. Engine should identify launch
+  stall from awareness gap, not market rejection.
+input:
+  signal: "OncoVance 2L uptake at Würzburg near zero despite large eligible population and open formulary."
+  context:
+    account_id: "wuerzburg_lung_clinic"
+    brand_id: "brand_oncovance"
+expected:
+  min_confidence: 0.80
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "launch"

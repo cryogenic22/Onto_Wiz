@@ -1,0 +1,20 @@
+id: "GOLD-008-dual-driver-separation"
+name: "Safety Signal vs Budget Pressure — Dual Driver Separation"
+description: >
+  Both a safety signal (Grade 3 hepatotoxicity) and budget pressure co-occur
+  at Dresden University Hospital. The engine should correctly identify the
+  safety signal (rule_safety_signal, P90) as the primary driver, not the
+  confounding budget barrier (no Financial:Crisis evidence, so rule_genuine_budget_crisis
+  does not fire). This tests the engine's ability to separate co-occurring signals.
+
+input:
+  signal: "OncoVance volume dropped 55% at Dresden amid hepatotoxicity reports and budget pressure."
+  context:
+    account_id: "dresden_klinikum"
+    brand_id: "brand_oncovance"
+
+expected:
+  min_confidence: 0.90
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "safety"

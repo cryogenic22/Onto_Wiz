@@ -1,0 +1,55 @@
+id: rule_loe_erosion_curve
+kind: decision_heuristic
+name: Loe Erosion Curve
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 9d2e8bc6-87c9-41af-b400-e49e993b9f9b
+  at: '2026-06-14T00:06:14.835659+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835659+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: forecasting
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835659+00:00'
+trigger_signals:
+- signal_name: has_loe_event
+  threshold: Lifecycle:LOE | Competitor:Biosimilar
+  data_source: tag_match
+- signal_name: has_volume_decline
+  threshold: Commercial:VolumeDrop | Commercial:ShareLoss
+  data_source: tag_match
+trigger_context:
+- "Post loss-of-exclusivity erosion follows a structural curve (steep first 2-3 quarters\
+  \ of generic/biosimilar substitution, then a plateau) \u2014 it is a forecastable\
+  \ trajectory, not a one-off volume drop to be diagnosed.\n"
+decision_logic: "has_loe_event AND has_volume_decline => LOE erosion curve. Model\
+  \ the decline as a structural substitution trajectory (steep then plateau), not\
+  \ an anomaly \u2014 forecast the floor, do not chase the slope."
+judgment_type: empirical
+exceptions: []
+anti_patterns: []
+evidence_required: []
+typical_outcome: "LOE erosion curve. Model the decline as a structural substitution\
+  \ trajectory (steep then plateau), not an anomaly \u2014 forecast the floor, do\
+  \ not chase the slope."
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '80'
+valid_for_days: 180

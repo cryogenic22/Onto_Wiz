@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ontowiz-core"
+version = "0.1.0"
+description = "Onto_Wiz governance brain (Tier B — INTERNAL ONLY, never ships to clients). Delta model, blast radius, HITL routing, graph store, evidence."
+requires-python = ">=3.10"
+dependencies = [
+    "ontowiz-spec",
+    "pydantic>=2.5",
+    "networkx>=3.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["ontowiz_core*"]

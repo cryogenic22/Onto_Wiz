@@ -1,0 +1,18 @@
+id: GOLD-001
+name: "Safety signal detection at Metro General"
+description: >
+  When a volume drop is detected at Metro General and linked to
+  medical inquiry signals, the reasoning engine should identify
+  a safety risk with high confidence.
+
+input:
+  question: "Why is volume dropping at Metro General?"
+  context:
+    account_id: "metro_general_hospital"
+    brand_id: "brand_oncovance"
+
+expected:
+  min_confidence: 0.5
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "safety"

@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ontowiz-spec"
+version = "0.1.0"
+description = "Onto_Wiz shared data contracts (Tier A — ships to clients). Artifact model, pack manifest, lifecycle, tags."
+requires-python = ">=3.10"
+dependencies = ["pydantic>=2.5"]
+
+[tool.setuptools.packages.find]
+include = ["ontowiz_spec*"]

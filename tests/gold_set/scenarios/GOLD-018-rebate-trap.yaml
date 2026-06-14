@@ -1,0 +1,16 @@
+id: "GOLD-018-rebate-trap"
+name: "Rebate Contract Escalator Penalty Erodes Margin"
+description: >
+  OncoVance rebate contract with RegionalCare includes escalator clause:
+  share below 40% triggers 5% penalty. Share fell to 32%, activating the
+  penalty. Engine should identify rebate trap as the structural constraint.
+input:
+  signal: "OncoVance at Magdeburg losing share and now triggering contract penalty clauses."
+  context:
+    account_id: "magdeburg_cancer_center"
+    brand_id: "brand_oncovance"
+expected:
+  min_confidence: 0.80
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "rebate"

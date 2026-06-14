@@ -1,0 +1,17 @@
+id: "GOLD-012-reimbursement-squeeze"
+name: "Buy-and-Bill Reimbursement Squeeze Shifts Site of Care"
+description: >
+  CMS-equivalent reimbursement for IV OncoVance cut to ASP+4.3%.
+  Essen University Hospital shifting infusions from hospital outpatient
+  to home health setting. Volume dropped 30% in hospital outpatient channel.
+  Engine should identify reimbursement pressure as driver of channel shift.
+input:
+  signal: "OncoVance hospital outpatient volume at Essen dropping as infusions move to home health."
+  context:
+    account_id: "essen_university_oncology"
+    brand_id: "brand_oncovance"
+expected:
+  min_confidence: 0.80
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "reimbursement"

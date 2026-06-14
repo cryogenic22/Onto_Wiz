@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onto_Wiz — UX Design, Domain Forge &amp; Pack Management Spec</title>
+<style>
+  :root{--bg:#0d1117;--panel:#161b22;--panel2:#1c2330;--border:#2d3748;--text:#d7dde6;--muted:#8b97a8;--accent:#58a6ff;--gold:#e3b341;--green:#3fb950;--red:#f85149;--purple:#bc8cff;--orange:#ffa657;--teal:#39d2c0;--pink:#f778ba}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.55;padding:0 0 80px}
+  .wrap{max-width:1220px;margin:0 auto;padding:0 32px}
+  header{padding:54px 0 34px;background:linear-gradient(180deg,#161226,var(--bg));border-bottom:1px solid var(--border);margin-bottom:36px}
+  h1{font-size:2.05rem;font-weight:700;letter-spacing:-.5px}h1 .a{color:var(--pink)}
+  .sub{color:var(--muted);font-size:1.04rem;margin-top:10px;max-width:920px}
+  .pills{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+  .pill{font-size:.74rem;padding:4px 12px;border-radius:99px;border:1px solid var(--border);color:var(--muted);background:var(--panel)}
+  h2{font-size:1.42rem;margin:52px 0 6px;color:#fff;display:flex;align-items:center;gap:12px}
+  h2 .num{font-size:.8rem;color:var(--pink);border:1px solid var(--pink);border-radius:6px;padding:2px 9px;font-weight:600}
+  h3{font-size:1.08rem;margin:26px 0 8px;color:var(--gold)}
+  h4{font-size:.96rem;margin-bottom:8px}
+  p{margin:10px 0}.lead{font-size:1.02rem}.muted{color:var(--muted)}
+  .grid{display:grid;gap:16px;margin:18px 0}
+  .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
+  .card ul{margin:8px 0 0 18px;font-size:.87rem;color:var(--muted)}.card li{margin:4px 0}.card li b{color:var(--text);font-weight:600}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.85rem}
+  th{text-align:left;padding:9px 11px;background:var(--panel2);color:var(--gold);font-weight:600;border-bottom:2px solid var(--border)}
+  td{padding:8px 11px;border-bottom:1px solid var(--border);vertical-align:top}
+  td:first-child{font-weight:600}
+  code{background:#21283587;border:1px solid #2d374866;border-radius:4px;padding:1px 6px;font-size:.83em;font-family:Consolas,monospace;color:var(--teal)}
+  .badge{font-size:.66rem;padding:2px 7px;border-radius:4px;font-weight:700;letter-spacing:.4px;display:inline-block}
+  .b-reuse{background:rgba(63,185,80,.15);color:var(--green)}
+  .b-grow{background:rgba(227,179,65,.15);color:var(--gold)}
+  .b-new{background:rgba(247,120,186,.15);color:var(--pink)}
+  pre.d{background:#0a0e14;border:1px solid var(--border);border-radius:10px;padding:20px 22px;overflow-x:auto;font-size:.8rem;line-height:1.5;font-family:'Cascadia Code',Consolas,monospace;color:#c9d4e3;margin:16px 0}
+  pre.d .hl{color:var(--accent)}.gd{color:var(--gold)}.gn{color:var(--green)}.pp{color:var(--purple)}.or{color:var(--orange)}.tl{color:var(--teal)}.pk{color:var(--pink)}.rd{color:var(--red)}.dim{color:#4d5a6e}
+  /* wireframe mock */
+  .wf{background:#0b0f16;border:1px solid var(--border);border-radius:12px;padding:14px;margin:16px 0;font-size:.8rem}
+  .wf .bar{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#11161f;border:1px solid var(--border);border-radius:7px;margin-bottom:10px;color:var(--muted);font-size:.76rem}
+  .wf .dot{width:9px;height:9px;border-radius:99px;display:inline-block}
+  .wf .row{display:flex;gap:10px;flex-wrap:wrap}
+  .wf .box{flex:1;min-width:120px;background:#11161f;border:1px solid var(--border);border-radius:8px;padding:11px 12px}
+  .wf .box.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .wf .box.warn{border-color:var(--orange)}
+  .wf .box.good{border-color:var(--green)}
+  .wf .t{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+  .wf .v{font-size:.86rem;color:var(--text)}
+  .wf .meter{height:6px;background:#1c2330;border-radius:99px;overflow:hidden;margin-top:6px}
+  .wf .meter i{display:block;height:100%}
+  .wf .chip{font-size:.66rem;padding:1px 7px;border-radius:99px;border:1px solid var(--border);color:var(--muted);display:inline-block;margin:2px 3px 0 0}
+  .wf .btn{font-size:.72rem;padding:4px 12px;border-radius:6px;display:inline-block}
+  .wf .btn.p{background:var(--accent);color:#04101f}.wf .btn.g{background:rgba(63,185,80,.18);color:var(--green);border:1px solid var(--green)}.wf .btn.r{background:rgba(248,81,73,.16);color:var(--red);border:1px solid var(--red)}.wf .btn.n{border:1px solid var(--border);color:var(--muted)}
+  .loop{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:8px;padding:15px 18px;margin:12px 0}
+  .loop.b{border-left-color:var(--green)}.loop.c{border-left-color:var(--gold)}.loop.d{border-left-color:var(--purple)}
+  .loop h4{font-size:1rem}.loop .flow{font-family:Consolas,monospace;font-size:.78rem;color:var(--teal);margin:7px 0;display:block}
+  .loop .src{font-size:.8rem;color:var(--muted)}.loop .src b{color:var(--gold)}
+  .callout{background:linear-gradient(135deg,rgba(247,120,186,.08),rgba(188,140,255,.06));border:1px solid rgba(247,120,186,.32);border-radius:12px;padding:20px 24px;margin:22px 0;font-size:1.0rem}
+  .callout b{color:var(--pink)}
+  .principle{border-left:3px solid var(--border);padding-left:14px;margin:10px 0}
+  .principle b{color:var(--text)}.principle.no{border-left-color:var(--red)}.principle.yes{border-left-color:var(--green)}
+  footer{margin-top:54px;padding-top:18px;border-top:1px solid var(--border);color:var(--muted);font-size:.8rem}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>The Game is the Interface. The <span class="a">Domain Layer</span> is the Product.</h1>
+  <div class="sub">UX design &amp; spec for the four surfaces of the Domain Intelligence Factory — <b>Domain Forge</b> (gamified SME elicitation), <b>Pack Registry</b> (the product catalog), <b>Knowledge Workbench</b> (the curation back-office), and <b>SME Impact</b> (the motivation engine) — plus the four human-in-the-loop UX loops that drive the five backend loops. Built by growing the Situation Room, Curator and SME dashboards you already have.</div>
+  <div class="pills"><span class="pill">UX Design &amp; Forge Spec v1</span><span class="pill">10 June 2026</span><span class="pill">grows existing Next.js frontend</span><span class="pill">for brainstorm</span></div>
+</div></header>
+<div class="wrap">
+
+<div class="callout">
+  <b>The one rule that keeps the game from becoming theatre:</b> every round, in every surface, must emit the same three things — a <b>pack delta</b>, a <b>gold eval label</b>, and a <b>confidence update</b>. If a screen can be played without producing all three, it is decoration and we cut it. The leaderboard is not the magic. <i>SME judgement → structured artifact → eval case → governed pack update</i> is the magic, and the UI's only job is to make that loop feel like sparring, not data entry.
+</div>
+
+<!-- 1 -->
+<h2><span class="num">01</span> Four surfaces — and you already have three of them</h2>
+<div class="grid g4">
+  <div class="card"><span class="badge b-grow">GROW</span><h4 style="margin-top:8px">🥊 Domain Forge</h4><p class="muted" style="font-size:.85rem">For SMEs. Grow <code>SituationRoom</code> (today one 9-step flow) into a <b>mission system</b> with 13 mission types and three play loops.</p></div>
+  <div class="card"><span class="badge b-new">NEW</span><h4 style="margin-top:8px">📦 Pack Registry</h4><p class="muted" style="font-size:.85rem">For agent builders &amp; delivery. The product catalog: versions, coverage, eval score, freshness, overlays, lineage, install. The cheap one — mostly read-only.</p></div>
+  <div class="card"><span class="badge b-grow">GROW</span><h4 style="margin-top:8px">🛠️ Knowledge Workbench</h4><p class="muted" style="font-size:.85rem">For knowledge engineers. Grow <code>CuratorDashboard</code> (today Delta review) into the back-office: candidate inbox, duplicate clusters, conflicts, concept graph, coverage, staleness.</p></div>
+  <div class="card"><span class="badge b-reuse">REUSE</span><h4 style="margin-top:8px">📈 SME Impact</h4><p class="muted" style="font-size:.85rem">For SMEs &amp; knowledge managers. <code>SMEDashboard</code> exists. Re-point it from <b>volume</b> to <b>impact</b>: packs you shaped, agent errors you prevented, teams that pin your work.</p></div>
+</div>
+
+<h3>Component inventory — reuse / grow / build</h3>
+<table>
+  <tr><th>Surface</th><th>Exists today</th><th>What we add</th></tr>
+  <tr><td>Domain Forge</td><td><span class="badge b-reuse">REUSE</span> ScenarioCard, HypothesisSelect, SignalPriority, DisconfirmInput, PatternRecognition, CommonMistakes, ActionRecommend, ConfidenceSlider, SessionSummary, <code>useGameSession</code></td><td>MissionPicker, DailyCardLoop, the 12 new mission components, MultiplayerConsensus room, ForgeRating widget</td></tr>
+  <tr><td>Pack Registry</td><td><span class="badge b-new">— nothing —</span></td><td>RegistryGrid, PackCard, PackDetail (OverlayStack, LineageExplain, ArtifactExplorer, EvalPanel, VersionDiff, InstallSnippet)</td></tr>
+  <tr><td>Knowledge Workbench</td><td><span class="badge b-reuse">REUSE</span> ReviewQueue, DeltaDetail, AuditTrail, QueueStats</td><td>CandidateInbox, DuplicateClusters, ConflictBoard, ConceptGraph, CoverageHeatmap, StalenessReview</td></tr>
+  <tr><td>SME Impact</td><td><span class="badge b-reuse">REUSE</span> ContributionStats, Leaderboard, DomainCoverage, ContributionHistory</td><td>ImpactStory ("used in N packs, prevented M errors"), DissentBadges, calibration view</td></tr>
+  <tr><td>Shared</td><td><span class="badge b-reuse">REUSE</span> Button, Card, Input, Textarea, Badge, Modal, ProgressDots, persona context (sme|curator)</td><td>extend persona → sme · curator · builder · manager; dark-slate design system kept</td></tr>
+</table>
+
+<!-- 2 -->
+<h2><span class="num">02</span> Domain Forge — gamification design</h2>
+<p class="lead">The Situation Room already has the right <i>tone</i>: a serious reasoning exercise, not Duolingo. We protect that and scale it. The senior SME should feel like they are challenging the machine, teaching junior analysts at scale, and preserving their judgement — not running a hamster wheel for points.</p>
+
+<h3>Design principles</h3>
+<div class="grid g2">
+  <div class="card">
+    <div class="principle yes"><b>✓ Sparring room, not quiz.</b> The frame is "can you beat / correct the machine?" The machine always proposes first; the SME reacts, challenges, refines. Reaction is easier than recall — show a senior a wrong rule and they light up.</div>
+    <div class="principle yes"><b>✓ Reward useful dissent.</b> "Everyone says X, but it fails when Y" is the best output a senior gives. Dissent that changes the pack scores <i>higher</i> than agreement.</div>
+    <div class="principle yes"><b>✓ Close the loop visibly.</b> The SME watches their judgement become a pack delta, then an eval, then a measurable agent improvement. That sight — not points — is the motivation engine.</div>
+  </div>
+  <div class="card">
+    <div class="principle no"><b>✗ No points for volume.</b> Nobody gets 500 points for clicking like a caffeinated pigeon. Speed and click-count are never scored.</div>
+    <div class="principle no"><b>✗ No blank-page interviews.</b> The steward pre-loads weak spots; the SME never faces "tell us everything you know." Curation accelerator, not elicitation from zero.</div>
+    <div class="principle no"><b>✗ Not analyst chat.</b> Forge is its own surface. Elicitation ≠ Q&amp;A. We never merge it into the agent chat experience.</div>
+  </div>
+</div>
+
+<h3>Mission catalog — each mission manufactures a typed artifact + an eval</h3>
+<p class="muted">This is the heart of the spec. Note how cleanly the missions map onto the artifact model we just built in <code>ontowiz-spec</code> — including the six new first-class types. A mission that doesn't produce an artifact <i>and</i> an eval doesn't ship.</p>
+<table>
+  <tr><th>Mission</th><th>SME does</th><th>→ Artifact</th><th>→ Eval</th><th>Loop</th></tr>
+  <tr><td>Diagnose the Case <span class="muted">(today's 9-step)</span></td><td>full reasoning on a messy scenario</td><td>JudgmentPattern · DecisionHeuristic · ActionTemplate</td><td>gold-answer EvalCase</td><td>weekly</td></tr>
+  <tr><td>Spot the Bad Insight</td><td>find what's wrong in an AI answer</td><td><b>AntiPattern</b></td><td>negative EvalCase (must_not_contain)</td><td>daily</td></tr>
+  <tr><td>Rank What Matters</td><td>rank dimensions for a question</td><td><b>QuestionPlaybook</b> (dimension weights)</td><td>ranking EvalCase</td><td>daily</td></tr>
+  <tr><td>Same or Different</td><td>resolve ambiguous concept/entity</td><td>JargonMap · EntityRegistry alias</td><td>disambiguation EvalCase</td><td>daily</td></tr>
+  <tr><td>What Evidence Would You Trust</td><td>pick best sources for a claim</td><td><b>SourceContract</b></td><td>source EvalCase</td><td>daily</td></tr>
+  <tr><td>Name the Caveat</td><td>add a data limitation</td><td>DataQuirk</td><td>guard EvalCase (blocks a wrong answer)</td><td>daily</td></tr>
+  <tr><td>Client Translation</td><td>map client language → canonical term</td><td>JargonMap</td><td>jargon EvalCase</td><td>daily</td></tr>
+  <tr><td>What Would Change Your Mind</td><td>define evidence thresholds</td><td>DecisionHeuristic threshold · <b>ExceptionRule</b></td><td>threshold EvalCase</td><td>weekly</td></tr>
+  <tr><td>What's Missing</td><td>spot gaps before a recommendation</td><td>QuestionPlaybook (completeness)</td><td>completeness EvalCase</td><td>weekly</td></tr>
+  <tr><td>Choose the Next Analysis</td><td>select the analytical workflow</td><td>ProcessPlaybook</td><td>workflow EvalCase</td><td>weekly</td></tr>
+  <tr><td>Red-team the Answer</td><td>challenge / break system output</td><td>Guardrail</td><td>adversarial EvalCase</td><td>weekly</td></tr>
+  <tr><td>Build the Slide Logic</td><td>order the narrative</td><td>PromptTemplate · reasoning pattern</td><td>structure EvalCase</td><td>weekly</td></tr>
+  <tr><td>Resolve Disagreement</td><td>compare/settle SME answers</td><td>consensus + ExceptionRule + confidence</td><td>consensus EvalCase</td><td>multiplayer</td></tr>
+</table>
+
+<h3>The three play loops</h3>
+
+<div class="grid g3">
+  <div class="card"><h4>⏱️ Loop 1 — Daily 5-minute</h4><p class="muted" style="font-size:.84rem">For busy seniors. 5 steward-ranked cards. Approve / rank / correct / caveat / mark-uncertain. Keyboard-driven, fast, never more than 5. Each card = one micro-mission = one delta + eval + confidence.</p></div>
+  <div class="card"><h4>🏟️ Loop 2 — Weekly Challenge</h4><p class="muted" style="font-size:.84rem">"Can you beat the machine on launch-readiness?" A messy case, the agent's proposed answer, source cards, the concept graph. The 9-step Diagnose flow + red-team. Output: richer playbook, gold answer.</p></div>
+  <div class="card"><h4>👥 Loop 3 — Multiplayer Consensus</h4><p class="muted" style="font-size:.84rem">For tricky, non-binary calls. "Three SMEs disagree: payer friction or channel execution?" Output: consensus score, dissent notes, confidence weighting, an ExceptionRule capturing the situated judgement.</p></div>
+</div>
+
+<h4 style="margin-top:22px">Wireframe — the Daily 5-minute card loop</h4>
+<div class="wf">
+  <div class="bar"><span class="dot" style="background:var(--pink)"></span> <b style="color:var(--text)">Domain Forge</b> · Daily Round &nbsp;·&nbsp; Market Access pack &nbsp;·&nbsp; <span style="margin-left:auto">Card 2 / 5 · ⏱ 3:40 left</span></div>
+  <div class="row">
+    <div class="box" style="flex:2">
+      <div class="t">Steward flagged · low confidence · high impact</div>
+      <div class="v" style="margin:6px 0 10px"><b>Candidate DataQuirk</b> — "IQVIA claims data lags ~6 weeks; recent-week TRx is undercounted."</div>
+      <div class="t">The machine wants to promote this. Is it right?</div>
+      <span class="chip">source: slide 14, MA deck</span><span class="chip">conf 0.42</span><span class="chip">affects: TRx, NBRx</span>
+      <div style="margin-top:12px">
+        <span class="btn g">✓ Approve</span> &nbsp; <span class="btn r">✗ Reject</span> &nbsp; <span class="btn n">✎ Correct</span> &nbsp; <span class="btn n">＋ Add caveat</span> &nbsp; <span class="btn n">? Uncertain</span>
+      </div>
+    </div>
+    <div class="box" style="flex:1">
+      <div class="t">This round emits</div>
+      <div class="v" style="font-size:.78rem;line-height:1.7">
+        <span class="gn">→ delta</span> DataQuirk update<br>
+        <span class="tl">→ eval</span> blocks "demand up" on recent week<br>
+        <span class="gd">→ confidence</span> 0.42 → your call
+      </div>
+      <div class="meter" style="margin-top:10px"><i style="width:40%;background:var(--accent)"></i></div>
+      <div class="t" style="margin-top:4px">Round progress</div>
+    </div>
+  </div>
+</div>
+<p class="muted" style="font-size:.85rem">The right-hand panel is the anti-theatre device: the SME always sees the three artifacts their click will create <i>before</i> they click. Knowledge production is the visible point of the interaction.</p>
+
+<h3>Scoring — "Forge Rating", not points</h3>
+<p>Replace a points counter with a <b>calibrated judgement rating</b> (think chess Elo for domain judgement) that only moves on things that improve the firm's brain. It is computed, never awarded for activity:</p>
+<pre class="d">
+  <span class="pk">ForgeRating</span> moves on five signals — none of them volume or speed:
+
+  <span class="gn">correctness</span>   agreement with eventual consensus / gold outcome
+  <span class="gd">novelty</span>       created a *new* artifact vs confirmed an existing one
+  <span class="or">impact</span>        blast-radius × downstream agent usage of the artifact
+  <span class="tl">eval value</span>    produced a gold EvalCase that catches a real error
+  <span class="pp">dissent value</span> productive disagreement that *changed* the pack   <span class="dim">← weighted highest</span>
+
+  decay: contributions that go stale or unused lose weight over time
+  anti-gaming: consensus-weighted; identical rapid clicks are ignored, not rewarded
+</pre>
+<p class="muted">The SME Impact dashboard renders this as a <b>story</b>, not a scoreboard: "Your judgement shapes 3 active packs, prevented 11 agent errors this quarter, and your dissent on <i>pull-through</i> overrode the base definition for 4 client teams." Dissent gets its own badge — being usefully, provably contrarian is the highest status.</p>
+
+<!-- 3 -->
+<h2><span class="num">03</span> Domain Pack management</h2>
+<p class="lead">The Pack Registry is where codified knowledge becomes reusable. It answers, for an agent builder: <i>what packs exist, are they any good, are they fresh, what do they override, how do I use them, and what do they still miss?</i></p>
+
+<h4>Wireframe — Registry grid</h4>
+<div class="wf">
+  <div class="bar"><span class="dot" style="background:var(--accent)"></span> <b style="color:var(--text)">Pack Registry</b> &nbsp;·&nbsp; search packs… &nbsp;·&nbsp; <span style="margin-left:auto">filter: domain ▾ · freshness ▾ · eval score ▾</span></div>
+  <div class="row">
+    <div class="box good">
+      <div class="v"><b>commercial_analytics</b> <span class="chip">@1.3.0</span></div>
+      <div class="t" style="margin-top:6px">coverage</div><div class="meter"><i style="width:78%;background:var(--green)"></i></div>
+      <div class="t" style="margin-top:6px">eval · agent lift</div><div class="meter"><i style="width:71%;background:var(--accent)"></i></div>
+      <div style="margin-top:8px"><span class="chip">fresh · 4d</span><span class="chip">142 artifacts</span><span class="chip" style="color:var(--green)">gate ✓</span><span class="chip">12 teams</span></div>
+    </div>
+    <div class="box warn">
+      <div class="v"><b>market_access_overlay</b> <span class="chip">@0.4.1</span></div>
+      <div class="t" style="margin-top:6px">coverage</div><div class="meter"><i style="width:46%;background:var(--orange)"></i></div>
+      <div class="t" style="margin-top:6px">eval · agent lift</div><div class="meter"><i style="width:38%;background:var(--orange)"></i></div>
+      <div style="margin-top:8px"><span class="chip" style="color:var(--orange)">stale · 38d</span><span class="chip">61 artifacts</span><span class="chip" style="color:var(--orange)">9 gaps</span></div>
+    </div>
+    <div class="box">
+      <div class="v"><b>oncology_overlay</b> <span class="chip">@1.1.0</span></div>
+      <div class="t" style="margin-top:6px">coverage</div><div class="meter"><i style="width:63%;background:var(--accent)"></i></div>
+      <div class="t" style="margin-top:6px">eval · agent lift</div><div class="meter"><i style="width:58%;background:var(--accent)"></i></div>
+      <div style="margin-top:8px"><span class="chip">fresh · 9d</span><span class="chip">88 artifacts</span><span class="chip" style="color:var(--green)">gate ✓</span></div>
+    </div>
+  </div>
+</div>
+
+<h4 style="margin-top:18px">Wireframe — Pack detail: the overlay stack &amp; "explain this definition"</h4>
+<div class="wf">
+  <div class="bar"><span class="dot" style="background:var(--accent)"></span> <b style="color:var(--text)">commercial_analytics @1.3.0</b> &nbsp;·&nbsp; Overlays · Artifacts · Evals · Versions · Install</div>
+  <div class="row">
+    <div class="box" style="flex:1.3">
+      <div class="t">Overlay stack (higher overrides lower)</div>
+      <div style="font-family:Consolas,monospace;font-size:.78rem;line-height:1.9;margin-top:6px">
+        <div class="box sel" style="padding:5px 9px;margin:3px 0;border-color:var(--pink)"><span class="pk">engagement_launch_readiness</span> · 1 override</div>
+        <div class="box" style="padding:5px 9px;margin:3px 0"><span class="or">client_merck</span> · 3 overrides</div>
+        <div class="box" style="padding:5px 9px;margin:3px 0"><span class="gd">us_market</span></div>
+        <div class="box" style="padding:5px 9px;margin:3px 0"><span class="pp">oncology</span></div>
+        <div class="box" style="padding:5px 9px;margin:3px 0"><span class="tl">commercial_analytics_base</span></div>
+        <div class="box" style="padding:5px 9px;margin:3px 0"><span class="gn">pharma_base</span></div>
+      </div>
+    </div>
+    <div class="box" style="flex:1">
+      <div class="t">Why this definition? · "pull-through"</div>
+      <div class="v" style="font-size:.82rem;margin:6px 0">Resolved from <b style="color:var(--or)">client_merck</b> overlay.</div>
+      <div class="t">overrides</div>
+      <div class="v" style="font-size:.78rem;color:var(--muted)">base def "TRx converted from new scripts" → Merck: "incl. patient-support starts"</div>
+      <div class="t" style="margin-top:8px">backed by</div>
+      <span class="chip">delta-318</span><span class="chip">SME: a.rao</span><span class="chip">EvalCase ec-204</span>
+    </div>
+  </div>
+</div>
+<p class="muted" style="font-size:.85rem">This is the difference between a useful assistant and a mysterious oracle in a suit: any consumer can ask "why did the agent use <i>this</i> definition of pull-through?" and the registry answers with the overlay, the override, the delta, the SME, and the eval that backs it.</p>
+
+<div class="grid g3">
+  <div class="card"><h4>Artifact Explorer</h4><p class="muted" style="font-size:.83rem">Filter by kind / lifecycle / tag / layer. Each row shows provenance, confidence, and whether it has eval coverage. Draft artifacts visibly marked "not served to agents."</p></div>
+  <div class="card"><h4>Version Diff</h4><p class="muted" style="font-size:.83rem">v1.2 → v1.3 as a knowledge-as-code diff: artifacts added / changed / removed, with the deltas and eval-score movement that justified the bump.</p></div>
+  <div class="card"><h4>Install / Use</h4><p class="muted" style="font-size:.83rem">Copy-paste pin: <code>commercial_analytics@1.3</code>, plus the <code>get_context()</code> snippet, the REST call, and the MCP tool config — the three doors from ADR-014.</p></div>
+</div>
+
+<!-- 4 -->
+<h2><span class="num">04</span> Knowledge Workbench — the curation back-office</h2>
+<p class="lead">Grow the Curator dashboard from "review deltas" into the serious back office the spec describes. This is where the machine's rough baseline gets cleaned <i>before</i> the game, so the Forge is a curation accelerator, not a blank page.</p>
+<div class="grid g2">
+  <div class="card"><h4>Candidate Inbox <span class="badge b-new">NEW</span></h4><p class="muted" style="font-size:.84rem">Loop 1 mining output: extracted candidates as PROPOSED deltas, grouped by concept, with confidence + source provenance. Bulk triage; send weak/high-impact ones to the Forge as missions.</p></div>
+  <div class="card"><h4>Duplicate Clusters <span class="badge b-new">NEW</span></h4><p class="muted" style="font-size:.84rem">"These 5 candidates are the same concept seen in 3 decks." Merge into one canonical artifact, preserving provenance from all sources.</p></div>
+  <div class="card"><h4>Conflict Board <span class="badge b-new">NEW</span></h4><p class="muted" style="font-size:.84rem">Where artifacts, sources, or SMEs disagree (CTX flags conflicts at compile). Resolve to consensus or capture an ExceptionRule. Conflict density is a tracked metric.</p></div>
+  <div class="card"><h4>Concept Graph <span class="badge b-new">NEW</span></h4><p class="muted" style="font-size:.84rem">The <code>ontowiz-core</code> NetworkX graph, visualized: concepts, relationships, supports / contradicts edges. Click a node to inspect its artifacts and evidence.</p></div>
+  <div class="card"><h4>Coverage Heatmap <span class="badge b-new">NEW</span></h4><p class="muted" style="font-size:.84rem">Domain × artifact-kind grid: green = codified + eval-covered, amber = codified no evals, red = gap. The map that tells the steward where to send the Forge next.</p></div>
+  <div class="card"><h4>Delta Review + Audit <span class="badge b-reuse">REUSE</span></h4><p class="muted" style="font-size:.84rem">Your existing ReviewQueue / DeltaDetail / AuditTrail, unchanged — the governance core every other panel feeds into.</p></div>
+</div>
+
+<!-- 5 -->
+<h2><span class="num">05</span> The UX loops — the human side of the five backend loops</h2>
+<p class="lead">"Design loops for it" — here they are. Each surface is the human touchpoint of a backend loop. The discipline: every loop has a <b>trigger</b> (what surfaces the work), an <b>act</b> (what the human does), and a <b>visible result</b> (the human watches their judgement land). The visible result is what makes seniors come back.</p>
+
+<div class="loop">
+  <h4>Loop A — Daily Forge loop <span class="muted">· human side of backend Loop 2 (steward) + Loop 3 (elicitation)</span></h4>
+  <span class="flow">steward ranks weak spots → 5 daily cards → SME plays → delta + eval + confidence → pack quality moves → tomorrow's cards are different</span>
+  <span class="src"><b>Surfaces:</b> Domain Forge (daily) → SME Impact. <b>Visible result:</b> "your call on the IQVIA lag is now live in market_access@0.5 and blocks a known bad answer."</span>
+</div>
+<div class="loop b">
+  <h4>Loop B — Curation loop <span class="muted">· human side of backend Loop 1 (mining)</span></h4>
+  <span class="flow">mining proposes candidates → Workbench Candidate Inbox → curator triages / merges / resolves conflicts → governed deltas → compiler ships a pack version</span>
+  <span class="src"><b>Surfaces:</b> Knowledge Workbench → Pack Registry. <b>Visible result:</b> coverage heatmap turns a red cell green; a new pack version appears in the registry.</span>
+</div>
+<div class="loop c">
+  <h4>Loop C — Pack lifecycle loop <span class="muted">· human side of backend Loop 4 (eval gate)</span></h4>
+  <span class="flow">pack compiles → eval gate runs → Registry shows lift / coverage / gaps → gaps auto-generate Forge missions → SMEs close them → next version</span>
+  <span class="src"><b>Surfaces:</b> Pack Registry ⇄ Domain Forge. <b>Visible result:</b> agent-lift bar goes up between versions; "9 gaps" becomes "3 gaps."</span>
+</div>
+<div class="loop d">
+  <h4>Loop D — Consumption-correction loop <span class="muted">· human side of backend Loop 5 (feedback)</span></h4>
+  <span class="flow">agents use packs → telemetry + corrections → surfaced as "this pack caused an error" cards → SME confirms → delta + new EvalCase → pack improves</span>
+  <span class="src"><b>Surfaces:</b> agent runtime → Domain Forge / Workbench. <b>Visible result:</b> one correction becomes an eval that prevents the whole class of error — the "correction reuse" metric, made visible.</span>
+</div>
+
+<pre class="d">
+  <span class="dim">How the four UX loops chain into one flywheel:</span>
+
+   <span class="gn">B. mining</span> ──► candidates ──► <span class="gd">curate</span> ──► governed deltas ──► <span class="pk">compile pack</span>
+        ▲                                                          │
+        │                                                          ▼
+   <span class="pp">D. corrections</span> ◄── agents consume ◄── <span class="hl">Pack Registry</span> ◄── <span class="or">C. eval gate</span>
+        ▲                                                          │
+        │                                                          ▼
+        └────────── <span class="rd">A. daily Forge</span> ◄── steward ranks gaps &amp; weak spots ◄┘
+
+  Every arrow is a screen. Every screen emits delta + eval + confidence.
+</pre>
+
+<!-- 6 -->
+<h2><span class="num">06</span> Design system &amp; build order</h2>
+<div class="grid g2">
+  <div class="card"><h4>Keep the system you have</h4><ul>
+    <li><b>Next.js app-router + TypeScript + Tailwind</b>, dark-slate palette, lucide icons — unchanged</li>
+    <li><b>UI kit</b> (Button, Card, Badge, Modal, ProgressDots, Input, Textarea) — extend, don't replace</li>
+    <li><b>Persona context</b> sme|curator → extend to <code>sme · curator · builder · manager</code> with per-persona landing</li>
+    <li><b>Game session hook</b> pattern (<code>useGameSession</code>) generalised to <code>useMission(type)</code></li>
+  </ul></div>
+  <div class="card"><h4>What the UI needs from the API/MCP <span class="muted">(shapes F3 serve)</span></h4><ul>
+    <li><code>GET /v1/packs</code>, <code>/v1/packs/{id}</code> (manifest, overlays, evals, diff) — Registry</li>
+    <li><code>GET /v1/packs/{id}/explain?concept=</code> — lineage</li>
+    <li><code>GET /v1/missions/daily</code> (steward-ranked), <code>POST /v1/missions/{id}/submit</code> → delta+eval+confidence — Forge</li>
+    <li><code>GET /v1/candidates</code>, <code>/v1/conflicts</code>, <code>/v1/coverage</code>, <code>/v1/graph</code> — Workbench</li>
+    <li><code>GET /v1/impact/{sme}</code> — Impact story; existing Delta/audit routes — reuse</li>
+  </ul></div>
+</div>
+
+<h3>Build order (slots into the foundation phases)</h3>
+<div class="card" style="padding:8px 22px">
+  <table style="margin:6px 0">
+    <tr><th>UX phase</th><th>Ships</th><th>Pairs with</th></tr>
+    <tr><td>UX-1</td><td>Mission framework: generalise SituationRoom → MissionPicker + <code>useMission</code>; wire the 5 daily micro-missions; enforce delta+eval+confidence in the submit contract</td><td>F1 (artifact model + bridge)</td></tr>
+    <tr><td>UX-2</td><td>Pack Registry: grid + PackCard + PackDetail (overlay stack, lineage, install)</td><td>F2 (compiler + first pack)</td></tr>
+    <tr><td>UX-3</td><td>Workbench: Candidate Inbox + Coverage Heatmap + Concept Graph; SME Impact re-pointed to impact</td><td>F2/F3 (mining + serve)</td></tr>
+    <tr><td>UX-4</td><td>Weekly Challenge + Multiplayer Consensus rooms; ForgeRating; Loop D correction cards</td><td>F4 (loops ported)</td></tr>
+  </table>
+</div>
+
+<div class="callout">
+  <b>Bottom line:</b> the UX is not a layer on top of the factory — it <i>is</i> the human half of the factory's loops. Four surfaces, four UX loops, one rule: every screen turns SME judgement into a pack delta, a gold eval, and a confidence update, and shows the SME it landed. Grow the Situation Room into missions, add the Pack Registry, grow the Curator into the Workbench, and re-point the SME dashboard from volume to impact. Start with the mission framework (UX-1) alongside F1 — it's the surface that makes everything else worth governing.
+</div>
+
+<footer>Onto_Wiz UX Design &amp; Domain Forge Spec · grows the existing Next.js frontend · pairs with Foundation phases F1–F4 · 10 June 2026</footer>
+</div>
+</body>
+</html>

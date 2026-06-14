@@ -1,0 +1,17 @@
+id: "GOLD-013-340b-erosion"
+name: "340B Covered Entity Growth Compresses Manufacturer Margins"
+description: >
+  Lübeck designated as 340B covered entity with 3 contract pharmacy locations.
+  OncoVance dispensed at 340B ceiling price while entity bills at commercial rates.
+  Net revenue per unit declined 42%, below breakeven for oral formulation.
+  Engine should identify 340B margin erosion as the primary driver.
+input:
+  signal: "OncoVance net revenue at Lübeck collapsing despite steady prescription volume."
+  context:
+    account_id: "lubeck_community_oncology"
+    brand_id: "brand_oncovance"
+expected:
+  min_confidence: 0.80
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "340b"

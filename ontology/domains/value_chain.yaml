@@ -1,0 +1,202 @@
+name: "Commercial Pharma Value Chain"
+version: "1.0.0"
+description: >
+  Full commercial pharma value chain taxonomy.
+  Reference document for engineering teams and scenario designers.
+  Maps the end-to-end flow from R&D pipeline through patient access.
+
+# =========================================================================
+# VALUE CHAIN STAGES — Sequential flow of commercial operations
+# =========================================================================
+
+value_chain:
+
+  pipeline_intelligence:
+    description: "Pre-launch competitive and clinical landscape analysis"
+    functions: [medical_affairs, competitive_intelligence, business_development]
+    key_activities:
+      - pipeline_monitoring
+      - clinical_trial_tracking
+      - competitive_landscape_mapping
+      - indication_prioritization
+    signals:
+      - "Pipeline:PhaseAdvance"
+      - "Pipeline:IndicationExpansion"
+      - "Competitor:Pipeline"
+      - "Clinical:RealWorld"
+
+  launch_planning:
+    description: "Pre-approval market shaping and launch readiness"
+    functions: [brand_marketing, market_access, medical_affairs, field_operations]
+    key_activities:
+      - market_sizing
+      - payer_engagement
+      - kol_identification
+      - field_force_design
+      - formulary_dossier_preparation
+    signals:
+      - "Commercial:LowAdoption"
+      - "Demand:AwarenessGap"
+      - "Field:LowCoverage"
+
+  market_access:
+    description: "Payer engagement, formulary placement, and access maintenance"
+    functions: [market_access, health_economics, government_affairs]
+    key_activities:
+      - formulary_review_management
+      - prior_authorization_monitoring
+      - rebate_negotiation
+      - step_therapy_appeals
+      - patient_assistance_programs
+    entities: [Payer, Formulary, Contract]
+    signals:
+      - "Access:PAReject"
+      - "Access:FormularyChange"
+      - "Access:StepEdit"
+      - "Access:Restricted"
+      - "Payer:TierChange"
+      - "Barrier:Budget"
+      - "Barrier:Administrative"
+
+  field_operations:
+    description: "Territory management, HCP engagement, and call planning"
+    functions: [sales, field_medical, key_account_management]
+    key_activities:
+      - territory_alignment
+      - call_plan_execution
+      - hcp_segmentation
+      - sample_management
+      - speaker_programs
+    entities: [FieldForce, Territory, HCP, KOL]
+    signals:
+      - "Field:RepVacancy"
+      - "Field:LowCoverage"
+      - "Field:KOLDisengaged"
+
+  brand_marketing:
+    description: "Brand strategy, messaging, and promotional campaigns"
+    functions: [brand_marketing, digital_marketing, medical_education]
+    key_activities:
+      - positioning_strategy
+      - promotional_material_development
+      - digital_engagement
+      - congress_presence
+      - peer_to_peer_education
+    signals:
+      - "Demand:AwarenessGap"
+      - "Demand:EngagementDrop"
+
+  commercial_analytics:
+    description: "Performance monitoring, forecasting, and signal detection"
+    functions: [analytics, forecasting, business_intelligence]
+    key_activities:
+      - demand_signal_monitoring
+      - territory_performance_analysis
+      - competitive_share_tracking
+      - patient_flow_analysis
+      - forecast_variance_analysis
+    entities: [Signal, EvidenceItem]
+    signals:
+      - "Commercial:VolumeDrop"
+      - "Commercial:ShareLoss"
+      - "Commercial:ChannelShift"
+      - "Demand:NBRxDecline"
+
+  distribution_fulfillment:
+    description: "Supply chain, specialty pharmacy, and patient services"
+    functions: [supply_chain, trade, patient_services]
+    key_activities:
+      - inventory_management
+      - specialty_pharmacy_network
+      - patient_hub_operations
+      - copay_assistance
+      - adherence_programs
+    entities: [Channel]
+    signals:
+      - "Supply:Shortage"
+      - "Supply:FulfillmentDelay"
+      - "Supply:DistributionGap"
+
+  pharmacovigilance:
+    description: "Safety monitoring, adverse event reporting, REMS management"
+    functions: [drug_safety, medical_affairs, regulatory]
+    key_activities:
+      - adverse_event_monitoring
+      - signal_detection
+      - rems_management
+      - label_update_tracking
+    signals:
+      - "Clinical:Safety"
+      - "Clinical:Efficacy"
+
+# =========================================================================
+# CROSS-FUNCTIONAL RESPONSE PATTERNS
+# =========================================================================
+
+response_patterns:
+
+  access_barrier_response:
+    trigger_signals: ["Access:PAReject", "Access:FormularyChange"]
+    involved_functions:
+      access: "Investigate payer policy, pull PA reject rates, assess appeal pathway"
+      field: "Identify affected territories, gather field intel on prescriber impact"
+      medical: "Prepare clinical value dossier for payer medical directors"
+      brand: "Assess messaging pivot for value story"
+
+  competitive_threat_response:
+    trigger_signals: ["Competitor:Launch", "Competitor:Pricing", "Commercial:ShareLoss"]
+    involved_functions:
+      brand: "Competitive positioning update, differentiation messaging"
+      field: "Targeted detailing in affected accounts, competitive objection handling"
+      access: "Contract renegotiation if price-driven, rebate strategy review"
+      medical: "Head-to-head data dissemination through appropriate channels"
+
+  safety_signal_response:
+    trigger_signals: ["Clinical:Safety", "Commercial:VolumeDrop"]
+    involved_functions:
+      medical: "Medical inquiry review, signal assessment, KOL consultation"
+      drug_safety: "Formal signal evaluation, causality assessment"
+      field: "Suspend proactive promotion pending assessment"
+      brand: "Pause planned campaigns, prepare holding statement"
+
+  launch_acceleration_response:
+    trigger_signals: ["Commercial:LowAdoption", "Demand:AwarenessGap"]
+    involved_functions:
+      brand: "Awareness campaign boost, digital engagement increase"
+      field: "Increase call frequency in high-potential accounts"
+      medical: "Expand speaker program, peer education"
+      access: "Expedite formulary submissions, patient assistance promotion"
+
+# =========================================================================
+# HYPOTHESIS → DRIVER MAPPING (aligns with HypothesisCategory enum)
+# =========================================================================
+
+hypothesis_driver_map:
+  commercial_execution:
+    canonical_driver: "field_execution_gap"
+    typical_signals: ["Field:RepVacancy", "Field:LowCoverage", "Commercial:VolumeDrop"]
+    investigation_priority: ["territory_performance", "call_activity", "rep_tenure"]
+  market_access:
+    canonical_driver: "access_friction"
+    typical_signals: ["Access:PAReject", "Access:FormularyChange", "Barrier:Budget"]
+    investigation_priority: ["pa_reject_rate", "formulary_status", "payer_policy"]
+  clinical_safety:
+    canonical_driver: "safety_signal"
+    typical_signals: ["Clinical:Safety", "Commercial:VolumeDrop"]
+    investigation_priority: ["medical_inquiries", "adverse_events", "prescriber_feedback"]
+  competitive_pressure:
+    canonical_driver: "competitor_displacement"
+    typical_signals: ["Competitor:Launch", "Competitor:Pricing", "Commercial:ShareLoss"]
+    investigation_priority: ["competitive_share", "new_entrant_uptake", "price_benchmarks"]
+  demand_erosion:
+    canonical_driver: "demand_erosion"
+    typical_signals: ["Demand:NBRxDecline", "Demand:EngagementDrop"]
+    investigation_priority: ["nbrx_trend", "hcp_engagement", "patient_flow"]
+  supply_disruption:
+    canonical_driver: "supply_disruption"
+    typical_signals: ["Supply:Shortage", "Supply:FulfillmentDelay"]
+    investigation_priority: ["inventory_levels", "fulfillment_rates", "distribution_coverage"]
+  too_early:
+    canonical_driver: "insufficient_data"
+    typical_signals: []
+    investigation_priority: ["wait_for_additional_data_points"]

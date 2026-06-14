@@ -1,0 +1,47 @@
+- id: fs-driver-001
+  task_type: driver_attribution
+  input_text: "NBRx dropped 15% in Q3 across oncology accounts with high PA edit rates"
+  output_text: |
+    Primary Driver: Access_Friction (confidence: 0.82)
+    Supporting Evidence: PA edit rate increase correlates with NBRx decline
+    Secondary Driver: Field_Execution_Gap (confidence: 0.45)
+    Recommendation: Investigate payer formulary changes in top-declining territories
+  tags:
+    therapeutic_area: ["oncology"]
+    signal_type: ["NBRx_Drop", "PA_Edit_Increase"]
+  quality_score: 0.95
+  status: approved
+  created_at: "2025-11-15T10:00:00"
+  version: "1.0.0"
+
+- id: fs-driver-002
+  task_type: driver_attribution
+  input_text: "TRx decline in specialty accounts despite stable market share"
+  output_text: |
+    Primary Driver: Access_Friction (confidence: 0.70)
+    Supporting Evidence: Stable share rules out competitive displacement
+    Secondary Driver: Supply_Disruption (confidence: 0.35)
+    Recommendation: Check fill rates and hub metrics for specialty channel
+  tags:
+    therapeutic_area: ["oncology", "immunology"]
+    signal_type: ["TRx_Drop"]
+  quality_score: 0.90
+  status: approved
+  created_at: "2025-11-20T10:00:00"
+  version: "1.0.0"
+
+- id: fs-driver-003
+  task_type: driver_attribution
+  input_text: "Market share loss in CNS despite increased field activity"
+  output_text: |
+    Primary Driver: Competitor_Displacement (confidence: 0.78)
+    Supporting Evidence: Field activity high but share declining suggests competitive pressure
+    Secondary Driver: Efficacy_Perception (confidence: 0.50)
+    Recommendation: Review competitor launch data and HCP perception surveys
+  tags:
+    therapeutic_area: ["cns"]
+    signal_type: ["Market_Share_Loss"]
+  quality_score: 0.88
+  status: approved
+  created_at: "2025-12-01T10:00:00"
+  version: "1.0.0"

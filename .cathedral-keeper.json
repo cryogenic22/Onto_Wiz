@@ -1,0 +1,99 @@
+{
+  "name": "Cathedral Keeper (Onto_Wiz)",
+  "version": "0.1.0",
+  "paths": {
+    "include": [
+      "src/**",
+      "tests/**",
+      "conftest.py",
+      "debug_engine.py",
+      "packages/ontowiz-spec/ontowiz_spec/**",
+      "packages/ontowiz-runtime/ontowiz_runtime/**",
+      "packages/ontowiz-serve/ontowiz_serve/**",
+      "packages/ontowiz-core/ontowiz_core/**",
+      "packages/ontowiz-factory/ontowiz_factory/**"
+    ],
+    "extensions": [".py"],
+    "exclude": [
+      "**/__pycache__/**",
+      "**/.venv/**",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.quality-reports/**",
+      "packages/ontowiz-ctx/**",
+      "packages/**/tests/**",
+      "packages/conftest.py"
+    ]
+  },
+  "integrations": {
+    "quality_gate": {
+      "enabled": true,
+      "qg_path": "quality-gate/quality_gate.py"
+    }
+  },
+  "policies": {
+    "CK-PY-CYCLES": {
+      "enabled": true,
+      "type": "python_cycles",
+      "severity": "high"
+    },
+    "CK-PY-ASYNC-BLOCKING": {
+      "enabled": true,
+      "type": "async_blocking",
+      "severity": "high"
+    },
+    "CK-PY-REQUESTS-TIMEOUT": {
+      "enabled": true,
+      "type": "requests_timeout",
+      "severity": "high"
+    },
+    "CK-PY-SYSPATH": {
+      "enabled": true,
+      "type": "syspath_hacks",
+      "severity": "medium"
+    },
+    "CK-PY-BOUNDARIES": {
+      "enabled": true,
+      "type": "python_boundaries",
+      "severity": "high",
+      "config": {
+        "rules": [
+          {
+            "id": "CK-ONTO-WIZ-CORE-NO-API",
+            "title": "Core must not depend on API layer",
+            "from": "src/core/**",
+            "to_module_prefixes": ["src.api"],
+            "severity": "high",
+            "why": "Keeping core independent prevents architecture drift and preserves reuse across frontends/adapters.",
+            "fix": "Move shared types into src/core or add a narrow interface that src/api depends on."
+          },
+          {
+            "id": "CK-ONTO-WIZ-REASONING-NO-API",
+            "title": "Reasoning must not depend on API layer",
+            "from": "src/reasoning/**",
+            "to_module_prefixes": ["src.api"],
+            "severity": "high",
+            "why": "Reasoning should remain portable and testable without API concerns.",
+            "fix": "Pass API inputs as data; keep adapters in src/api."
+          },
+          {
+            "id": "CK-ONTO-WIZ-INGESTION-NO-API",
+            "title": "Ingestion must not depend on API layer",
+            "from": "src/ingestion/**",
+            "to_module_prefixes": ["src.api"],
+            "severity": "high",
+            "why": "Ingestion pipeline should be invocable without the web server.",
+            "fix": "Use dependency injection or shared interfaces in src/core."
+          }
+        ]
+      }
+    }
+  },
+  "reporting": {
+    "top_findings": 30,
+    "top_files": 20
+  },
+  "thresholds": {
+    "fail_on_severity_at_or_above": "high"
+  }
+}

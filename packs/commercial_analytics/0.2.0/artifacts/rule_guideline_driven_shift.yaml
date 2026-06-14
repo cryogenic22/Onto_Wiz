@@ -1,0 +1,52 @@
+id: rule_guideline_driven_shift
+kind: decision_heuristic
+name: Guideline Driven Shift
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: e10e4b4f-d2b4-45e6-aebd-f8e174be0517
+  at: '2026-06-12T00:05:45.715373+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-12T00:05:45.715373+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-12T00:05:45.715373+00:00'
+trigger_signals:
+- signal_name: has_guideline_change
+  threshold: Clinical:Guideline
+  data_source: tag_match
+- signal_name: has_share_loss
+  threshold: Commercial:ShareLoss | Commercial:VolumeDrop
+  data_source: tag_match
+trigger_context:
+- Clinical guideline update (NCCN/ESMO) shifts standard of care away from brand.
+decision_logic: has_guideline_change AND has_share_loss => Guideline-driven displacement.
+  NCCN/ESMO update has shifted prescribing away from brand.
+judgment_type: empirical
+exceptions: []
+anti_patterns:
+- wrong_conclusion: A single institution's pathway-committee decision
+  why_wrong: "This is a national guideline body (NCCN/ESMO) changing standard of care\
+    \ across institutions at once \u2014 not one center's pathway exclusion."
+  unless_evidence: ''
+evidence_required: []
+typical_outcome: Guideline-driven displacement. NCCN/ESMO update has shifted prescribing
+  away from brand.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '78'
+valid_for_days: 180

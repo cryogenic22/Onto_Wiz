@@ -1,0 +1,317 @@
+company:
+  id: "compellium_pharma"
+  name: "Compellium Pharma"
+  type: "Biotech (Mid-Cap)"
+  hq: "Zurich, Switzerland"
+
+portfolio:
+  - id: "brand_oncovance"
+    name: "OncoVance"
+    molecule: "Compelizumab"
+    type: "Biologic"
+    therapy_area: "Oncology"
+    intent: "Curative"
+    indications:
+      - code: "NSCLC_1L"
+        name: "Non-Small Cell Lung Cancer (1st Line)"
+        status: "Launch"
+        launch_date: "2023-01-15"
+        approval_body: "EMA"
+    current_market:
+      region: "Germany"
+      focus_territory: "North Rhine-Westphalia (NRW)"
+
+market_context:
+  competitors:
+    - id: "brand_tumorx"
+      name: "TumorX"
+      company: "MegaCorp"
+      status: "Established (Standard of Care)"
+      price_index: 100
+    - id: "brand_lungo"
+      name: "LungoFix"
+      company: "GenericCo"
+      status: "Market Entry (Biosimilar)"
+      price_index: 70
+
+  key_accounts:
+    - id: "university_klinik_bonn"
+      name: "University Hospital Bonn"
+      type: "Academic Center"
+      potential: "High"
+      access_status: "Restricted (P&T Review Pending)"
+      key_stakeholders:
+        - name: "Dr. Klaus Weber"
+          role: "KOL / Department Head"
+          sentiment: "Neutral"
+          influence: "High"
+
+    - id: "st_mary_hospital"
+      name: "St. Mary's Hospital"
+      type: "IDN"
+      potential: "Medium"
+      access_status: "Open"
+      key_stakeholders:
+        - name: "Dr. Sarah Schmidt"
+          role: "Head of Oncology"
+          sentiment: "Positive"
+          influence: "High"
+
+    - id: "metro_general_hospital"
+      name: "Metro General Hospital"
+      type: "Community Hospital"
+      potential: "Medium"
+      access_status: "Open"
+      key_stakeholders:
+        - name: "Dr. Chen"
+          role: "Oncologist"
+          sentiment: "Concerned"
+          influence: "Medium"
+
+    - id: "riverside_clinic"
+      name: "Riverside Oncology Clinic"
+      type: "Community Clinic"
+      potential: "High"
+      access_status: "Restricted (Formulary Excluded)"
+      key_stakeholders:
+        - name: "Dr. Martinez"
+          role: "Lead Oncologist"
+          sentiment: "Frustrated"
+          influence: "Medium"
+
+    - id: "heidelberg_klinikum"
+      name: "Heidelberg University Hospital"
+      type: "Academic Center"
+      potential: "High"
+      access_status: "Contracted (Competitor Exclusive)"
+      key_stakeholders:
+        - name: "Dr. Hoffmann"
+          role: "Head of Thoracic Oncology"
+          sentiment: "Neutral"
+          influence: "High"
+
+    - id: "northern_medical_center"
+      name: "Northern Medical Center"
+      type: "IDN"
+      potential: "High"
+      access_status: "Open"
+      territory_status: "Vacant — Rep resigned Q1"
+      key_stakeholders:
+        - name: "Dr. Bergström"
+          role: "Chief of Oncology"
+          sentiment: "Disengaged"
+          influence: "High"
+
+    - id: "bavaria_lung_center"
+      name: "Bavaria Lung Cancer Center"
+      type: "Academic Center"
+      potential: "High"
+      access_status: "Open (guideline-driven formulary)"
+      key_stakeholders:
+        - name: "Prof. Dr. Richter"
+          role: "Head of Thoracic Oncology / Tumor Board Chair"
+          sentiment: "Evidence-driven"
+          influence: "Very High"
+
+    - id: "muenster_oncology"
+      name: "Münster University Oncology"
+      type: "Academic Center"
+      potential: "High"
+      access_status: "Open"
+
+    - id: "frankfurt_breast_center"
+      name: "Frankfurt Breast Cancer Center"
+      type: "Academic Center"
+      potential: "High"
+      access_status: "Open"
+
+    - id: "dresden_klinikum"
+      name: "Dresden University Hospital"
+      type: "Academic Center"
+      potential: "Medium"
+      access_status: "Open"
+
+    - id: "hanover_general"
+      name: "Hanover General Hospital"
+      type: "Community Hospital"
+      potential: "Medium"
+      access_status: "Open (Biosimilar Preferred)"
+
+    - id: "freiburg_cancer_institute"
+      name: "Freiburg Comprehensive Cancer Center"
+      type: "Academic Center"
+      potential: "High"
+      access_status: "Pathway-Restricted"
+
+    - id: "dortmund_infusion_center"
+      name: "Dortmund Regional Infusion Center"
+      type: "Community Hospital"
+      potential: "Medium"
+      access_status: "Open (Copay Accumulator Active)"
+
+    - id: "essen_university_oncology"
+      name: "Essen University Hospital Oncology"
+      type: "Academic Center"
+      potential: "High"
+      access_status: "Open (Buy-and-Bill)"
+
+    - id: "lubeck_community_oncology"
+      name: "Lübeck Community Oncology Practice"
+      type: "Community Clinic"
+      potential: "Medium"
+      access_status: "340B Covered Entity"
+
+    - id: "augsburg_regional_hospital"
+      name: "Augsburg Regional Hospital"
+      type: "Community Hospital"
+      potential: "Medium"
+      access_status: "Open (Supply Disrupted)"
+
+    - id: "wuerzburg_lung_clinic"
+      name: "Würzburg Lung Clinic"
+      type: "Community Clinic"
+      potential: "High"
+      access_status: "Open (New Launch Territory)"
+
+    - id: "kiel_oncology_practice"
+      name: "Kiel Community Oncology Practice"
+      type: "Community Clinic"
+      potential: "Medium"
+      access_status: "Open"
+      territory_status: "Vacant — Rep transferred Q2"
+
+    - id: "rostock_specialty_pharmacy"
+      name: "Rostock Specialty Pharmacy Network"
+      type: "Specialty Pharmacy"
+      potential: "High"
+      access_status: "Open (Channel Migration Active)"
+
+    - id: "magdeburg_cancer_center"
+      name: "Magdeburg University Cancer Center"
+      type: "Academic Center"
+      potential: "High"
+      access_status: "Contracted (Rebate Lock-In)"
+
+  dark_data_signals:
+    - { date: "2023-03-10", source: "Field Rep Note (CRM)", confidence: 0.85, account_id: "university_klinik_bonn",
+        content: "Dr. Weber frustrated with TumorX rep frequency. Open to OncoVance but worried about budget.",
+        tags: ["Sentiment:Open", "Barrier:Budget"] }
+    - { date: "2023-03-12", source: "MSL Insight", confidence: 0.60, account_id: "university_klinik_bonn",
+        content: "Rumor MegaCorp negotiating 20% TumorX discount to lock formulary for 2 years.",
+        tags: ["Competitor:Pricing", "Risk:Lockout"] }
+    - { date: "2023-03-15", source: "Internal Memo (Finance)", confidence: 0.95, account_id: "st_mary_hospital",
+        content: "St. Mary's Q1 report: hiring freeze and 15% cut in pharmacy capital expenditure.",
+        tags: ["Financial:Crisis", "Evidence:Hard"] }
+    - { date: "2023-03-16", source: "Field Rep Note (CRM)", confidence: 0.90, account_id: "st_mary_hospital",
+        content: "Dr. Schmidt loves OncoVance clinical profile but hands tied by hospital-wide spending cap.",
+        tags: ["Barrier:Budget", "Sentiment:Positive"] }
+    - { date: "2023-04-01", source: "Medical Inquiry Log", confidence: 1.0, account_id: "metro_general_hospital",
+        content: "Dr. Chen asked about Grade 3 skin rashes in elderly OncoVance patients. 2 cases this week.",
+        tags: ["Clinical:Safety", "Symptom:Rash"] }
+    - { date: "2023-04-02", source: "Field Rep Note (CRM)", confidence: 0.90, account_id: "metro_general_hospital",
+        content: "Metro General volume dropped 40%. Dr. Chen switching to TumorX citing patient preference.",
+        tags: ["Commercial:VolumeDrop", "Reason:Preference"] }
+    - { date: "2023-04-10", source: "Access Team Report", confidence: 0.95, account_id: "riverside_clinic",
+        content: "HealthGuard added step-edit requiring TumorX failure before OncoVance. PA reject rate 45%.",
+        tags: ["Access:PAReject", "Access:StepEdit"] }
+    - { date: "2023-04-12", source: "Payer Intelligence", confidence: 0.90, account_id: "riverside_clinic",
+        content: "HealthGuard Q2 formulary: OncoVance moved Tier 2 to Tier 3, mandatory PA + step therapy.",
+        tags: ["Access:FormularyChange", "Access:Restricted"] }
+    - { date: "2023-04-15", source: "Market Analytics", confidence: 0.85, account_id: "heidelberg_klinikum",
+        content: "MegaCorp aggressive contract program. Heidelberg signed exclusive 18-month TumorX deal at 30% discount.",
+        tags: ["Competitor:Launch", "Competitor:Pricing"] }
+    - { date: "2023-04-18", source: "Field Rep Note (CRM)", confidence: 0.90, account_id: "heidelberg_klinikum",
+        content: "OncoVance volume at Heidelberg dropped 60%. Formulary committee blocked new starts.",
+        tags: ["Commercial:ShareLoss", "Commercial:VolumeDrop"] }
+    - { date: "2023-05-01", source: "Prescription Analytics", confidence: 0.85, account_id: "northern_medical_center",
+        content: "NBRx for OncoVance at Northern Medical declined 35% over 6 weeks despite open formulary.",
+        tags: ["Demand:NBRxDecline", "Commercial:VolumeDrop"] }
+    - { date: "2023-05-03", source: "Field Manager Note", confidence: 0.90, account_id: "northern_medical_center",
+        content: "Territory 47 vacant 10 weeks. Dr. Bergström no longer responding to MSL outreach.",
+        tags: ["Field:RepVacancy", "Demand:EngagementDrop"] }
+    - { date: "2023-05-10", source: "Medical Affairs Alert", confidence: 0.95, account_id: "bavaria_lung_center",
+        content: "NCCN NSCLC 1L update: competitor elevated to Cat 1 preferred. OncoVance downgraded to Cat 2A.",
+        tags: ["Clinical:Guideline", "Competitor:Pipeline"] }
+    - { date: "2023-05-12", source: "Prescription Analytics", confidence: 0.90, account_id: "bavaria_lung_center",
+        content: "OncoVance NBRx at Bavaria dropped 50% in 3 weeks. Tumor board switched to competitor regimen.",
+        tags: ["Commercial:ShareLoss", "Commercial:VolumeDrop"] }
+    - { date: "2023-05-15", source: "Medical Affairs Report", confidence: 0.85, account_id: "muenster_oncology",
+        content: "Only 35% of NSCLC patients at Münster receiving NGS testing. EGFR+ patients defaulting to chemo.",
+        tags: ["Demand:AwarenessGap"] }
+    - { date: "2023-05-17", source: "Clinical Outcomes Data", confidence: 0.90, account_id: "muenster_oncology",
+        content: "OncoVance 62% ORR in PD-L1 high but low testing rates mean eligible patients never identified.",
+        tags: ["Clinical:Efficacy", "Commercial:MarketExpansion"] }
+    - { date: "2023-06-01", source: "Market Intelligence", confidence: 0.90, account_id: "frankfurt_breast_center",
+        content: "T-DXd rapid uptake in HER2+ breast 2L at Frankfurt. Tumor board updated protocol.",
+        tags: ["Competitor:Launch"] }
+    - { date: "2023-06-05", source: "Prescription Analytics", confidence: 0.85, account_id: "frankfurt_breast_center",
+        content: "HER2+ regimen share at Frankfurt dropped 40% in 8 weeks as clinicians shift to ADC sequence.",
+        tags: ["Commercial:ShareLoss", "Commercial:VolumeDrop"] }
+    - { date: "2023-06-10", source: "Medical Inquiry Log", confidence: 0.95, account_id: "dresden_klinikum",
+        content: "Dr. Müller reported 3 cases of Grade 3 hepatotoxicity in OncoVance patients over 2 weeks.",
+        tags: ["Clinical:Safety"] }
+    - { date: "2023-06-12", source: "Field Rep Note (CRM)", confidence: 0.90, account_id: "dresden_klinikum",
+        content: "OncoVance at Dresden dropped 55%. Dr. Müller cites safety concerns and budget pressure.",
+        tags: ["Commercial:VolumeDrop", "Barrier:Budget"] }
+    - { date: "2023-06-15", source: "Payer Intelligence", confidence: 0.90, account_id: "hanover_general",
+        content: "LungoFix (biosimilar) gained preferred formulary at Hanover. Automatic substitution for new starts.",
+        tags: ["Competitor:Biosimilar"] }
+    - { date: "2023-06-18", source: "Prescription Analytics", confidence: 0.85, account_id: "hanover_general",
+        content: "OncoVance new starts at Hanover fell to near zero. Patients transitioning to LungoFix.",
+        tags: ["Commercial:ShareLoss", "Commercial:VolumeDrop"] }
+    - { date: "2023-06-20", source: "Access Team Report", confidence: 0.90, account_id: "freiburg_cancer_institute",
+        content: "Freiburg pathway committee excluded OncoVance from NSCLC 1L protocol despite guideline support.",
+        tags: ["Access:Restricted"] }
+    - { date: "2023-06-22", source: "Prescription Analytics", confidence: 0.95, account_id: "freiburg_cancer_institute",
+        content: "OncoVance NBRx at Freiburg dropped to zero. All new NSCLC patients on competitor per protocol.",
+        tags: ["Demand:NBRxDecline"] }
+    # --- Market Access Signals (ATL-004) ---
+    - { date: "2023-07-01", source: "Payer Intelligence", confidence: 0.90, account_id: "dortmund_infusion_center",
+        content: "HealthGuard adopted copay accumulator policy for specialty drugs. OncoVance copay card no longer counts toward OOP max.",
+        tags: ["Access:CopayAccumulator"] }
+    - { date: "2023-07-05", source: "Patient Services Report", confidence: 0.85, account_id: "dortmund_infusion_center",
+        content: "28% of OncoVance patients at Dortmund abandoned therapy in Q3 after copay card benefit exhausted.",
+        tags: ["Demand:PatientAbandonment"] }
+    - { date: "2023-07-10", source: "Reimbursement Analytics", confidence: 0.90, account_id: "essen_university_oncology",
+        content: "CMS-equivalent reimbursement for IV OncoVance cut to ASP+4.3% after sequestration. Essen shifting infusions to outpatient.",
+        tags: ["Access:ReimbursementPressure"] }
+    - { date: "2023-07-12", source: "Field Rep Note (CRM)", confidence: 0.85, account_id: "essen_university_oncology",
+        content: "Essen oncology department redirecting OncoVance infusions to home health. Hospital outpatient volume dropped 30%.",
+        tags: ["Commercial:ChannelShift"] }
+    - { date: "2023-07-15", source: "Contract Analytics", confidence: 0.90, account_id: "lubeck_community_oncology",
+        content: "Lübeck designated as 340B covered entity. Contract pharmacy network added 3 retail locations dispensing OncoVance at 340B price.",
+        tags: ["Access:340BUtilization"] }
+    - { date: "2023-07-18", source: "Finance Report", confidence: 0.95, account_id: "lubeck_community_oncology",
+        content: "Net revenue per OncoVance unit at Lübeck declined 42% due to 340B ceiling price. Margin below breakeven for oral formulation.",
+        tags: ["Financial:MarginPressure"] }
+    # --- Gold Set Expansion Signals (ATL-005) ---
+    - { date: "2023-08-01", source: "Supply Chain Alert", confidence: 0.95, account_id: "augsburg_regional_hospital",
+        content: "OncoVance API shortage at contract manufacturer. Augsburg received zero shipments for 3 consecutive weeks.",
+        tags: ["Supply:Shortage"] }
+    - { date: "2023-08-03", source: "Prescription Analytics", confidence: 0.90, account_id: "augsburg_regional_hospital",
+        content: "OncoVance volume at Augsburg dropped 80%. Patients redirected to TumorX due to stockout.",
+        tags: ["Commercial:VolumeDrop"] }
+    - { date: "2023-08-10", source: "Launch Analytics", confidence: 0.85, account_id: "wuerzburg_lung_clinic",
+        content: "OncoVance 2L NSCLC indication launched 8 weeks ago. Only 3 patients started at Würzburg despite 40+ eligible.",
+        tags: ["Commercial:LowAdoption"] }
+    - { date: "2023-08-12", source: "Field Rep Note (CRM)", confidence: 0.85, account_id: "wuerzburg_lung_clinic",
+        content: "Würzburg physicians unaware of 2L data. No speaker programs scheduled. MSL visit overdue by 6 weeks.",
+        tags: ["Demand:AwarenessGap"] }
+    - { date: "2023-08-15", source: "Territory Analytics", confidence: 0.90, account_id: "kiel_oncology_practice",
+        content: "OncoVance volume at Kiel declined 45% over 8 weeks. No field activity logged since rep transfer.",
+        tags: ["Commercial:VolumeDrop"] }
+    - { date: "2023-08-18", source: "Field Manager Note", confidence: 0.90, account_id: "kiel_oncology_practice",
+        content: "Territory 62 vacant since Q2 rep transfer. Kiel practice has received no calls, samples, or MSL follow-up.",
+        tags: ["Field:RepVacancy"] }
+    - { date: "2023-08-20", source: "Channel Analytics", confidence: 0.85, account_id: "rostock_specialty_pharmacy",
+        content: "OncoVance oral formulation shifting from retail to specialty pharmacy network at Rostock. Retail volume down 60%.",
+        tags: ["Commercial:ChannelShift"] }
+    - { date: "2023-08-22", source: "Market Analytics", confidence: 0.90, account_id: "rostock_specialty_pharmacy",
+        content: "OncoVance share at Rostock declined 15% as specialty pharmacy applies therapeutic interchange protocol.",
+        tags: ["Commercial:ShareLoss"] }
+    - { date: "2023-08-25", source: "Contract Analytics", confidence: 0.90, account_id: "magdeburg_cancer_center",
+        content: "OncoVance rebate contract with RegionalCare includes escalator clause: share below 40% triggers 5% penalty.",
+        tags: ["Access:RebateContractRisk"] }
+    - { date: "2023-08-28", source: "Prescription Analytics", confidence: 0.85, account_id: "magdeburg_cancer_center",
+        content: "OncoVance share at Magdeburg fell to 32%. Escalator penalty now active. Volume continuing downward trend.",
+        tags: ["Commercial:VolumeDrop"] }

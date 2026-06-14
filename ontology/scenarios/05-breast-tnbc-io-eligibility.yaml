@@ -1,0 +1,41 @@
+id: "onc-breast-tnbc-io-eligibility"
+name: "TNBC IO Eligibility — PD-L1 CPS Testing Gap"
+description: >
+  Triple-negative breast cancer patients eligible for pembrolizumab+chemo
+  (PD-L1 CPS >=10) are being missed due to inconsistent PD-L1 testing with
+  the SP142 vs 22C3 antibody clone. Community sites use SP142 (lower positivity
+  rate) instead of 22C3 (CPS scoring), reducing the identifiable eligible pool.
+
+therapeutic_area: "oncology"
+indication: "breast_cancer"
+molecular_subtype: "TNBC (ER-/PR-/HER2-)"
+line_of_therapy: "1L"
+
+brand_context:
+  brand: "OncoVance"
+  lifecycle: "growth"
+  asset_class: "biologic"
+  biomarkers_required: ["PD-L1 CPS (22C3 pharmDx, CPS >=10)"]
+  companion_diagnostic: "PD-L1 IHC 22C3 pharmDx"
+
+account_context:
+  type: "community_oncology"
+  potential: "medium"
+  access_status: "open"
+  testing_infrastructure: "IHC available, but using wrong antibody clone"
+
+trigger_signal:
+  metric: "NBRx"
+  direction: "decline"
+  magnitude: -0.20
+  description: "20% fewer IO-eligible TNBC patients identified vs expected incidence"
+
+expected_hypothesis: "commercial_execution"
+expected_drivers:
+  - driver: "biomarker_testing_gap"
+    inference_rule: "rule_biomarker_testing_gap"
+    confidence: 0.70
+  - driver: "awareness_gap"
+    confidence: 0.60
+
+complexity_level: "high"

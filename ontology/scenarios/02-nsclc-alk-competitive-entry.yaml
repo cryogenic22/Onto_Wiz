@@ -1,0 +1,41 @@
+id: "onc-nsclc-alk-competitive-entry"
+name: "NSCLC ALK+ Lorlatinib Competitive Displacement"
+description: >
+  ALK-rearranged NSCLC market disrupted by lorlatinib gaining 1L positioning
+  after CROWN trial data. Academic centers rapidly update protocols, shifting
+  away from alectinib-based sequences. OncoVance loses share in ALK+ segment
+  at institutions with strong tumor board governance.
+
+therapeutic_area: "oncology"
+indication: "NSCLC"
+molecular_subtype: "ALK-rearranged"
+line_of_therapy: "1L"
+
+brand_context:
+  brand: "OncoVance"
+  lifecycle: "growth"
+  asset_class: "biologic"
+  biomarkers_required: ["ALK rearrangement (FISH or IHC)"]
+
+account_context:
+  type: "academic_center"
+  potential: "high"
+  access_status: "open"
+  tumor_board_influence: "high"
+
+trigger_signal:
+  metric: "market_share"
+  direction: "decline"
+  magnitude: -0.30
+  description: "30% share loss in ALK+ segment following competitor protocol adoption"
+
+expected_hypothesis: "competitive_pressure"
+expected_drivers:
+  - driver: "competitive_displacement"
+    inference_rule: "rule_competitive_displacement"
+    confidence: 0.80
+  - driver: "guideline_shift"
+    inference_rule: "rule_guideline_driven_shift"
+    confidence: 0.60
+
+complexity_level: "medium"

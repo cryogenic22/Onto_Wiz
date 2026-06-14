@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+
+  /* Persona: SME (warm) */
+  --persona-spacing-sm: 0.75rem;
+  --persona-spacing-md: 1.25rem;
+  --persona-spacing-lg: 2rem;
+  --persona-radius: 0.75rem;
+  --persona-font-sm: 0.9375rem;
+  --persona-font-base: 1.0625rem;
+  --persona-font-lg: 1.25rem;
+  --persona-font-xl: 1.5rem;
+}
+
+.persona-curator {
+  --persona-spacing-sm: 0.375rem;
+  --persona-spacing-md: 0.75rem;
+  --persona-spacing-lg: 1.25rem;
+  --persona-radius: 0.375rem;
+  --persona-font-sm: 0.8125rem;
+  --persona-font-base: 0.875rem;
+  --persona-font-lg: 1rem;
+  --persona-font-xl: 1.125rem;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}

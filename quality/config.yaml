@@ -1,0 +1,33 @@
+# Onto_Wiz Quality Thresholds
+# Centralized config for all quality gates.
+# Referenced by: CI pipeline, pre-commit hooks, quality-gate/quality_gate.py, cathedral-keeper/ck.py
+# Owner: Team SENTINEL
+
+coverage:
+  minimum: 70       # CI fails below this (pytest --cov-fail-under)
+  target: 80        # Goal for new code coverage
+  source: src       # Coverage source directory
+
+function_size:
+  max_lines: 50     # Enforced by quality_gate.py (DEC-004)
+
+complexity:
+  max_cyclomatic: 10  # Enforced by quality_gate.py
+
+prs:
+  min_score: 85     # Portable Readability Score minimum (DEC-003)
+  error_weight: 10
+  warning_weight: 2
+
+architecture:
+  boundary_violations: 0   # core/ must not import api/
+  circular_imports: 0
+
+lint:
+  tool: ruff
+  line_length: 100
+  target_version: py311
+
+type_check:
+  tool: mypy
+  strict_boundaries: true  # No Any at API boundaries

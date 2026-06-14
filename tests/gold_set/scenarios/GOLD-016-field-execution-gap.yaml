@@ -1,0 +1,16 @@
+id: "GOLD-016-field-execution-gap"
+name: "Territory Vacancy Drives Volume Decline Independent of Market"
+description: >
+  OncoVance volume at Kiel declined 45% over 8 weeks. Territory 62 vacant
+  since Q2 rep transfer. No field calls, samples, or MSL follow-up logged.
+  Engine should identify field execution gap, not demand or access issue.
+input:
+  signal: "OncoVance volume at Kiel dropping with zero field activity since rep departed."
+  context:
+    account_id: "kiel_oncology_practice"
+    brand_id: "brand_oncovance"
+expected:
+  min_confidence: 0.80
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "execution"

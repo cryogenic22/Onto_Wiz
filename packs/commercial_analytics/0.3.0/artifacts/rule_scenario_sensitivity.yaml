@@ -1,0 +1,54 @@
+id: rule_scenario_sensitivity
+kind: decision_heuristic
+name: Scenario Sensitivity
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 7a794805-d94f-4447-8671-b3de0c1e9291
+  at: '2026-06-14T00:06:14.835685+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835685+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: forecasting
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835685+00:00'
+trigger_signals:
+- signal_name: has_driver_uncertainty
+  threshold: Financial:MarginPressure | Access:ReimbursementPressure
+  data_source: tag_match
+- signal_name: has_forecast_swing
+  threshold: Commercial:ShareLoss | Commercial:MarketExpansion
+  data_source: tag_match
+trigger_context:
+- "When a single driver's plausible swing moves the forecast more than the base-case\
+  \ delta, the number is sensitivity-bound \u2014 report a scenario band around that\
+  \ driver rather than a false point estimate.\n"
+decision_logic: "has_driver_uncertainty AND has_forecast_swing => Scenario-sensitivity\
+  \ dominant. One driver's swing exceeds the base-case delta \u2014 deliver a scenario\
+  \ band keyed to that driver, not a point estimate."
+judgment_type: empirical
+exceptions: []
+anti_patterns: []
+evidence_required: []
+typical_outcome: "Scenario-sensitivity dominant. One driver's swing exceeds the base-case\
+  \ delta \u2014 deliver a scenario band keyed to that driver, not a point estimate."
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '60'
+valid_for_days: 180

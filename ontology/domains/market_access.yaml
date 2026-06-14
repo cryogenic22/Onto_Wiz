@@ -1,0 +1,171 @@
+name: "Market Access & Reimbursement"
+version: "1.0.0"
+description: >
+  Payer landscape, formulary management, prior authorization,
+  contracting and rebate strategy, and patient affordability.
+  US-centric with global extension points. References NDC, HCPCS,
+  and CMS formulary structures.
+
+standards_referenced:
+  - ICD_10
+  - NDC
+  - HCPCS
+  - CMS_formulary
+
+# =========================================================================
+# ENTITY TYPES
+# =========================================================================
+
+entity_types:
+
+  - name: PayerPlan
+    description: "A health insurance plan covering a defined population"
+    attributes:
+      - plan_id
+      - payer_name      # e.g., "UnitedHealthcare", "Aetna", "Blue Cross"
+      - plan_type       # Commercial, Medicare Part D, Medicare Part B, Medicaid, VA, Tricare, Exchange
+      - lives_covered   # Number of beneficiaries
+      - geography       # National, Regional, State
+      - formulary_id
+      - pbm             # Pharmacy Benefit Manager (if applicable)
+      - medical_benefit  # Boolean — drug covered under medical benefit (buy-and-bill)
+      - pharmacy_benefit # Boolean — drug covered under pharmacy benefit
+
+  - name: FormularyPosition
+    description: "A brand's placement on a specific payer formulary"
+    attributes:
+      - brand_id
+      - formulary_id
+      - tier            # Tier 1 (Generic), Tier 2 (Preferred), Tier 3 (Non-Preferred), Tier 4 (Specialty), Not Listed
+      - pa_required     # Boolean — prior authorization needed
+      - step_therapy    # Boolean — step-through required
+      - quantity_limit  # Boolean — quantity or days supply limit
+      - specialty_pharmacy_required  # Boolean
+      - effective_date
+      - last_review_date
+
+  - name: PriorAuthorization
+    description: "A payer requirement for pre-approval before dispensing"
+    attributes:
+      - pa_id
+      - payer_id
+      - brand_id
+      - criteria        # Clinical criteria for approval (diagnosis, lab values, prior therapy)
+      - approval_rate   # Historical approval percentage
+      - appeal_rate     # Percentage of denials that are appealed
+      - appeal_success_rate
+      - turnaround_days # Typical PA decision time
+      - electronic_pa   # Boolean — supports ePA
+
+  - name: RebateContract
+    description: "Financial arrangement between pharma manufacturer and payer/PBM"
+    attributes:
+      - contract_id
+      - payer_id
+      - brand_id
+      - contract_type   # Formulary Rebate, Market Share Rebate, Volume Rebate, Outcomes-Based
+      - base_rebate_pct # Base rebate percentage off WAC
+      - tier_escalator  # Additional rebate for higher market share tiers
+      - effective_date
+      - term_months
+      - exclusivity_clause  # Boolean — exclusive formulary position
+      - price_protection    # Boolean — caps annual price increases
+
+  - name: CopayProgram
+    description: "Patient affordability program reducing out-of-pocket cost"
+    attributes:
+      - program_id
+      - program_type    # Copay Card, Free Trial, Bridge Program, PAP (Patient Assistance)
+      - eligible_insurance  # Commercial Only, Medicare excluded, Uninsured eligible
+      - max_benefit     # Maximum annual benefit per patient
+      - patient_pays    # Residual copay after benefit (e.g., "$0", "$10")
+      - enrollment_count
+      - utilization_rate
+
+# =========================================================================
+# RELATIONSHIPS
+# =========================================================================
+
+relationships:
+  - { source: PayerPlan, target: FormularyPosition, type: defines }
+  - { source: FormularyPosition, target: PriorAuthorization, type: requires }
+  - { source: RebateContract, target: PayerPlan, type: governs }
+  - { source: RebateContract, target: FormularyPosition, type: secures }
+  - { source: CopayProgram, target: Brand, type: supports_access_for }
+
+# =========================================================================
+# TAXONOMY
+# =========================================================================
+
+taxonomy:
+
+  us_payer_segments:
+    commercial:
+      description: "Employer-sponsored and individual market insurance"
+      lives_estimate: "~180M"
+      decision_maker: "PBM formulary committee"
+      key_levers: [rebates, formulary_tier, pa_criteria, step_therapy]
+    medicare_part_d:
+      description: "Outpatient prescription drug benefit for 65+ and disabled"
+      lives_estimate: "~50M"
+      decision_maker: "CMS + Part D plan sponsors"
+      key_levers: [formulary_tier, coverage_gap, IRA_negotiation]
+      note: "Inflation Reduction Act enables CMS drug price negotiation starting 2026"
+    medicare_part_b:
+      description: "Physician-administered drugs (buy-and-bill)"
+      lives_estimate: "~65M (all Medicare)"
+      decision_maker: "CMS (ASP-based reimbursement)"
+      key_levers: [ASP_plus_6_pct, sequestration, site_of_care]
+    medicaid:
+      description: "Federal-state program for low-income populations"
+      lives_estimate: "~90M"
+      decision_maker: "State Medicaid + MCOs"
+      key_levers: [best_price, supplemental_rebates, PDL]
+      note: "Mandatory coverage with Medicaid Drug Rebate Program (23.1% or best price)"
+    va_dod:
+      description: "Veterans Affairs and Department of Defense"
+      lives_estimate: "~15M"
+      decision_maker: "VA VISN formulary committees"
+      key_levers: [FSS_pricing, VANF_inclusion, federal_ceiling_price]
+    exchange_aca:
+      description: "ACA marketplace plans"
+      lives_estimate: "~20M"
+      decision_maker: "Plan issuers, state exchanges"
+      key_levers: [essential_health_benefits, formulary_adequacy]
+
+  formulary_tiers:
+    tier_1: { label: "Generic / Preferred Generic", typical_copay: "$0-15", access_level: "Unrestricted" }
+    tier_2: { label: "Preferred Brand", typical_copay: "$20-50", access_level: "Open" }
+    tier_3: { label: "Non-Preferred Brand", typical_copay: "$50-100", access_level: "PA or Step often required" }
+    tier_4: { label: "Specialty", typical_copay: "20-33% coinsurance", access_level: "PA + Specialty Pharmacy" }
+    tier_5: { label: "Specialty Premium", typical_copay: "25-50% coinsurance", access_level: "High barrier" }
+    not_listed: { label: "Excluded", typical_copay: "Full price", access_level: "No coverage" }
+
+  access_barriers:
+    prior_authorization: "Payer requires pre-approval with clinical criteria before dispensing"
+    step_therapy: "Patient must try and fail a preferred alternative first"
+    quantity_limit: "Restricts days supply or units per fill"
+    specialty_pharmacy: "Must use designated specialty pharmacy for fulfillment"
+    site_of_care: "Restricts administration to specific settings (e.g., outpatient only)"
+    age_gender_edit: "Claim rejected if patient demographics don't match"
+
+# =========================================================================
+# SIGNALS — Access events impacting commercial
+# =========================================================================
+
+signals_to_commercial:
+  - signal: "Access:MajorFormularyWin"
+    commercial_impact: "Large payer adds brand to preferred tier — volume opportunity"
+    tags: ["Access:FormularyChange"]
+  - signal: "Access:FormularyExclusion"
+    commercial_impact: "Major payer excludes brand — significant volume loss"
+    tags: ["Access:Restricted", "Commercial:ShareLoss"]
+  - signal: "Access:StepEditImposed"
+    commercial_impact: "New step therapy barrier reduces new starts"
+    tags: ["Access:StepEdit", "Demand:NBRxDecline"]
+  - signal: "Access:340B_Erosion"
+    commercial_impact: "340B utilization growing — margin pressure in covered entity accounts"
+    tags: ["Financial:BudgetCut", "Commercial:ShareLoss"]
+  - signal: "Access:IRA_Negotiation"
+    commercial_impact: "CMS selects drug for Medicare price negotiation — price ceiling imposed"
+    tags: ["Competitor:Pricing", "Financial:BudgetCut"]

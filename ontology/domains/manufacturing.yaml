@@ -1,0 +1,200 @@
+name: "Manufacturing & Supply Chain"
+version: "1.0.0"
+description: >
+  Pharmaceutical manufacturing, quality systems, distribution, and
+  supply chain management. Grounded in ICH Q-series guidelines,
+  GS1 identification standards, FDA DSCSA serialization, and GDP.
+
+standards_referenced:
+  - ICH_Q7
+  - ICH_Q8
+  - ICH_Q10
+  - GS1_GTIN
+  - GS1_GLN
+  - FDA_DSCSA
+  - GDP
+
+# =========================================================================
+# ENTITY TYPES
+# =========================================================================
+
+entity_types:
+
+  - name: ManufacturingSite
+    description: "A facility that produces drug substance or drug product"
+    attributes:
+      - site_id
+      - name
+      - location        # Country, city
+      - site_type       # API, Drug Product, Packaging, Biologics, Cell/Gene
+      - gmp_status      # Compliant, Warning Letter, Consent Decree, Debarred
+      - last_inspection # Date of last regulatory inspection
+      - capacity_utilization  # Percentage
+      - products_manufactured  # List of brand IDs
+      - cmo             # Boolean — is this a contract manufacturer?
+
+  - name: DrugSubstance
+    description: "Active Pharmaceutical Ingredient (API)"
+    attributes:
+      - api_name
+      - cas_number      # Chemical Abstracts Service registry number
+      - molecular_type  # Small molecule, Monoclonal antibody, Peptide, Oligonucleotide, Cell therapy
+      - synthesis_route # Chemical synthesis, Fermentation, Cell culture, Extraction
+      - critical_quality_attributes  # CQAs per ICH Q8
+      - suppliers       # List of API suppliers (dual-source strategy)
+      - shelf_life_months
+
+  - name: DrugProduct
+    description: "Finished dosage form ready for distribution"
+    attributes:
+      - product_name
+      - dosage_form     # Tablet, Capsule, Injectable, Infusion, Patch, Inhaler, Topical
+      - strength        # e.g., "100mg", "10mg/mL"
+      - container       # Vial, PFS, Autoinjector, Blister, Bottle
+      - storage_condition  # Ambient, Refrigerated (2-8°C), Frozen (-20°C), Ultra-cold (-80°C)
+      - shelf_life_months
+      - ndc_code        # National Drug Code (US)
+      - gtin            # Global Trade Item Number (GS1)
+
+  - name: BatchRecord
+    description: "Manufacturing record for a production batch"
+    attributes:
+      - batch_number
+      - product_id
+      - site_id
+      - manufacture_date
+      - expiry_date
+      - batch_size      # Number of units
+      - yield_pct       # Actual vs theoretical yield
+      - disposition     # Released, Quarantined, Rejected, Recalled
+      - deviations      # Number of deviations recorded
+      - capa_required   # Boolean — corrective action needed
+
+  - name: DistributionNode
+    description: "A location in the distribution network"
+    attributes:
+      - node_id
+      - gln             # Global Location Number (GS1)
+      - node_type       # Central Warehouse, Regional DC, 3PL, Specialty Pharmacy, Wholesaler, Hospital
+      - cold_chain_capable  # Boolean
+      - serialization_compliant  # DSCSA compliance status
+      - countries_served
+
+  - name: SupplyContract
+    description: "Agreement with a supplier, CMO, or 3PL"
+    attributes:
+      - contract_id
+      - counterparty
+      - contract_type   # API Supply, CMO Manufacturing, 3PL Distribution, Packaging
+      - minimum_order_quantity
+      - lead_time_weeks
+      - quality_agreement  # Boolean — QA in place
+      - backup_supplier    # Boolean — dual-sourced
+
+# =========================================================================
+# RELATIONSHIPS
+# =========================================================================
+
+relationships:
+  - { source: ManufacturingSite, target: DrugSubstance, type: produces }
+  - { source: ManufacturingSite, target: DrugProduct, type: manufactures }
+  - { source: DrugSubstance, target: DrugProduct, type: component_of }
+  - { source: DrugProduct, target: BatchRecord, type: produced_as }
+  - { source: DrugProduct, target: DistributionNode, type: shipped_to }
+  - { source: DistributionNode, target: DistributionNode, type: forwards_to }
+  - { source: SupplyContract, target: ManufacturingSite, type: governs }
+  - { source: SupplyContract, target: DistributionNode, type: covers }
+
+# =========================================================================
+# TAXONOMY
+# =========================================================================
+
+taxonomy:
+
+  dosage_forms:
+    oral_solid: [tablet, capsule, granule, powder, orally_disintegrating]
+    oral_liquid: [solution, suspension, syrup]
+    injectable: [IV_infusion, subcutaneous, intramuscular, intrathecal]
+    prefilled_devices: [prefilled_syringe, autoinjector, pen]
+    inhaled: [MDI, DPI, nebulizer_solution]
+    topical: [cream, ointment, gel, patch, spray]
+    advanced: [cell_therapy, gene_therapy, implant, liposomal]
+
+  storage_conditions:
+    ambient: { range: "15-30°C", label: "Room Temperature" }
+    controlled_room_temp: { range: "20-25°C", label: "CRT" }
+    refrigerated: { range: "2-8°C", label: "Cold Chain" }
+    frozen: { range: "-20°C", label: "Frozen" }
+    ultra_cold: { range: "-60 to -80°C", label: "Ultra-Cold (Cell/Gene)" }
+    cryogenic: { range: "-150°C or LN2", label: "Cryogenic Storage" }
+
+  quality_events:
+    deviation: "Departure from approved procedure or specification"
+    oos_result: "Out-of-specification test result"
+    capa: "Corrective and Preventive Action"
+    change_control: "Planned modification to process, equipment, or material"
+    recall:
+      class_I: "Reasonable probability of serious adverse health consequences or death"
+      class_II: "May cause temporary or medically reversible adverse health consequences"
+      class_III: "Not likely to cause adverse health consequences"
+
+  serialization_levels:
+    unit: "Individual saleable unit (GTIN + serial number)"
+    bundle: "Homogeneous case of units"
+    case: "Shipping case"
+    pallet: "Aggregation of cases on pallet"
+
+# =========================================================================
+# SUPPLY CHAIN RISK SIGNALS
+# =========================================================================
+
+signals_to_commercial:
+  - signal: "Supply:APIShortage"
+    commercial_impact: "May cause production delays, stock-outs, allocation"
+    tags: ["Supply:Shortage", "Supply:FulfillmentDelay"]
+  - signal: "Supply:GMP_Warning"
+    commercial_impact: "Regulatory inspection failure may halt production at site"
+    tags: ["Supply:Shortage", "Regulatory:Warning"]
+  - signal: "Supply:RecallEvent"
+    commercial_impact: "Product withdrawal, market disruption, prescriber confidence impact"
+    tags: ["Clinical:Safety", "Supply:Shortage"]
+  - signal: "Supply:ColdChainExcursion"
+    commercial_impact: "Product stability compromised, potential batch loss"
+    tags: ["Supply:FulfillmentDelay"]
+  - signal: "Supply:SingleSourceRisk"
+    commercial_impact: "No backup supplier — any disruption has full impact"
+    tags: ["Supply:Shortage", "Supply:DistributionGap"]
+  - signal: "Supply:CMOCapacityLimit"
+    commercial_impact: "Contract manufacturer at capacity, limits growth or launch supply"
+    tags: ["Supply:Shortage", "Commercial:LowAdoption"]
+
+# =========================================================================
+# INFERENCE RULES — Supply chain reasoning
+# =========================================================================
+
+inference_rules:
+
+  - id: "rule_supply_single_source_risk"
+    description: "Single-source API or CMO creates catastrophic supply vulnerability"
+    priority: 85
+    applies_when:
+      conditions: [single_source_api, no_backup_supplier]
+      lifecycle: [launch, growth]
+    typical_impact: "Complete supply disruption if source fails"
+    recommended_action: "Qualify backup supplier within 12 months"
+
+  - id: "rule_cold_chain_complexity"
+    description: "Ultra-cold or cryogenic products face distribution bottlenecks"
+    priority: 70
+    applies_when:
+      conditions: [storage_below_minus_20, limited_cold_chain_network]
+    typical_impact: "Restricted distribution reach, higher logistics cost"
+    recommended_action: "Expand cold-chain capable distribution network"
+
+  - id: "rule_serialization_gap"
+    description: "Non-compliant serialization blocks market access in regulated markets"
+    priority: 80
+    applies_when:
+      conditions: [serialization_non_compliant, target_market_requires_dscsa]
+    typical_impact: "Cannot ship to US market without DSCSA compliance"
+    recommended_action: "Implement unit-level serialization at packaging site"

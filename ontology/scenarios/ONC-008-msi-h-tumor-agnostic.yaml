@@ -1,0 +1,23 @@
+id: "ONC-008"
+name: "MSI-H Tumor-Agnostic IO — Cross-Indication Testing Adoption"
+description: >
+  Pembrolizumab has tumor-agnostic approval for MSI-H/dMMR solid tumors.
+  Adoption varies dramatically by tumor type: high in CRC (standard MSI testing)
+  but very low in endometrial, gastric, and rare tumors where MSI/MMR testing
+  is not routine. Untapped MSI-H patients represent significant unmet commercial
+  opportunity gated by testing infrastructure.
+therapeutic_area: "oncology"
+indication: "Tumor-Agnostic — MSI-H/dMMR solid tumors"
+molecular_context: "MSI-H by PCR or dMMR by IHC (MLH1, MSH2, MSH6, PMS2)"
+brand_context:
+  brand: "Checkpoint inhibitor with tumor-agnostic MSI-H approval"
+  lifecycle: "growth (indication expansion phase)"
+  channel: "buy_and_bill"
+account_context:
+  type: "Mixed Academic/Community — varies by tumor type"
+  biomarker_testing: "MSI/MMR reflexed in CRC pathology; not standardized in other tumor types"
+trigger_signal: "MSI-H IO utilization 90% in mCRC but <20% in endometrial and gastric despite similar prevalence"
+expected_hypothesis: "demand_erosion"
+expected_drivers: ["testing_rate_disparity_by_tumor", "pathology_workflow_gap", "oncologist_awareness_outside_crc"]
+inference_rules_exercised: ["rule_biomarker_testing_gap"]
+complexity_level: "high"

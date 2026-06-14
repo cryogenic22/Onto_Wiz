@@ -1,0 +1,183 @@
+name: "Patient Services & Support"
+version: "1.0.0"
+description: >
+  Hub operations, copay assistance, adherence programs, nurse support,
+  REMS fulfillment, and patient journey tracking. Covers the patient
+  experience from prescription to ongoing therapy management.
+
+standards_referenced:
+  - NCPDP
+  - SNOMED_CT
+
+# =========================================================================
+# ENTITY TYPES
+# =========================================================================
+
+entity_types:
+
+  - name: PatientHub
+    description: "Centralized patient services center coordinating access and support"
+    attributes:
+      - hub_id
+      - hub_name        # e.g., "OncoVance Patient Connect"
+      - vendor          # Hub vendor (e.g., CoverMyMeds, AssistRx, Lash Group)
+      - services_offered  # List: PA support, copay, nurse, adherence, REMS
+      - products_supported
+      - enrollment_count
+      - avg_time_to_therapy_days  # From prescription to first fill
+      - abandonment_rate  # Percentage who never fill
+
+  - name: PatientJourney
+    description: "Individual patient's path from diagnosis to ongoing therapy"
+    attributes:
+      - journey_id
+      - patient_id      # De-identified
+      - brand_id
+      - prescription_date
+      - benefits_verification_date
+      - pa_submitted_date
+      - pa_decision_date
+      - pa_outcome       # Approved, Denied, Appeal Filed, Appeal Won
+      - first_fill_date
+      - time_to_therapy_days
+      - abandonment_point  # None, Pre-PA, PA-Denied, Copay-Barrier, Pharmacy
+      - copay_assistance_used  # Boolean
+      - specialty_pharmacy
+
+  - name: AdherenceProgram
+    description: "Program designed to keep patients on therapy"
+    attributes:
+      - program_id
+      - program_type    # Refill Reminder, Nurse Check-in, Digital App, SMS, IVR
+      - frequency       # Weekly, Bi-weekly, Monthly, Event-triggered
+      - target_metric   # PDC, Refill rate, Days on therapy
+      - enrollment_count
+      - effectiveness   # Measured PDC improvement or refill lift
+
+  - name: NurseSupport
+    description: "Clinical nurse educator or patient navigator program"
+    attributes:
+      - program_id
+      - support_type    # Injection Training, Disease Education, Side Effect Management, Emotional Support
+      - delivery_mode   # Phone, Video, In-Home, In-Office
+      - touchpoint_frequency
+      - caseload_per_nurse
+      - patient_satisfaction_score
+
+  - name: PatientAssistance
+    description: "Free drug program for uninsured or underinsured patients"
+    attributes:
+      - program_id
+      - eligibility_criteria  # Income threshold (e.g., "≤400% FPL"), insurance status
+      - enrollment_count
+      - annual_drug_value_per_patient
+      - funding_source   # Manufacturer, Foundation, Government
+      - application_process  # Online, Paper, HCP-submitted
+
+  - name: SpecialtyPharmacy
+    description: "Pharmacy dispensing specialty drugs with clinical services"
+    attributes:
+      - pharmacy_id
+      - name
+      - accreditation   # URAC, ACHC, TJC
+      - limited_distribution  # Boolean — exclusive or limited network
+      - cold_chain_capable
+      - clinical_services  # Adherence calls, refill management, outcomes reporting
+      - payer_contracts   # Number of payer contracts
+      - avg_ship_time_days
+
+# =========================================================================
+# RELATIONSHIPS
+# =========================================================================
+
+relationships:
+  - { source: PatientHub, target: PatientJourney, type: manages }
+  - { source: PatientHub, target: AdherenceProgram, type: operates }
+  - { source: PatientHub, target: NurseSupport, type: coordinates }
+  - { source: PatientHub, target: PatientAssistance, type: administers }
+  - { source: PatientJourney, target: SpecialtyPharmacy, type: fulfilled_by }
+  - { source: PatientJourney, target: AdherenceProgram, type: enrolled_in }
+
+# =========================================================================
+# TAXONOMY
+# =========================================================================
+
+taxonomy:
+
+  patient_journey_stages:
+    diagnosis:
+      description: "Patient receives diagnosis and treatment decision"
+      key_metrics: [time_to_diagnosis, specialist_referral_rate]
+      drop_off_risk: "Patient not referred to specialist or delays treatment"
+    prescription:
+      description: "HCP writes prescription for brand"
+      key_metrics: [prescription_volume, e_prescribe_rate]
+      drop_off_risk: "HCP prescribes alternative due to formulary or habit"
+    benefits_verification:
+      description: "Insurance coverage and patient responsibility determined"
+      key_metrics: [bv_turnaround_days, coverage_rate]
+      drop_off_risk: "Coverage denied or patient uninsured"
+    prior_authorization:
+      description: "Payer pre-approval obtained if required"
+      key_metrics: [pa_approval_rate, pa_turnaround_days, appeal_rate]
+      drop_off_risk: "PA denied and patient or HCP doesn't appeal"
+    fulfillment:
+      description: "Drug dispensed through pharmacy"
+      key_metrics: [time_to_first_fill, fill_rate]
+      drop_off_risk: "Patient doesn't pick up or copay too high (sticker shock)"
+    onboarding:
+      description: "Patient starts therapy with clinical support"
+      key_metrics: [onboarding_call_completion, injection_training_rate]
+      drop_off_risk: "Side effects or administration difficulty"
+    adherence:
+      description: "Patient continues therapy as prescribed"
+      key_metrics: [PDC, refill_rate, days_on_therapy, persistence_6mo]
+      drop_off_risk: "Side effects, cost burden, perceived lack of efficacy"
+    outcomes:
+      description: "Treatment outcome measured"
+      key_metrics: [response_rate, progression_free, patient_satisfaction]
+
+  abandonment_reasons:
+    cost_related:
+      - high_copay
+      - deductible_not_met
+      - coverage_gap
+      - no_copay_card_awareness
+    access_related:
+      - pa_denied
+      - step_therapy_required
+      - pharmacy_out_of_stock
+      - limited_distribution_delay
+    clinical_related:
+      - side_effects
+      - perceived_inefficacy
+      - disease_progression
+      - competing_therapy_preference
+    administrative:
+      - prescription_not_transferred
+      - benefits_verification_delay
+      - incomplete_enrollment
+
+  hub_services:
+    access_services: [benefits_verification, prior_authorization_support, appeals_assistance, copay_enrollment]
+    clinical_services: [nurse_educator, injection_training, side_effect_management, adherence_counseling]
+    financial_services: [copay_card, free_trial, patient_assistance, foundation_referral]
+    logistics: [specialty_pharmacy_coordination, refill_management, cold_chain_delivery]
+
+# =========================================================================
+# SIGNALS — Patient services events impacting commercial
+# =========================================================================
+
+signals_to_commercial:
+  - signal: "PatientServices:HighAbandonment"
+    commercial_impact: "Patients dropping off before first fill — lost prescriptions"
+    tags: ["Demand:NBRxDecline", "Access:PAReject"]
+  - signal: "PatientServices:AdherenceDecline"
+    commercial_impact: "Refill rates dropping — persistence issue"
+    tags: ["Demand:EngagementDrop", "Commercial:VolumeDrop"]
+  - signal: "PatientServices:CopayExhaustion"
+    commercial_impact: "Patients hitting copay card max — risk of switching"
+    tags: ["Barrier:Budget", "Demand:NBRxDecline"]
+  - signal: "PatientServices:HubOverload"
+    commercial_impact: "Hub capacity strained — longer time to therapy"
+    tags: ["Supply:FulfillmentDelay"]

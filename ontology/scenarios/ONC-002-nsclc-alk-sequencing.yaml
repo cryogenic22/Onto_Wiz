@@ -1,0 +1,22 @@
+id: "ONC-002"
+name: "NSCLC ALK+ Treatment Sequencing Disruption"
+description: >
+  Lorlatinib Phase 3 data (CROWN) disrupts ALK+ NSCLC 1L sequencing.
+  Physicians who previously used crizotinib→alectinib→lorlatinib now
+  consider lorlatinib upfront. Brand (alectinib-positioned) faces 1L
+  share erosion from lorlatinib's CNS penetration advantage.
+therapeutic_area: "oncology"
+indication: "NSCLC — ALK-rearranged"
+molecular_context: "ALK fusion (EML4-ALK)"
+brand_context:
+  brand: "ALK TKI (2nd-generation)"
+  lifecycle: "growth"
+  channel: "specialty_pharmacy"
+account_context:
+  type: "Academic Center with molecular tumor board"
+  biomarker_testing: "NGS panel at diagnosis including ALK FISH confirmation"
+trigger_signal: "Competitor 3rd-gen ALK TKI data shifts 1L preference at academic centers"
+expected_hypothesis: "competitive_pressure"
+expected_drivers: ["superior_cns_penetration_data", "kol_early_adoption", "guideline_update_pending"]
+inference_rules_exercised: ["rule_competitive_displacement"]
+complexity_level: "high"

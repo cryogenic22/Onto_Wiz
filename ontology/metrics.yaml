@@ -1,0 +1,186 @@
+name: "Pharma Commercial Metrics"
+version: "1.0.0"
+description: >
+  Standardized metric definitions for commercial pharma analytics.
+  Each metric has a canonical name, definition, signal roles,
+  and interpretation guidance by lifecycle stage.
+
+# =========================================================================
+# PRESCRIPTION METRICS — Core demand signals
+# =========================================================================
+
+metrics:
+
+  - id: "TRx"
+    name: "Total Prescriptions"
+    definition: "Total prescriptions dispensed (new + refills) in a period"
+    category: demand
+    direction_interpretation:
+      declining: "Demand weakening or access barrier"
+      stable: "Steady state demand"
+      growing: "Increasing utilization"
+    signal_role_by_context:
+      regional_performance_dip: "validation"
+      launch_trajectory: "validation"
+      competitive_displacement: "validation"
+    related_metrics: ["NBRx", "RRx"]
+    tags: ["Commercial:VolumeDrop", "Commercial:ShareLoss"]
+
+  - id: "NBRx"
+    name: "New-to-Brand Prescriptions"
+    definition: "Prescriptions written for patients new to the brand in a period"
+    category: demand
+    direction_interpretation:
+      declining: "New patient starts dropping — demand or access issue at initiation"
+      stable: "Consistent new patient flow"
+      growing: "Growing adoption, successful awareness"
+    signal_role_by_context:
+      regional_performance_dip: "disconfirming"
+      launch_trajectory: "validation"
+      demand_erosion: "validation"
+    related_metrics: ["TRx", "NPS"]
+    tags: ["Demand:NBRxDecline", "Commercial:LowAdoption"]
+
+  - id: "RRx"
+    name: "Refill Prescriptions"
+    definition: "Repeat/refill prescriptions in a period (TRx minus NBRx)"
+    category: demand
+    direction_interpretation:
+      declining: "Adherence issue or switch-away"
+      stable: "Patients staying on therapy"
+      growing: "Expanding patient base retained"
+    signal_role_by_context:
+      regional_performance_dip: "supporting"
+      safety_signal: "disconfirming"
+
+  - id: "PDC"
+    name: "Proportion of Days Covered"
+    definition: "Percentage of days in a period that a patient has medication available"
+    category: adherence
+    direction_interpretation:
+      declining: "Adherence deteriorating — side effects, cost, or access"
+      stable: "Consistent adherence"
+      growing: "Improving compliance"
+    threshold: { good: 0.80, warning: 0.60 }
+    signal_role_by_context:
+      safety_signal: "supporting"
+      demand_erosion: "supporting"
+
+  # =========================================================================
+  # MARKET SHARE METRICS
+  # =========================================================================
+
+  - id: "market_share_trx"
+    name: "TRx Market Share"
+    definition: "Brand TRx as percentage of total market TRx in the defined market"
+    category: competitive
+    direction_interpretation:
+      declining: "Losing share — competitive, access, or demand issue"
+      stable: "Holding position"
+      growing: "Gaining share — momentum or competitor weakness"
+    signal_role_by_context:
+      competitive_displacement: "validation"
+      biosimilar_erosion: "validation"
+    tags: ["Commercial:ShareLoss"]
+
+  - id: "market_share_nbrx"
+    name: "NBRx Market Share"
+    definition: "Brand NBRx as percentage of total market NBRx (leading indicator of share trajectory)"
+    category: competitive
+    direction_interpretation:
+      declining: "Losing prescriber preference — early warning"
+      growing: "Gaining prescriber preference — positive signal"
+    signal_role_by_context:
+      competitive_displacement: "leading"
+      launch_trajectory: "validation"
+
+  # =========================================================================
+  # ACCESS METRICS
+  # =========================================================================
+
+  - id: "pa_reject_rate"
+    name: "Prior Authorization Rejection Rate"
+    definition: "Percentage of PA requests denied by payer in a period"
+    category: access
+    direction_interpretation:
+      increasing: "Access tightening — payer policy change or criteria shift"
+      stable: "Consistent access environment"
+      decreasing: "Access improving — successful appeals or policy change"
+    threshold: { warning: 0.15, critical: 0.30 }
+    signal_role_by_context:
+      regional_performance_dip: "validation"
+      access_barrier: "validation"
+    tags: ["Access:PAReject"]
+
+  - id: "formulary_coverage"
+    name: "Formulary Coverage Rate"
+    definition: "Percentage of covered lives with brand on formulary (any tier)"
+    category: access
+    direction_interpretation:
+      declining: "Formulary losses — payer exclusions or tier changes"
+      stable: "Maintained access"
+      growing: "Expanding formulary wins"
+    tags: ["Access:FormularyChange", "Access:Restricted"]
+
+  - id: "net_price"
+    name: "Net Price (Post-Rebate)"
+    definition: "Average realized price after all rebates, discounts, and chargebacks"
+    category: financial
+    direction_interpretation:
+      declining: "Price erosion — competitive pressure or payer demands"
+      stable: "Price maintenance"
+    related_metrics: ["gross_to_net", "wac"]
+
+  # =========================================================================
+  # FIELD ACTIVITY METRICS
+  # =========================================================================
+
+  - id: "call_reach"
+    name: "Call Reach"
+    definition: "Percentage of target HCPs contacted at least once in a period"
+    category: execution
+    direction_interpretation:
+      declining: "Coverage gap — vacancy, territory imbalance, or disengagement"
+      growing: "Improving territory coverage"
+    threshold: { target: 0.80, warning: 0.60 }
+    tags: ["Field:LowCoverage"]
+
+  - id: "call_frequency"
+    name: "Average Call Frequency"
+    definition: "Average number of rep visits per target HCP in a period"
+    category: execution
+    direction_interpretation:
+      declining: "Reduced engagement — may indicate vacancy or priority shift"
+      growing: "Intensifying engagement"
+    tags: ["Field:RepVacancy", "Field:LowCoverage"]
+
+  - id: "territory_vacancy_rate"
+    name: "Territory Vacancy Rate"
+    definition: "Percentage of territories without an assigned representative"
+    category: execution
+    direction_interpretation:
+      increasing: "Growing execution gap — recruitment or retention issue"
+    threshold: { warning: 0.10, critical: 0.20 }
+    tags: ["Field:RepVacancy"]
+
+  # =========================================================================
+  # ENGAGEMENT METRICS
+  # =========================================================================
+
+  - id: "hcp_engagement_score"
+    name: "HCP Engagement Score"
+    definition: "Composite score of HCP interactions (calls, samples, programs, digital)"
+    category: engagement
+    direction_interpretation:
+      declining: "Disengagement — may precede prescribing behavior change"
+      growing: "Deepening relationship"
+    tags: ["Demand:EngagementDrop", "Field:KOLDisengaged"]
+
+  - id: "nps_hcp"
+    name: "HCP Net Promoter Score"
+    definition: "Net promoter score from HCP surveys (likelihood to recommend brand)"
+    category: engagement
+    direction_interpretation:
+      declining: "Prescriber sentiment deteriorating"
+      growing: "Improving clinical confidence"
+    tags: ["Demand:EngagementDrop"]

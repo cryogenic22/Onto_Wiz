@@ -1,0 +1,40 @@
+id: rule_cyber_disruption
+kind: decision_heuristic
+name: Cyber Disruption
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: steward
+  reason: approved mined candidate b42104a6-d6cb-458b-bfbc-1a882c50e555
+  delta_id: 4e69f6cb-03a1-422c-904d-6d34e7b51886
+  at: '2026-06-13T11:03:34.010915+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-13T11:03:34.010915+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.85
+created_at: null
+updated_at: '2026-06-13T11:03:34.010915+00:00'
+trigger_signals: []
+trigger_context:
+- A cyber/IT incident at a distributor can masquerade as a demand drop.
+decision_logic: cyberattack on distributor IT => fulfillment outage => volume drop
+judgment_type: empirical
+exceptions: []
+anti_patterns: []
+evidence_required: []
+typical_outcome: "Cyberattack-driven distribution outage: an IT incident at the distributor\
+  \ halted fulfillment \u2014 a supply-side outage, not demand or access."
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope: {}
+valid_for_days: 180

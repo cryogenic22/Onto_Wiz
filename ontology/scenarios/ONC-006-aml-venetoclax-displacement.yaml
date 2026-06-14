@@ -1,0 +1,22 @@
+id: "ONC-006"
+name: "AML Unfit — Venetoclax+Azacitidine Displaces Prior Standard"
+description: >
+  VIALE-A data establishes venetoclax+azacitidine as new SOC for unfit AML,
+  displacing HMA monotherapy and low-dose cytarabine. Brand (HMA monotherapy)
+  loses share rapidly at academic centers. Community adoption follows with 6-12
+  month lag. Mutation-specific agents (IDH1/2, FLT3) create further segmentation.
+therapeutic_area: "oncology"
+indication: "Acute Myeloid Leukemia (AML) — transplant-ineligible"
+molecular_context: "Non-mutation-specific (all-comers); IDH1/IDH2/FLT3 subtypes have additional targeted options"
+brand_context:
+  brand: "HMA monotherapy (azacitidine or decitabine alone)"
+  lifecycle: "maturity / LOE"
+  channel: "buy_and_bill"
+account_context:
+  type: "Academic Leukemia Center"
+  biomarker_testing: "Comprehensive mutational panel (FLT3, IDH1, IDH2, NPM1, TP53) at diagnosis"
+trigger_signal: "HMA monotherapy share drops 65% at academic centers within 6 months of combination availability"
+expected_hypothesis: "competitive_pressure"
+expected_drivers: ["superior_os_data_viale_a", "nccn_category_1_update", "rapid_kol_adoption"]
+inference_rules_exercised: ["rule_competitive_displacement", "rule_guideline_driven_shift"]
+complexity_level: "high"

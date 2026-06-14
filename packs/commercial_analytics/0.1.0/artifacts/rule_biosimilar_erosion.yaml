@@ -1,0 +1,48 @@
+id: rule_biosimilar_erosion
+kind: decision_heuristic
+name: Biosimilar Erosion
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: f0d68a51-48cf-4c8c-8940-ee584f49d690
+  at: '2026-06-12T00:05:45.715320+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-12T00:05:45.715320+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-12T00:05:45.715320+00:00'
+trigger_signals:
+- signal_name: has_biosimilar_entry
+  threshold: Competitor:Biosimilar
+  data_source: tag_match
+- signal_name: has_price_or_share_pressure
+  threshold: Commercial:ShareLoss | Competitor:Pricing
+  data_source: tag_match
+trigger_context:
+- Biosimilar entry eroding originator brand share through price pressure.
+decision_logic: has_biosimilar_entry AND has_price_or_share_pressure => Biosimilar
+  erosion pattern. Price-driven switching is accelerating share loss.
+judgment_type: empirical
+exceptions: []
+anti_patterns: []
+evidence_required: []
+typical_outcome: Biosimilar erosion pattern. Price-driven switching is accelerating
+  share loss.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '65'
+valid_for_days: 180

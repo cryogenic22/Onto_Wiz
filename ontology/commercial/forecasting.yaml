@@ -1,0 +1,102 @@
+ontology:
+  name: "Commercial Forecasting Module"
+  version: "1.0.0"
+  # Declared once for the whole module — every rule below inherits FUNCTION=forecasting
+  # (a rule may still override with its own `function:`). This is the drop-a-file
+  # expansion of the single licensable commercial_analytics pack (ADR-012 keeps it
+  # one pack, sub-divided by TagDimension.FUNCTION).
+  function: "forecasting"
+  description: >
+    Forward-looking commercial heuristics: loss-of-exclusivity erosion curves,
+    demand-sensing divergence, analog-based launch trajectories, and scenario
+    sensitivity. Distinguishes a forecastable, structural trajectory from the
+    in-period diagnostic patterns in the base pack.
+
+  meta_model:
+    entities:
+      - name: "Forecast"
+        attributes: [brand_id, horizon_months, method, base_case, confidence_interval]
+      - name: "ScenarioDriver"
+        attributes: [name, swing_low, swing_high, elasticity, owner]
+
+    relationships:
+      - { source: Forecast, target: Brand, type: projects, attributes: [horizon, method] }
+      - { source: ScenarioDriver, target: Forecast, type: sensitizes, attributes: [elasticity] }
+
+  inference_rules:
+
+    - id: "rule_loe_erosion_curve"
+      description: >
+        Post loss-of-exclusivity erosion follows a structural curve (steep first
+        2-3 quarters of generic/biosimilar substitution, then a plateau) — it is a
+        forecastable trajectory, not a one-off volume drop to be diagnosed.
+      priority: 80
+      conditions:
+        - name: "has_loe_event"
+          pattern: "tag_match"
+          args: ["Lifecycle:LOE", "Competitor:Biosimilar"]
+        - name: "has_volume_decline"
+          pattern: "tag_match"
+          args: ["Commercial:VolumeDrop", "Commercial:ShareLoss"]
+      logic: "has_loe_event AND has_volume_decline"
+      consequence:
+        risk: "Forecast:ErosionCurve"
+        verdict: "LOE erosion curve. Model the decline as a structural substitution trajectory (steep then plateau), not an anomaly — forecast the floor, do not chase the slope."
+        confidence_modifier: "average"
+
+    - id: "rule_demand_sensing_divergence"
+      description: >
+        Leading demand indicators (new-patient starts, search/Rx intent, diagnosis
+        rates) diverging from shipped volume signal a turning point ahead of the
+        trended forecast — refresh the forecast off the leading signal.
+      priority: 72
+      conditions:
+        - name: "has_leading_signal_shift"
+          pattern: "tag_match"
+          args: ["Demand:NBRxDecline", "Demand:AwarenessGap"]
+        - name: "has_trend_divergence"
+          pattern: "tag_match"
+          args: ["Commercial:VolumeDrop", "Commercial:ChannelShift"]
+      logic: "has_leading_signal_shift AND has_trend_divergence"
+      consequence:
+        risk: "Forecast:DemandSensing"
+        verdict: "Demand-sensing divergence. Leading indicators have decoupled from shipped volume — re-anchor the forecast on the leading signal, the trend line is stale."
+        confidence_modifier: "average"
+
+    - id: "rule_analog_launch_trajectory"
+      description: >
+        A new launch under-indexing its pre-agreed analog trajectory is an early,
+        forecastable trajectory miss (awareness/access ramp), distinct from a
+        post-hoc launch-stall diagnosis — re-forecast the curve against the analog.
+      priority: 68
+      conditions:
+        - name: "has_launch_phase"
+          pattern: "tag_match"
+          args: ["Commercial:LowAdoption", "Lifecycle:Launch"]
+        - name: "has_analog_gap"
+          pattern: "tag_match"
+          args: ["Demand:AwarenessGap", "Field:LowCoverage"]
+      logic: "has_launch_phase AND has_analog_gap"
+      consequence:
+        risk: "Forecast:AnalogTrajectory"
+        verdict: "Analog launch-trajectory miss. The uptake curve is tracking below the analog band — re-forecast against the analog and isolate the ramp driver early."
+        confidence_modifier: "average"
+
+    - id: "rule_scenario_sensitivity"
+      description: >
+        When a single driver's plausible swing moves the forecast more than the
+        base-case delta, the number is sensitivity-bound — report a scenario band
+        around that driver rather than a false point estimate.
+      priority: 60
+      conditions:
+        - name: "has_driver_uncertainty"
+          pattern: "tag_match"
+          args: ["Financial:MarginPressure", "Access:ReimbursementPressure"]
+        - name: "has_forecast_swing"
+          pattern: "tag_match"
+          args: ["Commercial:ShareLoss", "Commercial:MarketExpansion"]
+      logic: "has_driver_uncertainty AND has_forecast_swing"
+      consequence:
+        risk: "Forecast:ScenarioSensitivity"
+        verdict: "Scenario-sensitivity dominant. One driver's swing exceeds the base-case delta — deliver a scenario band keyed to that driver, not a point estimate."
+        confidence_modifier: "average"

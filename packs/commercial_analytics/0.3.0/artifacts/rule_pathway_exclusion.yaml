@@ -1,0 +1,60 @@
+id: rule_pathway_exclusion
+kind: decision_heuristic
+name: Pathway Exclusion
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: f541a186-6309-4c12-abe1-5f8fda6d8e06
+  at: '2026-06-14T00:06:14.835650+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835650+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: market_access
+  parent: null
+- dimension: therapy_area
+  value: oncology
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835650+00:00'
+trigger_signals:
+- signal_name: has_pathway_restriction
+  threshold: Access:Restricted | Clinical:Guideline
+  data_source: tag_match
+- signal_name: has_institutional_impact
+  threshold: Commercial:ShareLoss | Demand:NBRxDecline
+  data_source: tag_match
+trigger_context:
+- Clinical pathway committee excludes brand from institutional treatment protocol.
+decision_logic: has_pathway_restriction AND has_institutional_impact => Institutional
+  pathway exclusion. Clinical pathway committee has deprioritized brand, blocking
+  new starts.
+judgment_type: empirical
+exceptions: []
+anti_patterns:
+- wrong_conclusion: An external clinical-guideline (NCCN/ESMO) shift
+  why_wrong: "This is an INSTITUTIONAL pathway-committee deprioritization at specific\
+    \ centers \u2014 not a national guideline-body update. The governed label is pathway\
+    \ exclusion, not guideline shift."
+  unless_evidence: ''
+evidence_required: []
+typical_outcome: Institutional pathway exclusion. Clinical pathway committee has deprioritized
+  brand, blocking new starts.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '72'
+valid_for_days: 180

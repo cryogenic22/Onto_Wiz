@@ -1,0 +1,156 @@
+name: "Health Economics & Outcomes Research"
+version: "1.0.0"
+description: >
+  Health economic evaluation, pricing strategy, HTA submissions,
+  real-world evidence, and patient-reported outcomes. Grounded in
+  CHEERS reporting standards, ISPOR methodology guidelines, and
+  HTA body requirements (NICE, G-BA, HAS, CADTH, PBAC).
+
+standards_referenced:
+  - CHEERS
+  - ISPOR
+  - EQ5D
+  - ICER
+
+# =========================================================================
+# ENTITY TYPES
+# =========================================================================
+
+entity_types:
+
+  - name: EconomicModel
+    description: "A quantitative model evaluating cost-effectiveness or budget impact"
+    attributes:
+      - model_id
+      - model_type      # Cost-Effectiveness, Cost-Utility, Budget Impact, Cost-Minimization
+      - analytic_framework  # Decision Tree, Markov, Partitioned Survival, Microsimulation, DES
+      - perspective      # Payer, Societal, Healthcare System, Hospital
+      - time_horizon     # e.g., "Lifetime", "5 years", "1 year"
+      - discount_rate    # e.g., 3.0%, 3.5%
+      - comparators      # List of comparator treatments
+      - primary_outcome  # ICER, QALY gained, LYG, NMB
+      - result_icer      # Incremental cost per QALY (if cost-utility)
+      - wtp_threshold    # Willingness-to-pay threshold used
+
+  - name: HTASubmission
+    description: "Submission to a Health Technology Assessment body"
+    attributes:
+      - submission_id
+      - hta_body        # NICE, G-BA, HAS, CADTH, PBAC, IQWIG, ZIN, TLV
+      - country
+      - product
+      - indication
+      - submission_date
+      - decision_date
+      - recommendation  # Positive, Negative, Conditional, Restricted, Optimized
+      - price_negotiated  # Boolean
+      - restrictions     # Any usage restrictions imposed
+      - resubmission_planned  # Boolean
+
+  - name: PricingStrategy
+    description: "Drug pricing and contracting approach"
+    attributes:
+      - product
+      - geography
+      - pricing_model   # WAC, Net, Value-Based, Outcomes-Based, Indication-Based
+      - wac_price       # List price (Wholesale Acquisition Cost)
+      - net_price       # Post-rebate realized price
+      - gross_to_net_pct  # Rebate percentage
+      - reference_pricing  # Boolean — subject to international reference pricing
+      - launch_price_strategy  # At parity, premium, discount, access-driven
+
+  - name: RealWorldStudy
+    description: "Observational study using real-world data (RWD)"
+    attributes:
+      - study_id
+      - study_type      # Retrospective Cohort, Prospective Registry, Claims Analysis, EHR Study
+      - data_source      # Claims DB, EHR, Registry, Patient Survey
+      - data_source_name # e.g., "Optum", "IQVIA", "Flatiron", "MarketScan", "CPRD"
+      - population_size
+      - endpoints        # Effectiveness, Safety, Adherence, Resource Utilization, PRO
+      - publication_status  # Planned, Ongoing, Completed, Published
+      - regulatory_use   # Boolean — used for regulatory submission
+
+  - name: PatientReportedOutcome
+    description: "A validated instrument measuring patient perspective"
+    attributes:
+      - instrument_name  # e.g., "EQ-5D-5L", "EORTC QLQ-C30", "PHQ-9", "SF-36"
+      - domain           # Quality of Life, Symptom Burden, Functioning, Satisfaction
+      - validated_for    # List of indications/populations
+      - mcid             # Minimum Clinically Important Difference
+      - scoring_range    # e.g., "0-100", "-0.594 to 1.0"
+      - regulatory_accepted  # Boolean — accepted by FDA/EMA as endpoint
+
+# =========================================================================
+# RELATIONSHIPS
+# =========================================================================
+
+relationships:
+  - { source: EconomicModel, target: HTASubmission, type: supports }
+  - { source: RealWorldStudy, target: EconomicModel, type: informs }
+  - { source: RealWorldStudy, target: HTASubmission, type: supports }
+  - { source: PatientReportedOutcome, target: EconomicModel, type: input_to }
+  - { source: PricingStrategy, target: HTASubmission, type: shapes }
+  - { source: HTASubmission, target: Brand, type: determines_access_for }
+
+# =========================================================================
+# TAXONOMY
+# =========================================================================
+
+taxonomy:
+
+  hta_bodies_by_market:
+    us: { body: "ICER", role: "Independent value assessment (non-binding)", influence: "Payer negotiations" }
+    uk: { body: "NICE", role: "HTA and reimbursement recommendation", wtp_threshold: "£20,000-30,000/QALY" }
+    germany: { body: "G-BA / IQWiG", role: "Benefit assessment + price negotiation (AMNOG)", framework: "Added therapeutic benefit (1-6 scale)" }
+    france: { body: "HAS", role: "SMR/ASMR rating for reimbursement", framework: "ASMR I-V (major to no improvement)" }
+    canada: { body: "CADTH / INESSS", role: "HTA recommendation for public formularies", wtp_threshold: "CAD 50,000/QALY" }
+    australia: { body: "PBAC", role: "Reimbursement recommendation for PBS", framework: "Cost-effectiveness + budget impact" }
+    japan: { body: "Chuikyo", role: "Drug pricing based on cost-effectiveness (above threshold)", framework: "ICER threshold ¥5M/QALY" }
+    south_korea: { body: "HIRA", role: "Economic evaluation for NHI listing" }
+    brazil: { body: "CONITEC", role: "HTA for SUS (public system) inclusion" }
+
+  economic_evaluation_types:
+    cost_effectiveness: "Compares cost per natural unit (LYG, event avoided)"
+    cost_utility: "Compares cost per QALY — most common for HTA"
+    cost_minimization: "When efficacy equivalent, compares total cost"
+    cost_benefit: "Monetizes all outcomes — rarely used in pharma"
+    budget_impact: "Estimates total financial impact to payer over 1-5 years"
+
+  value_frameworks:
+    icer: { name: "ICER Value Assessment Framework", metrics: [ICER_per_QALY, evLYG, budget_impact, other_benefits] }
+    esmo_mcbs: { name: "ESMO Magnitude of Clinical Benefit Scale", metrics: [HR, absolute_benefit, toxicity, QoL], oncology_specific: true }
+    asco_vf: { name: "ASCO Value Framework", metrics: [clinical_benefit, toxicity, bonus_points], oncology_specific: true }
+    nccn_eb: { name: "NCCN Evidence Blocks", metrics: [efficacy, safety, consistency, affordability] }
+
+  common_pro_instruments:
+    generic:
+      - { name: "EQ-5D-5L", domains: [mobility, self_care, usual_activities, pain, anxiety], use: "QALY calculation" }
+      - { name: "SF-36", domains: [physical_functioning, role_physical, bodily_pain, general_health, vitality, social, role_emotional, mental_health] }
+    oncology:
+      - { name: "EORTC QLQ-C30", domains: [global_health, physical, role, emotional, cognitive, social, symptom_scales] }
+      - { name: "FACT-G", domains: [physical, social, emotional, functional] }
+    depression:
+      - { name: "PHQ-9", domains: [depression_severity], scoring: "0-27" }
+      - { name: "HAM-D", domains: [depression_severity], scoring: "0-52" }
+    pain:
+      - { name: "VAS", domains: [pain_intensity], scoring: "0-100mm" }
+      - { name: "BPI", domains: [pain_severity, pain_interference] }
+
+# =========================================================================
+# SIGNALS — HEOR events impacting commercial strategy
+# =========================================================================
+
+signals_to_commercial:
+  - signal: "HEOR:NegativeHTADecision"
+    commercial_impact: "Blocked or restricted reimbursement in market"
+    tags: ["Access:Restricted", "Commercial:ShareLoss"]
+  - signal: "HEOR:FavorableICER"
+    commercial_impact: "Strong value story supports payer negotiations"
+    tags: ["Access:FormularyChange"]
+  - signal: "HEOR:RWE_SafetySignal"
+    commercial_impact: "Real-world safety data may change risk-benefit perception"
+    tags: ["Clinical:Safety", "Clinical:RealWorld"]
+  - signal: "HEOR:CompetitorValueClaim"
+    commercial_impact: "Competitor publishes superior cost-effectiveness data"
+    tags: ["Competitor:Pricing", "Clinical:Efficacy"]

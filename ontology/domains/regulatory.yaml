@@ -1,0 +1,167 @@
+name: "Regulatory Affairs"
+version: "1.0.0"
+description: >
+  Regulatory submission pathways, approval types, labeling, and
+  post-marketing obligations. Grounded in ICH CTD/eCTD structure,
+  FDA and EMA submission frameworks, and global regulatory harmonization.
+
+standards_referenced:
+  - ICH_CTD
+  - ICH_eCTD
+  - FDA_OrangeBook
+  - EMA_EPAR
+
+# =========================================================================
+# ENTITY TYPES
+# =========================================================================
+
+entity_types:
+
+  - name: RegulatorySubmission
+    description: "A formal application to a regulatory authority for drug approval"
+    attributes:
+      - submission_id
+      - type            # NDA, BLA, sNDA, ANDA, MAA, Type II Variation
+      - agency          # FDA, EMA, PMDA, NMPA, Health Canada, TGA, MHRA
+      - status          # Drafted, Submitted, Under Review, Approved, Refused, Withdrawn
+      - submission_date
+      - pdufa_date      # FDA target action date
+      - priority_review # Boolean
+      - orphan_designation  # Boolean
+      - breakthrough_therapy # Boolean
+      - accelerated_approval # Boolean
+
+  - name: ApprovalPathway
+    description: "Regulatory pathway used for drug approval"
+    attributes:
+      - pathway_name    # Standard, Priority, Accelerated, Breakthrough, Fast Track, RMAT
+      - agency
+      - typical_review_months
+      - requirements    # Additional commitments if any
+      - post_marketing_required  # Boolean
+
+  - name: DrugLabel
+    description: "Approved product labeling (USPI, SmPC, PIL)"
+    attributes:
+      - label_type      # USPI (US), SmPC (EU), PIL (patient), Prescribing Information
+      - version
+      - approval_date
+      - indications     # List of approved indications
+      - dosing          # Approved dosing regimens
+      - boxed_warning   # Boolean — has black box warning
+      - rems_required   # Boolean
+      - contraindications
+      - warnings_precautions
+
+  - name: Patent
+    description: "Drug-related patent listed in Orange Book or equivalent"
+    attributes:
+      - patent_number
+      - expiry_date
+      - type            # Composition of Matter, Method of Use, Formulation, Process
+      - patent_challenge # ANDA Paragraph IV, IPR, etc.
+      - pediatric_extension  # 6-month extension
+
+  - name: Exclusivity
+    description: "Market exclusivity period granted by regulatory authority"
+    attributes:
+      - type            # NCE (5yr), Orphan (7yr), Pediatric (6mo), BLA (12yr), Data (10yr EU)
+      - start_date
+      - expiry_date
+      - agency
+
+  - name: PostMarketingCommitment
+    description: "Required study or action after approval"
+    attributes:
+      - commitment_id
+      - type            # PMR (required), PMC (committed), REMS
+      - description
+      - due_date
+      - status          # Pending, Ongoing, Fulfilled, Delayed
+
+# =========================================================================
+# RELATIONSHIPS
+# =========================================================================
+
+relationships:
+  - { source: RegulatorySubmission, target: DrugLabel, type: results_in }
+  - { source: RegulatorySubmission, target: ApprovalPathway, type: uses }
+  - { source: DrugLabel, target: Patent, type: protected_by }
+  - { source: DrugLabel, target: Exclusivity, type: covered_by }
+  - { source: DrugLabel, target: PostMarketingCommitment, type: requires }
+
+# =========================================================================
+# TAXONOMY
+# =========================================================================
+
+taxonomy:
+
+  submission_types:
+    us_fda:
+      new_drug:
+        NDA: "New Drug Application — small molecule"
+        BLA: "Biologics License Application — biologics"
+        sNDA: "Supplemental NDA — new indication, formulation, or labeling change"
+        sBLA: "Supplemental BLA — biologic label supplement"
+      generic:
+        ANDA: "Abbreviated NDA — generic drug"
+        biosimilar_BLA: "351(k) BLA — biosimilar biologic"
+      special:
+        EUA: "Emergency Use Authorization"
+        IND: "Investigational New Drug — pre-approval clinical use"
+    eu_ema:
+      MAA: "Marketing Authorisation Application"
+      type_II_variation: "Major label change (new indication, safety update)"
+      type_IB_variation: "Minor change requiring approval"
+      type_IA_variation: "Administrative change, notify only"
+      conditional_approval: "Conditional Marketing Authorisation"
+    japan_pmda:
+      JNDA: "Japan New Drug Application"
+      partial_change: "Label expansion or formulation change"
+    global:
+      WHO_prequalification: "WHO prequalification for procurement"
+
+  review_designations:
+    fda:
+      - { name: "Priority Review", criteria: "Significant improvement over existing therapy", review_months: 6 }
+      - { name: "Breakthrough Therapy", criteria: "Substantial improvement on clinically significant endpoint", benefit: "Intensive FDA guidance, rolling review" }
+      - { name: "Fast Track", criteria: "Serious condition + unmet need", benefit: "Rolling review, more frequent meetings" }
+      - { name: "Accelerated Approval", criteria: "Surrogate or intermediate endpoint", requirement: "Confirmatory post-marketing trial" }
+      - { name: "RMAT", criteria: "Regenerative medicine advanced therapy", benefit: "Expedited development similar to Breakthrough" }
+      - { name: "Orphan Drug", criteria: "<200,000 US patients", benefit: "7 years market exclusivity, tax credits" }
+    ema:
+      - { name: "PRIME", criteria: "Unmet medical need", benefit: "Enhanced early dialogue" }
+      - { name: "Conditional Approval", criteria: "Positive benefit-risk on incomplete data", requirement: "Post-approval data generation" }
+      - { name: "Accelerated Assessment", criteria: "Major public health interest", review_months: 5 }
+      - { name: "Orphan Medicinal Product", criteria: "<5 in 10,000 EU prevalence", benefit: "10 years market exclusivity" }
+
+  ictd_modules:
+    module_1: "Administrative and prescribing information (region-specific)"
+    module_2: "CTD summaries (quality, nonclinical, clinical overviews and summaries)"
+    module_3: "Quality (CMC data — drug substance, drug product, stability)"
+    module_4: "Nonclinical study reports (pharmacology, PK, toxicology)"
+    module_5: "Clinical study reports (all clinical data)"
+
+# =========================================================================
+# SIGNALS — Regulatory events that impact commercial
+# =========================================================================
+
+signals_to_commercial:
+  - signal: "Regulatory:Approval"
+    commercial_impact: "Triggers launch planning, payer submissions, field deployment"
+    tags: ["Regulatory:Approval", "Commercial:LaunchReady"]
+  - signal: "Regulatory:CRL"
+    commercial_impact: "Complete Response Letter delays launch, requires additional data"
+    tags: ["Regulatory:CRL", "Pipeline:Setback"]
+  - signal: "Regulatory:LabelExpansion"
+    commercial_impact: "New indication broadens addressable market"
+    tags: ["Regulatory:LabelChange", "Commercial:MarketExpansion"]
+  - signal: "Regulatory:SafetyLabelUpdate"
+    commercial_impact: "New warning may restrict prescribing or require field messaging update"
+    tags: ["Clinical:Safety", "Regulatory:LabelChange"]
+  - signal: "Regulatory:PatentExpiry"
+    commercial_impact: "Enables generic/biosimilar entry, price erosion imminent"
+    tags: ["Competitor:Biosimilar", "Commercial:ShareLoss"]
+  - signal: "Regulatory:GenericApproval"
+    commercial_impact: "Generic competition begins, volume and price impact"
+    tags: ["Competitor:Launch", "Competitor:Pricing"]

@@ -1,0 +1,258 @@
+name: "Oncology Biomarkers & Companion Diagnostics"
+version: "1.0.0"
+description: >
+  Biomarker-driven therapy selection in oncology. Maps predictive and
+  prognostic biomarkers to approved therapies, companion diagnostics,
+  and testing methodologies. Grounded in FDA CDx approvals, NCCN
+  biomarker guidelines, and ESMO Scale for Clinical Actionability
+  of molecular Targets (ESCAT).
+
+standards_referenced:
+  - NCI_Thesaurus
+  - FDA_CDx_List
+  - NCCN_Biomarker_Compendium
+
+# =========================================================================
+# BIOMARKER ENTITY TYPES
+# =========================================================================
+
+entity_types:
+
+  - name: OncologyBiomarker
+    description: "A molecular marker used for treatment selection or prognosis in cancer"
+    attributes:
+      - biomarker_name
+      - biomarker_type     # Predictive, Prognostic, Pharmacodynamic, Resistance, Monitoring
+      - alteration_type    # Mutation, Amplification, Fusion, Expression, Deletion, MSI, TMB
+      - gene_or_protein
+      - testing_method     # IHC, FISH, PCR, NGS, Liquid Biopsy (ctDNA)
+      - specimen_type      # Tissue (FFPE), Blood (ctDNA), Bone Marrow
+      - turnaround_days    # Typical TAT for results
+      - escat_level        # ESMO ESCAT I, II, III, IV, X (level of clinical actionability)
+
+  - name: CompanionDiagnostic
+    description: "FDA-approved or CE-marked test required for prescribing a specific therapy"
+    attributes:
+      - cdx_name           # e.g., "cobas EGFR Mutation Test v2", "Ventana PD-L1 (SP263)"
+      - manufacturer       # Roche, Agilent/Dako, Thermo Fisher, Foundation Medicine
+      - platform           # IHC, PCR, NGS panel, FISH
+      - biomarker_tested
+      - approved_drugs     # List of drugs for which this CDx is required
+      - sample_requirement # FFPE tissue, liquid biopsy, bone marrow
+      - fda_approval_date
+
+  - name: BiomarkerDrugPairing
+    description: "A validated biomarker-drug-indication triplet"
+    attributes:
+      - biomarker
+      - drug
+      - indication
+      - evidence_level     # FDA-approved CDx, NCCN Category 1, Emerging, Investigational
+      - effect_direction   # Positive predictor (respond) or Negative predictor (do NOT use)
+      - pivotal_trial      # Trial name that validated the pairing
+
+# =========================================================================
+# RELATIONSHIPS
+# =========================================================================
+
+relationships:
+  - { source: OncologyBiomarker, target: CompanionDiagnostic, type: tested_by }
+  - { source: OncologyBiomarker, target: BiomarkerDrugPairing, type: predicts_for }
+  - { source: CompanionDiagnostic, target: TreatmentRegimen, type: gates_access_to }
+  - { source: BiomarkerDrugPairing, target: OncologyIndication, type: applies_in }
+
+# =========================================================================
+# PREDICTIVE BIOMARKERS — By tumor type
+# =========================================================================
+
+predictive_biomarkers:
+
+  # --- NSCLC (directly relevant to OncoVance / compelizumab) ---
+  nsclc:
+    - biomarker: "PD-L1 (TPS)"
+      alteration: expression
+      cutoffs: ["TPS ≥50% (monotherapy IO)", "TPS 1-49% (IO + chemo)", "TPS <1% (chemo ± IO)"]
+      cdx: ["Dako 22C3 (pembrolizumab)", "Ventana SP142 (atezolizumab)", "Ventana SP263 (durvalumab)"]
+      clinical_impact: "Determines IO monotherapy eligibility vs combination in 1L NSCLC"
+      testing_note: "Different antibody clones score differently; 22C3 and SP263 concordant, SP142 lower sensitivity"
+
+    - biomarker: "EGFR mutations"
+      alteration: mutation
+      key_variants: [exon_19_del, L858R, T790M, exon_20_ins, C797S]
+      cdx: ["cobas EGFR Mutation Test v2 (Roche)", "FoundationOne CDx"]
+      drugs: ["osimertinib (1L/2L)", "amivantamab (exon 20 ins)", "erlotinib, gefitinib (older)"]
+      resistance: "T790M (to 1st/2nd-gen TKI), C797S (to osimertinib), MET amplification, histologic transformation"
+
+    - biomarker: "ALK rearrangement"
+      alteration: fusion
+      cdx: ["Vysis ALK Break-Apart FISH (Abbott)", "Ventana ALK (D5F3) IHC", "FoundationOne CDx"]
+      drugs: ["alectinib (1L)", "lorlatinib (1L or 2L)", "crizotinib, ceritinib, brigatinib"]
+      resistance: "ALK resistance mutations (G1202R, L1196M), bypass pathway activation"
+
+    - biomarker: "KRAS G12C"
+      alteration: mutation
+      cdx: ["therascreen KRAS RGQ PCR Kit", "FoundationOne CDx"]
+      drugs: ["sotorasib (2L)", "adagrasib (2L)"]
+      testing_note: "Only G12C is currently druggable; other KRAS mutations (G12D, G12V) in development"
+
+    - biomarker: "ROS1 rearrangement"
+      alteration: fusion
+      drugs: ["crizotinib", "entrectinib", "repotrectinib"]
+
+    - biomarker: "RET rearrangement"
+      alteration: fusion
+      drugs: ["selpercatinib", "pralsetinib"]
+
+    - biomarker: "MET exon 14 skipping"
+      alteration: mutation
+      drugs: ["capmatinib", "tepotinib"]
+
+    - biomarker: "BRAF V600E"
+      alteration: mutation
+      drugs: ["dabrafenib + trametinib"]
+
+  # --- Breast Cancer ---
+  breast:
+    - biomarker: "HER2 (ERBB2)"
+      alteration: amplification_or_overexpression
+      cutoffs: ["IHC 3+ (positive)", "IHC 2+ / FISH+ (positive)", "IHC 1+ or 2+/FISH- (HER2-low)"]
+      cdx: ["HercepTest (Dako)", "PATHWAY (Ventana)", "HER2 FISH (various)"]
+      drugs: ["trastuzumab, pertuzumab (HER2+)", "T-DXd (HER2+ and HER2-low)"]
+      note: "HER2-low (~55% of breast cancers) is a new actionable category with T-DXd (DESTINY-Breast04)"
+
+    - biomarker: "HR (ER/PR)"
+      alteration: expression
+      cutoffs: ["ER ≥1% (positive per ASCO/CAP)", "ER 1-10% (low positive, uncertain benefit)"]
+      clinical_impact: "Determines endocrine therapy eligibility; CDK4/6i backbone in HR+/HER2-"
+
+    - biomarker: "PIK3CA mutation"
+      alteration: mutation
+      drugs: ["alpelisib + fulvestrant (SOLAR-1)"]
+      cdx: ["therascreen PIK3CA RGQ PCR Kit"]
+
+    - biomarker: "BRCA1/2 (germline)"
+      alteration: mutation
+      drugs: ["olaparib (OlympiAD)", "talazoparib (EMBRACA)"]
+      cdx: ["BRACAnalysis CDx (Myriad)", "FoundationOne CDx"]
+
+    - biomarker: "PD-L1 CPS"
+      alteration: expression
+      cutoffs: ["CPS ≥10 (pembrolizumab eligible in TNBC)"]
+      cdx: ["Dako 22C3"]
+
+  # --- Colorectal Cancer ---
+  colorectal:
+    - biomarker: "MSI-H / dMMR"
+      alteration: microsatellite_instability
+      cdx: ["MSI by PCR (Promega)", "IHC for MMR proteins (MLH1, MSH2, MSH6, PMS2)"]
+      drugs: ["pembrolizumab (1L mCRC, KEYNOTE-177)", "nivolumab ± ipilimumab (CheckMate-142)"]
+      note: "MSI-H has tumor-agnostic approval for pembrolizumab and dostarlimab"
+
+    - biomarker: "RAS (KRAS/NRAS)"
+      alteration: mutation
+      testing: "Extended RAS panel (codons 12, 13, 59, 61, 117, 146 of KRAS and NRAS)"
+      clinical_impact: "RAS-mutated patients do NOT respond to anti-EGFR therapy"
+      effect_direction: negative_predictor
+
+    - biomarker: "BRAF V600E"
+      alteration: mutation
+      drugs: ["encorafenib + cetuximab (BEACON)"]
+
+    - biomarker: "HER2 amplification"
+      alteration: amplification
+      drugs: ["trastuzumab + pertuzumab (MyPathway)", "trastuzumab deruxtecan (DESTINY-CRC02)"]
+
+# =========================================================================
+# TUMOR-AGNOSTIC BIOMARKERS — Tissue-of-origin independent
+# =========================================================================
+
+tumor_agnostic_biomarkers:
+  - biomarker: "MSI-H / dMMR"
+    fda_approved_drugs: ["pembrolizumab (KEYNOTE-158)", "dostarlimab (GARNET)"]
+    prevalence_across_tumors: "Variable: ~15% endometrial, ~5% CRC metastatic, ~2% gastric, rare in others"
+
+  - biomarker: "TMB-High (≥10 mut/Mb)"
+    fda_approved_drugs: ["pembrolizumab (KEYNOTE-158)"]
+    cdx: ["FoundationOne CDx (F1CDx)"]
+    controversy: "TMB cutoff and predictive value debated; not universally adopted outside US"
+
+  - biomarker: "NTRK fusion"
+    fda_approved_drugs: ["larotrectinib (LOXO-101)", "entrectinib (STARTRK-2)"]
+    prevalence: "<1% in common cancers; up to 90% in rare tumors (infantile fibrosarcoma, secretory breast)"
+
+  - biomarker: "RET fusion/mutation"
+    fda_approved_drugs: ["selpercatinib (LIBRETTO-001)"]
+    tumor_types: ["NSCLC", "Thyroid (MTC, PTC)"]
+
+  - biomarker: "BRAF V600E (tumor-agnostic)"
+    fda_approved_drugs: ["dabrafenib + trametinib"]
+    note: "Approved across solid tumors with BRAF V600E after prior therapy"
+
+# =========================================================================
+# TESTING METHODOLOGY TAXONOMY
+# =========================================================================
+
+testing_methods:
+  single_gene_tests:
+    description: "Test for one specific alteration"
+    examples: ["cobas EGFR PCR", "Vysis ALK FISH", "Dako PD-L1 IHC"]
+    turnaround: "1-3 days"
+    cost: "$200-500"
+    limitation: "Must run serially for multiple biomarkers; tissue-consuming"
+
+  targeted_ngs_panels:
+    description: "Sequence 50-500 genes simultaneously"
+    examples: ["FoundationOne CDx (324 genes)", "MSK-IMPACT (505 genes)", "Tempus xT (648 genes)"]
+    turnaround: "7-14 days"
+    cost: "$3,000-5,000"
+    advantage: "Comprehensive profiling in one test; detects fusions, TMB, MSI"
+    note: "NCCN recommends broad NGS for metastatic NSCLC, CRC, breast, melanoma"
+
+  whole_exome_sequencing:
+    description: "Sequence all protein-coding regions (~20,000 genes)"
+    turnaround: "14-21 days"
+    use_case: "Research, rare tumors, when targeted panel is negative"
+
+  liquid_biopsy:
+    description: "Cell-free DNA (cfDNA) analysis from blood draw"
+    examples: ["Guardant360 CDx", "FoundationOne Liquid CDx"]
+    turnaround: "5-7 days"
+    advantage: "Non-invasive, captures tumor heterogeneity, monitors resistance"
+    limitation: "Lower sensitivity for CNS-only disease; false negatives possible"
+    clinical_use: ["tissue-unavailable patients", "resistance monitoring", "MRD detection"]
+
+  immunohistochemistry:
+    description: "Protein expression on tissue section using antibodies"
+    examples: ["PD-L1 (22C3, SP142, SP263)", "HER2 (HercepTest)", "ALK (D5F3)"]
+    turnaround: "1-2 days"
+    note: "Scoring systems differ by antibody clone and tumor type"
+
+# =========================================================================
+# BIOMARKER TESTING BARRIERS — Commercial relevance
+# =========================================================================
+
+testing_barriers:
+  turnaround_time: "NGS takes 2+ weeks — patients may start empiric chemo before results return"
+  tissue_insufficiency: "Small biopsies (especially in lung) may lack sufficient material for NGS"
+  reflex_testing_gaps: "Not all institutions have reflex NGS ordering; depends on pathologist practice"
+  cost_and_coverage: "Some payers don't cover broad NGS panels; prior auth may be required"
+  health_equity: "Biomarker testing rates lower in community settings, underserved populations"
+  clinical_impact: "Untested patients may miss targeted therapy — direct commercial implication for targeted agents"
+
+# =========================================================================
+# SIGNALS — Biomarker events impacting commercial
+# =========================================================================
+
+signals_to_commercial:
+  - signal: "Biomarker:NewCDxApproval"
+    commercial_impact: "New companion diagnostic expands or restricts addressable population"
+    tags: ["Clinical:Efficacy", "Access:FormularyChange"]
+  - signal: "Biomarker:TestingRateDecline"
+    commercial_impact: "Fewer patients tested means fewer identified for targeted therapy"
+    tags: ["Demand:NBRxDecline", "Demand:AwarenessGap"]
+  - signal: "Biomarker:ResistanceMechanism"
+    commercial_impact: "Published resistance data may shift treatment sequencing preferences"
+    tags: ["Clinical:Efficacy", "Competitor:Pipeline"]
+  - signal: "Biomarker:LiquidBiopsyAdoption"
+    commercial_impact: "Faster testing turnaround improves time-to-treatment for targeted agents"
+    tags: ["Commercial:MarketExpansion", "Pipeline:PhaseAdvance"]

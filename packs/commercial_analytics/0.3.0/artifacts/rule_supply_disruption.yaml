@@ -1,0 +1,55 @@
+id: rule_supply_disruption
+kind: decision_heuristic
+name: Supply Disruption
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 60702620-3b51-41d5-8cf6-cee8e2d2db19
+  at: '2026-06-14T00:06:14.835469+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835469+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: base
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835469+00:00'
+trigger_signals:
+- signal_name: has_supply_issue
+  threshold: Supply:Shortage | Supply:FulfillmentDelay
+  data_source: tag_match
+- signal_name: has_volume_impact
+  threshold: Commercial:VolumeDrop | Supply:DistributionGap
+  data_source: tag_match
+trigger_context:
+- Supply chain disruption causes volume drops independent of demand or access.
+decision_logic: has_supply_issue AND has_volume_impact => Supply chain disruption
+  confirmed. Volume impact is supply-driven, not demand or access.
+judgment_type: empirical
+exceptions: []
+anti_patterns:
+- wrong_conclusion: A demand or access problem
+  why_wrong: "A volume drop tied to a manufacturing/fill-finish interruption with\
+    \ no demand-signal change is supply-driven \u2014 not demand or access."
+  unless_evidence: ''
+evidence_required: []
+typical_outcome: Supply chain disruption confirmed. Volume impact is supply-driven,
+  not demand or access.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '95'
+valid_for_days: 180

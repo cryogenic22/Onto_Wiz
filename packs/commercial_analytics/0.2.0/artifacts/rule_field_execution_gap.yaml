@@ -1,0 +1,53 @@
+id: rule_field_execution_gap
+kind: decision_heuristic
+name: Field Execution Gap
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: cf0edbb6-6d51-48a9-8be4-fcc545c25aef
+  at: '2026-06-12T00:05:45.715352+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-12T00:05:45.715352+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-12T00:05:45.715352+00:00'
+trigger_signals:
+- signal_name: has_territory_underperformance
+  threshold: Commercial:VolumeDrop | Commercial:ShareLoss
+  data_source: tag_match
+- signal_name: has_field_gap
+  threshold: Field:RepVacancy | Field:LowCoverage
+  data_source: tag_match
+trigger_context:
+- Territory underperformance linked to field force gaps, not market conditions.
+decision_logic: has_territory_underperformance AND has_field_gap => Field execution
+  gap detected. Territory underperformance correlates with rep vacancy or low call
+  coverage.
+judgment_type: empirical
+exceptions: []
+anti_patterns:
+- wrong_conclusion: A payer/formulary access barrier or market-wide demand loss
+  why_wrong: "Underperformance isolated to a territory with a rep vacancy / low coverage,\
+    \ while neighbors are fine, is a field-execution gap \u2014 not payer action."
+  unless_evidence: ''
+evidence_required: []
+typical_outcome: Field execution gap detected. Territory underperformance correlates
+  with rep vacancy or low call coverage.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '60'
+valid_for_days: 180

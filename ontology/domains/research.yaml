@@ -1,0 +1,146 @@
+name: "Research & Discovery"
+version: "1.0.0"
+description: >
+  Early-stage drug discovery and translational science. Covers target
+  identification, lead optimization, preclinical development, and
+  the handoff to clinical development. References UniProt for protein
+  targets, ChEMBL for bioactivity data, and NCI Thesaurus for oncology.
+
+standards_referenced:
+  - UniProt
+  - ChEMBL
+  - Gene_Ontology
+  - NCI_Thesaurus
+
+# =========================================================================
+# ENTITY TYPES
+# =========================================================================
+
+entity_types:
+
+  - name: TherapeuticTarget
+    description: "A biological entity (protein, gene, pathway) that a drug modulates"
+    attributes:
+      - target_name     # e.g., "PD-1", "EGFR", "BRAF V600E"
+      - target_type     # Receptor, Enzyme, Ion Channel, Transporter, Transcription Factor
+      - gene_symbol     # HUGO gene symbol (e.g., PDCD1, EGFR, BRAF)
+      - uniprot_id      # UniProt accession (e.g., Q15116)
+      - pathway         # Signaling pathway (e.g., "RAS-MAPK", "PI3K-AKT", "JAK-STAT")
+      - druggability    # High, Medium, Low, Undruggable
+      - validation_level  # Genetic, Clinical, Pharmacological, Preclinical
+
+  - name: LeadCompound
+    description: "A chemical or biological entity in optimization"
+    attributes:
+      - compound_id
+      - chembl_id       # ChEMBL identifier
+      - modality        # Small Molecule, Antibody, ADC, BiTE, CAR-T, siRNA, ASO, mRNA
+      - mechanism        # Inhibitor, Agonist, Antagonist, Degrader, Neutralizing
+      - selectivity     # Selective, Multi-target, Pan-inhibitor
+      - potency_nm      # IC50 or EC50 in nanomolar
+      - oral_bioavailability  # Percentage (for small molecules)
+      - half_life_hours
+      - development_stage  # Hit, Lead, Optimized Lead, Preclinical Candidate
+
+  - name: PreclinicalStudy
+    description: "Non-human study evaluating safety, efficacy, or PK"
+    attributes:
+      - study_id
+      - study_type      # In Vitro, In Vivo Efficacy, PK, Toxicology, Safety Pharmacology
+      - species         # Mouse, Rat, Dog, NHP, In Vitro (cell line)
+      - model           # e.g., "PDX xenograft", "Spontaneous tumor", "Collagen-induced arthritis"
+      - compound_id
+      - key_findings
+      - glp_compliant   # Boolean — Good Laboratory Practice
+
+  - name: Biomarker
+    description: "A measurable indicator of biological state or drug response"
+    attributes:
+      - biomarker_name  # e.g., "PD-L1 TPS", "ctDNA", "HbA1c", "CRP"
+      - biomarker_type  # Predictive, Prognostic, Pharmacodynamic, Safety, Surrogate
+      - assay_method    # IHC, PCR, NGS, ELISA, Flow Cytometry
+      - cutoff_value    # e.g., "TPS ≥ 50%", "TMB ≥ 10 mut/Mb"
+      - validated       # Boolean — analytically and clinically validated
+      - companion_diagnostic  # Boolean — required for prescribing
+
+  - name: DiseaseModel
+    description: "A preclinical or computational model of human disease"
+    attributes:
+      - model_name
+      - model_type      # Animal (syngeneic, xenograft, GEM, PDX), Organoid, In Silico, Cell Line
+      - disease_relevance  # Which human disease it models
+      - predictive_validity  # High, Medium, Low
+      - species
+
+# =========================================================================
+# RELATIONSHIPS
+# =========================================================================
+
+relationships:
+  - { source: TherapeuticTarget, target: LeadCompound, type: modulated_by }
+  - { source: LeadCompound, target: PreclinicalStudy, type: evaluated_in }
+  - { source: Biomarker, target: TherapeuticTarget, type: indicates_activity_of }
+  - { source: Biomarker, target: LeadCompound, type: predicts_response_to }
+  - { source: DiseaseModel, target: PreclinicalStudy, type: used_in }
+  - { source: LeadCompound, target: ClinicalTrial, type: advances_to }
+
+# =========================================================================
+# TAXONOMY
+# =========================================================================
+
+taxonomy:
+
+  drug_modalities:
+    small_molecule:
+      description: "Chemical compounds typically < 500 Da, often oral"
+      subtypes: [kinase_inhibitor, protease_inhibitor, GPCR_modulator, nuclear_hormone, PROTAC, molecular_glue]
+      typical_route: oral
+    large_molecule:
+      description: "Protein-based therapeutics"
+      subtypes: [monoclonal_antibody, bispecific_antibody, antibody_drug_conjugate, fusion_protein, enzyme_replacement]
+      typical_route: injectable
+    cell_and_gene:
+      description: "Living cells or genetic material as therapy"
+      subtypes: [CAR_T, TCR_T, TIL, gene_therapy_AAV, gene_therapy_lentiviral, gene_editing_CRISPR]
+      typical_route: IV_or_local
+    nucleic_acid:
+      description: "RNA or DNA-based therapeutics"
+      subtypes: [siRNA, ASO, mRNA, aptamer, saRNA]
+      typical_route: injectable_or_intrathecal
+    other:
+      subtypes: [vaccine, radiopharmaceutical, microbiome, peptide]
+
+  target_classes:
+    kinases: "Protein kinases — largest druggable target class (~550 human kinases)"
+    gpcrs: "G protein-coupled receptors — ~800 in human genome, ~35% of approved drugs target GPCRs"
+    ion_channels: "Voltage-gated, ligand-gated, and mechanosensitive channels"
+    nuclear_receptors: "Transcription factors activated by lipophilic ligands (steroids, thyroid, retinoids)"
+    epigenetic: "Chromatin-modifying enzymes (HDACs, BET, EZH2, DOT1L)"
+    immune_checkpoints: "Co-inhibitory or co-stimulatory receptors (PD-1, CTLA-4, LAG-3, TIGIT, TIM-3)"
+    protein_degradation: "Ubiquitin-proteasome targets via PROTACs and molecular glues"
+
+  preclinical_to_clinical_milestones:
+    - { milestone: "Target Validation", gate: "Genetic + pharmacological evidence in disease-relevant model" }
+    - { milestone: "Hit Identification", gate: "Screen hit with confirmed activity (IC50 < 10µM)" }
+    - { milestone: "Lead Optimization", gate: "Potent (< 100nM), selective, drug-like properties" }
+    - { milestone: "Preclinical Candidate", gate: "GLP tox complete, formulation, CMC ready" }
+    - { milestone: "IND/CTA Filing", gate: "Regulatory package submitted, clinical hold lifted" }
+    - { milestone: "First-in-Human", gate: "Phase 1 dosing begins" }
+
+# =========================================================================
+# SIGNALS — Research events impacting pipeline and commercial
+# =========================================================================
+
+signals_to_commercial:
+  - signal: "Research:TargetValidation"
+    commercial_impact: "Strengthens scientific rationale for pipeline asset"
+    tags: ["Pipeline:PhaseAdvance"]
+  - signal: "Research:PreclinicalFailure"
+    commercial_impact: "Pipeline asset terminated — portfolio gap"
+    tags: ["Pipeline:Setback"]
+  - signal: "Research:CompetitorBreakthrough"
+    commercial_impact: "Competitor validates same target with superior molecule"
+    tags: ["Competitor:Pipeline"]
+  - signal: "Research:BiomarkerValidation"
+    commercial_impact: "Companion diagnostic path clarified — affects market sizing"
+    tags: ["Clinical:Efficacy", "Pipeline:PhaseAdvance"]

@@ -1,0 +1,222 @@
+name: "Oncology"
+version: "1.0.0"
+description: >
+  Core oncology therapeutic area taxonomy. Covers tumor classification,
+  treatment modalities, lines of therapy, mechanisms of action, and
+  oncology-specific commercial dynamics. References NCI Thesaurus,
+  ICD-10, WHO Classification of Tumours, and NCCN/ESMO guidelines.
+
+standards_referenced:
+  - NCI_Thesaurus
+  - ICD_10
+  - ATC
+  - SNOMED_CT
+
+# =========================================================================
+# ENTITY TYPES
+# =========================================================================
+
+entity_types:
+
+  - name: TumorType
+    description: "A classified malignancy by site and histology"
+    attributes:
+      - tumor_id
+      - site              # Anatomical site (lung, breast, colon, blood, etc.)
+      - histology          # Adenocarcinoma, Squamous, Small Cell, etc.
+      - icd10_code
+      - who_classification # WHO Blue Book classification
+      - category           # solid_tumor | hematologic | cns_tumor
+      - molecular_subtype  # e.g., EGFR+, ALK+, HER2+, BCR-ABL+
+      - staging_system     # TNM (AJCC), Ann Arbor, FIGO, Rai/Binet
+
+  - name: OncologyIndication
+    description: "A specific clinical indication defined by tumor + stage + biomarker"
+    attributes:
+      - indication_id
+      - tumor_type_id
+      - stage              # Early (I-II), Locally Advanced (III), Metastatic (IV), Relapsed/Refractory
+      - biomarker_selection # e.g., "PD-L1 TPS ≥50%", "EGFR exon 19/21", "none"
+      - line_of_therapy     # 1L, 2L, 3L+, neoadjuvant, adjuvant, maintenance
+      - incidence_annual    # New cases per year (US or global)
+      - five_year_survival  # Percentage
+      - standard_of_care    # Current SOC regimen(s)
+      - unmet_need_level    # high, moderate, low
+
+  - name: TreatmentRegimen
+    description: "A specific drug combination and schedule for an indication"
+    attributes:
+      - regimen_id
+      - regimen_name       # e.g., "pembrolizumab + pemetrexed + carboplatin"
+      - drugs               # List of component drugs
+      - indication_id
+      - line_of_therapy
+      - schedule            # e.g., "Q3W x 4 cycles then maintenance"
+      - administration      # IV, oral, SC, intrathecal
+      - treatment_duration  # e.g., "Until progression", "6 cycles", "2 years"
+      - guideline_category  # NCCN Category 1, 2A, 2B, 3; ESMO I-V
+      - pivotal_trial       # Trial name/NCT that established this regimen
+
+  - name: MechanismOfAction
+    description: "Drug mechanism classified by target and pathway"
+    attributes:
+      - moa_id
+      - moa_class          # Checkpoint Inhibitor, TKI, ADC, BiTE, CDK Inhibitor, etc.
+      - target              # PD-1, PD-L1, EGFR, ALK, HER2, VEGF, etc.
+      - pathway             # Immune checkpoint, RAS-MAPK, PI3K-AKT, DDR, cell cycle
+      - modality            # Small molecule, mAb, ADC, BiTE, CAR-T, etc.
+      - resistance_mechanisms  # Known resistance pathways
+
+  - name: ClinicalGuideline
+    description: "Treatment guideline from a recognized oncology body"
+    attributes:
+      - guideline_id
+      - issuing_body       # NCCN, ESMO, ASCO, NICE, DKG (Germany)
+      - tumor_type
+      - version_date
+      - recommendation_level  # Category 1/2A/2B/3 (NCCN) or I-V,A-E (ESMO)
+      - key_changes          # Notable changes from prior version
+
+  - name: OncologyTrial
+    description: "Cancer clinical trial with oncology-specific attributes"
+    attributes:
+      - nct_id
+      - trial_name         # e.g., "KEYNOTE-189", "CheckMate-227", "ADAURA"
+      - tumor_type
+      - indication
+      - phase
+      - primary_endpoint   # OS, PFS, ORR, DFS, pCR, MRD
+      - design             # Randomized, Basket, Umbrella, Platform, Single-arm
+      - biomarker_selected # Boolean
+      - comparator         # SOC arm
+      - status             # Recruiting, Active, Completed, Reported
+
+  - name: TumorBoard
+    description: "Multidisciplinary team making treatment decisions"
+    attributes:
+      - board_type         # Institutional, Molecular, Virtual
+      - specialties        # Medical Oncology, Surgical, Radiation, Pathology, Radiology
+      - decision_factors   # Staging, biomarkers, comorbidities, patient preference
+      - formulary_influence  # Whether board drives formulary/protocol decisions
+
+# =========================================================================
+# RELATIONSHIPS
+# =========================================================================
+
+relationships:
+  - { source: TumorType, target: OncologyIndication, type: classified_as }
+  - { source: OncologyIndication, target: TreatmentRegimen, type: treated_by }
+  - { source: TreatmentRegimen, target: MechanismOfAction, type: acts_via }
+  - { source: ClinicalGuideline, target: TreatmentRegimen, type: recommends }
+  - { source: OncologyTrial, target: TreatmentRegimen, type: evaluates }
+  - { source: OncologyTrial, target: OncologyIndication, type: targets }
+  - { source: TumorBoard, target: TreatmentRegimen, type: selects }
+  - { source: MechanismOfAction, target: Biomarker, type: predicted_by }
+
+# =========================================================================
+# TAXONOMY — Tumor classification hierarchy
+# =========================================================================
+
+taxonomy:
+
+  tumor_classification:
+    solid_tumors:
+      thoracic:
+        - { name: "Non-Small Cell Lung Cancer", abbrev: "NSCLC", icd10: "C34", subtypes: [adenocarcinoma, squamous, large_cell] }
+        - { name: "Small Cell Lung Cancer", abbrev: "SCLC", icd10: "C34", subtypes: [limited_stage, extensive_stage] }
+        - { name: "Mesothelioma", icd10: "C45" }
+      breast:
+        - { name: "HR+ HER2- Breast Cancer", icd10: "C50", subtype: "luminal" }
+        - { name: "HER2+ Breast Cancer", icd10: "C50", subtype: "HER2_amplified" }
+        - { name: "Triple-Negative Breast Cancer", abbrev: "TNBC", icd10: "C50", subtype: "basal_like" }
+      gastrointestinal:
+        - { name: "Colorectal Cancer", abbrev: "CRC", icd10: "C18-C20", subtypes: [MSS, MSI_H, KRAS_mut, BRAF_V600E] }
+        - { name: "Hepatocellular Carcinoma", abbrev: "HCC", icd10: "C22.0" }
+        - { name: "Pancreatic Adenocarcinoma", abbrev: "PDAC", icd10: "C25" }
+        - { name: "Gastric/GEJ Cancer", icd10: "C16" }
+      genitourinary:
+        - { name: "Renal Cell Carcinoma", abbrev: "RCC", icd10: "C64", subtypes: [clear_cell, papillary, chromophobe] }
+        - { name: "Urothelial Carcinoma", abbrev: "UC", icd10: "C67" }
+        - { name: "Prostate Cancer", abbrev: "mCRPC", icd10: "C61" }
+      skin:
+        - { name: "Melanoma", icd10: "C43", subtypes: [BRAF_V600, NRAS, wild_type, uveal] }
+        - { name: "Merkel Cell Carcinoma", icd10: "C44" }
+      head_and_neck:
+        - { name: "Head and Neck Squamous Cell Carcinoma", abbrev: "HNSCC", icd10: "C00-C14,C30-C32" }
+      gynecologic:
+        - { name: "Ovarian Cancer", icd10: "C56", subtypes: [high_grade_serous, BRCA_mutated] }
+        - { name: "Endometrial Cancer", icd10: "C54", subtypes: [MSI_H, dMMR, POLE_mutated] }
+        - { name: "Cervical Cancer", icd10: "C53" }
+
+    hematologic_malignancies:
+      leukemia:
+        - { name: "Acute Myeloid Leukemia", abbrev: "AML", icd10: "C92.0", subtypes: [FLT3_ITD, IDH1, IDH2, NPM1, TP53] }
+        - { name: "Chronic Lymphocytic Leukemia", abbrev: "CLL", icd10: "C91.1", subtypes: [del17p, TP53_mut, IGHV_unmutated] }
+        - { name: "Acute Lymphoblastic Leukemia", abbrev: "ALL", icd10: "C91.0", subtypes: [Ph_positive, Ph_like, MLL_rearranged] }
+        - { name: "Chronic Myeloid Leukemia", abbrev: "CML", icd10: "C92.1", subtype: "BCR_ABL_positive" }
+      lymphoma:
+        - { name: "Diffuse Large B-Cell Lymphoma", abbrev: "DLBCL", icd10: "C83.3", subtypes: [GCB, ABC, double_hit] }
+        - { name: "Follicular Lymphoma", abbrev: "FL", icd10: "C82" }
+        - { name: "Hodgkin Lymphoma", abbrev: "HL", icd10: "C81" }
+        - { name: "Mantle Cell Lymphoma", abbrev: "MCL", icd10: "C83.1" }
+      myeloma:
+        - { name: "Multiple Myeloma", abbrev: "MM", icd10: "C90.0", subtypes: [standard_risk, high_risk_t4_14, del17p] }
+
+  lines_of_therapy:
+    neoadjuvant: "Treatment before surgery to shrink tumor (e.g., IO + chemo before resection)"
+    adjuvant: "Treatment after surgery to reduce recurrence risk (e.g., osimertinib post-NSCLC resection)"
+    first_line: "Initial treatment for advanced/metastatic disease (1L)"
+    second_line: "Treatment after progression on 1L (2L)"
+    third_line_plus: "Treatment after 2L failure (3L+) — often clinical trial or tumor-agnostic"
+    maintenance: "Continuation therapy after initial response to extend PFS"
+    consolidation: "Intensification after induction response (common in heme)"
+
+  treatment_modalities:
+    cytotoxic_chemotherapy: "Platinum doublets, taxanes, antimetabolites — backbone of many regimens"
+    targeted_therapy: "Small molecule or mAb targeting specific oncogenic driver (TKI, mAb)"
+    immuno_oncology: "Checkpoint inhibitors (anti-PD-1/PD-L1/CTLA-4), cytokine therapy"
+    antibody_drug_conjugate: "ADC — antibody linked to cytotoxic payload (e.g., T-DXd, EV)"
+    bispecific_antibody: "BiTE or bispecific T-cell engager (e.g., blinatumomab, teclistamab)"
+    cell_therapy: "CAR-T, TIL, TCR-T — autologous or allogeneic"
+    radiopharmaceutical: "Targeted radionuclide therapy (e.g., Lu-177 PSMA, I-131)"
+    radiation_therapy: "EBRT, SBRT, proton therapy — often combined with systemic"
+    surgery: "Curative resection, debulking, metastasectomy"
+    supportive_care: "Antiemetics, G-CSF, pain management, palliative care"
+
+  oncology_commercial_dynamics:
+    buy_and_bill:
+      description: "Physician-administered IV drugs reimbursed under medical benefit (Part B)"
+      implications: ["ASP+6% reimbursement", "site_of_care_matters", "340B_exposure", "white_bagging_risk"]
+    oral_oncology:
+      description: "Oral targeted therapies dispensed through specialty pharmacy (Part D)"
+      implications: ["pharmacy_benefit", "copay_accumulator_risk", "specialty_pharmacy_required", "patient_adherence_critical"]
+    combination_regimens:
+      description: "Multi-drug regimens create complex access and reimbursement dynamics"
+      implications: ["multiple_PAs_required", "sequencing_matters", "cost_stacking", "clinical_pathway_influence"]
+    biomarker_testing:
+      description: "Companion diagnostics gate treatment access"
+      implications: ["testing_turnaround_delays_therapy", "NGS_vs_single_gene", "reflex_testing_adoption", "liquid_biopsy_emerging"]
+
+# =========================================================================
+# SIGNALS — Oncology-specific events impacting commercial
+# =========================================================================
+
+signals_to_commercial:
+  - signal: "Onc:GuidelineUpdate"
+    commercial_impact: "NCCN/ESMO category change affects formulary and clinical pathway adoption"
+    tags: ["Clinical:Guideline", "Access:FormularyChange"]
+  - signal: "Onc:BiomarkerShift"
+    commercial_impact: "New biomarker data changes eligible patient population size"
+    tags: ["Clinical:Efficacy", "Commercial:MarketExpansion"]
+  - signal: "Onc:CompetitorOSData"
+    commercial_impact: "Competitor overall survival readout may shift standard of care"
+    tags: ["Competitor:Pipeline", "Clinical:Efficacy"]
+  - signal: "Onc:ADCEntryThreat"
+    commercial_impact: "New ADC approval disrupts existing treatment sequencing"
+    tags: ["Competitor:Launch", "Clinical:Efficacy"]
+  - signal: "Onc:PathwayExclusion"
+    commercial_impact: "Clinical pathway committee drops brand from preferred protocol"
+    tags: ["Access:Restricted", "Commercial:ShareLoss"]
+  - signal: "Onc:SiteOfCareShift"
+    commercial_impact: "Payer mandates home infusion or ASC — away from hospital outpatient"
+    tags: ["Commercial:ChannelShift", "Access:FormularyChange"]

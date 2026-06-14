@@ -1,0 +1,55 @@
+id: rule_channel_shift
+kind: decision_heuristic
+name: Channel Shift
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 8c190abd-836e-445b-a7d9-e9cf75673991
+  at: '2026-06-14T00:06:14.835622+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835622+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: brand_performance
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835622+00:00'
+trigger_signals:
+- signal_name: has_channel_change
+  threshold: Commercial:ChannelShift
+  data_source: tag_match
+- signal_name: has_volume_anomaly
+  threshold: Commercial:VolumeDrop | Commercial:ShareLoss
+  data_source: tag_match
+trigger_context:
+- Dispensing pattern shift from one channel to another affecting volume measurement.
+decision_logic: has_channel_change AND has_volume_anomaly => Channel shift detected.
+  Apparent volume decline may reflect dispensing migration, not true demand loss.
+judgment_type: empirical
+exceptions: []
+anti_patterns:
+- wrong_conclusion: A genuine loss of patient demand
+  why_wrong: "A dispensing/channel migration is a measurement artifact in the tracked\
+    \ source \u2014 apparent volume loss, not true demand erosion."
+  unless_evidence: ''
+evidence_required: []
+typical_outcome: Channel shift detected. Apparent volume decline may reflect dispensing
+  migration, not true demand loss.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '55'
+valid_for_days: 180

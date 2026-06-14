@@ -1,0 +1,19 @@
+id: GOLD-003
+name: "Competitive displacement at Heidelberg University Hospital"
+description: >
+  When competitor launch/pricing signals co-occur with share loss
+  signals at an account, the reasoning engine should identify
+  competitive displacement. Tests rule_competitive_displacement
+  (priority 75).
+
+input:
+  question: "Why is OncoVance share declining at Heidelberg University Hospital?"
+  context:
+    account_id: "heidelberg_klinikum"
+    brand_id: "brand_oncovance"
+
+expected:
+  min_confidence: 0.5
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "competitive"

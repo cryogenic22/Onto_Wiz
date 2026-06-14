@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domain Intelligence Layer — Vision &amp; Approach</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --panel2: #1c2330;
+    --border: #2d3748;
+    --text: #d7dde6;
+    --muted: #8b97a8;
+    --accent: #58a6ff;
+    --gold: #e3b341;
+    --green: #3fb950;
+    --red: #f85149;
+    --purple: #bc8cff;
+    --orange: #ffa657;
+    --teal: #39d2c0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.55; padding: 0 0 80px 0;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+  header {
+    padding: 56px 0 36px;
+    background: linear-gradient(180deg, #11182a 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+  h1 { font-size: 2.1rem; font-weight: 700; letter-spacing: -0.5px; }
+  h1 .accent { color: var(--accent); }
+  .subtitle { color: var(--muted); font-size: 1.05rem; margin-top: 10px; max-width: 860px; }
+  .pill-row { margin-top: 18px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill {
+    font-size: 0.75rem; padding: 4px 12px; border-radius: 99px;
+    border: 1px solid var(--border); color: var(--muted); background: var(--panel);
+  }
+  h2 {
+    font-size: 1.45rem; margin: 52px 0 6px; color: #fff;
+    display: flex; align-items: center; gap: 12px;
+  }
+  h2 .num {
+    font-size: 0.8rem; color: var(--accent); border: 1px solid var(--accent);
+    border-radius: 6px; padding: 2px 9px; font-weight: 600;
+  }
+  h3 { font-size: 1.05rem; margin: 24px 0 8px; color: var(--gold); }
+  p { margin: 10px 0; }
+  .lead { color: var(--text); font-size: 1.02rem; }
+  .muted { color: var(--muted); }
+  .grid { display: grid; gap: 16px; margin: 18px 0; }
+  .g2 { grid-template-columns: 1fr 1fr; }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 900px) { .g2, .g4 { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px;
+  }
+  .card h4 { font-size: 0.95rem; margin-bottom: 8px; }
+  .card ul { margin: 8px 0 0 18px; font-size: 0.88rem; color: var(--muted); }
+  .card li { margin: 4px 0; }
+  .card li b { color: var(--text); font-weight: 600; }
+  .tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: 700; letter-spacing: 0.5px; }
+  .tag.brain { background: rgba(88,166,255,.15); color: var(--accent); }
+  .tag.engine { background: rgba(63,185,80,.15); color: var(--green); }
+  .tag.harness { background: rgba(227,179,65,.15); color: var(--gold); }
+  .tag.pattern { background: rgba(188,140,255,.15); color: var(--purple); }
+  pre.diagram {
+    background: #0a0e14; border: 1px solid var(--border); border-radius: 10px;
+    padding: 22px 26px; overflow-x: auto; font-size: 0.84rem; line-height: 1.5;
+    font-family: 'Cascadia Code', Consolas, monospace; color: #c9d4e3; margin: 18px 0;
+  }
+  pre.diagram .hl { color: var(--accent); font-weight: 600; }
+  pre.diagram .gd { color: var(--gold); }
+  pre.diagram .gn { color: var(--green); }
+  pre.diagram .pp { color: var(--purple); }
+  pre.diagram .or { color: var(--orange); }
+  pre.diagram .tl { color: var(--teal); }
+  pre.diagram .dim { color: #4d5a6e; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.88rem; }
+  th { text-align: left; padding: 10px 12px; background: var(--panel2); color: var(--gold); font-weight: 600; border-bottom: 2px solid var(--border); }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  td:first-child { white-space: nowrap; font-weight: 600; }
+  code {
+    background: #21283587; border: 1px solid #2d374866; border-radius: 4px;
+    padding: 1px 6px; font-size: 0.83em; font-family: Consolas, monospace; color: var(--teal);
+  }
+  .loop-card {
+    background: var(--panel); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+    border-radius: 8px; padding: 16px 20px; margin: 12px 0;
+  }
+  .loop-card.l2 { border-left-color: var(--green); }
+  .loop-card.l3 { border-left-color: var(--gold); }
+  .loop-card.l4 { border-left-color: var(--purple); }
+  .loop-card.l5 { border-left-color: var(--orange); }
+  .loop-card h4 { font-size: 1rem; margin-bottom: 4px; }
+  .loop-card .cadence { float: right; font-size: 0.75rem; color: var(--muted); border: 1px solid var(--border); padding: 2px 10px; border-radius: 99px; }
+  .loop-card .flow { font-family: Consolas, monospace; font-size: 0.8rem; color: var(--teal); margin: 8px 0; display: block; }
+  .loop-card .src { font-size: 0.8rem; color: var(--muted); }
+  .loop-card .src b { color: var(--gold); }
+  .phase {
+    display: grid; grid-template-columns: 120px 1fr; gap: 18px;
+    padding: 16px 0; border-bottom: 1px solid var(--border);
+  }
+  .phase:last-child { border-bottom: none; }
+  .phase .ph-label { font-weight: 700; color: var(--accent); font-size: 0.95rem; }
+  .phase .ph-label small { display: block; color: var(--muted); font-weight: 400; font-size: 0.75rem; margin-top: 2px; }
+  .phase p { margin: 4px 0; font-size: 0.92rem; }
+  .phase .deliver { font-size: 0.82rem; color: var(--green); }
+  .decision {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px 20px; margin: 12px 0;
+  }
+  .decision h4 { color: var(--orange); font-size: 0.98rem; margin-bottom: 6px; }
+  .decision .rec { color: var(--green); font-size: 0.88rem; margin-top: 8px; }
+  .decision .rec::before { content: "→ Recommendation: "; font-weight: 700; }
+  .callout {
+    background: linear-gradient(135deg, rgba(88,166,255,.08), rgba(188,140,255,.06));
+    border: 1px solid rgba(88,166,255,.35); border-radius: 12px;
+    padding: 22px 26px; margin: 24px 0; font-size: 1.02rem;
+  }
+  .callout b { color: var(--accent); }
+  footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.82rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>The Domain Intelligence <span class="accent">Factory</span></h1>
+    <div class="subtitle">A modular, governed knowledge capability — built in <b>Onto_Wiz</b>, powered by <b>SpecOmagic</b>'s extraction engine, run on <b>market_zero</b>'s loop harness, packaged with <b>aura.ai</b>'s domain-pack pattern — consumable by any agent we ever build.</div>
+    <div class="pill-row">
+      <span class="pill">Vision &amp; Approach v1 — for brainstorm</span>
+      <span class="pill">10 June 2026</span>
+      <span class="pill">Source: spec_raw.md + 4-repo deep scan</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ TLDR ============ -->
+  <div class="callout">
+    <b>The one-sentence thesis:</b> Stop building knowledge into agents; build a <b>governed domain layer</b> that agents subscribe to. Extract candidates from artifacts → elicit judgement through Domain Forge → govern through Deltas → compile into versioned Domain Packs → test through evals → consume through a one-call SDK → improve through closed loops. <b>The packs are the product. Everything else is the factory.</b>
+  </div>
+
+  <p class="lead">My core finding from scanning all four repos: <b>we are not starting a build — we are doing an assembly.</b> Roughly 70% of the spec already exists in production-grade form, just scattered across four codebases that each solved a different slice of the same problem. The work is to define the seams, pick the dependency directions, and wire the loops. That changes the plan from "6 months of greenfield" to "weeks of integration plus targeted new builds."</p>
+
+  <!-- ============ SECTION 1 ============ -->
+  <h2><span class="num">01</span> What we already have — the asset map</h2>
+
+  <div class="grid g4">
+    <div class="card">
+      <span class="tag brain">THE BRAIN</span>
+      <h4 style="margin-top:8px">Onto_Wiz <span class="muted">(this repo)</span></h4>
+      <ul>
+        <li><b>Delta governance</b>: PROPOSED → APPROVED → MERGED, blast radius, HITL routing, full audit (<code>src/core/models.py</code>)</li>
+        <li><b>Judgment artifacts</b>: JudgmentPattern, Guardrail, ActionTemplate</li>
+        <li><b>Evidence store</b> with HARD/SOFT/RUMOR reliability</li>
+        <li><b>Graph store</b>: NetworkX, 9 node / 10 edge types</li>
+        <li><b>11 domain ontologies</b> in YAML</li>
+        <li><b>SME game UI</b>: Situation Room + Curator dashboard (Next.js)</li>
+        <li><b>ADR-007</b>: core never imports api — clean boundary, CI-enforced</li>
+        <li>Gap: in-memory only, no pack compiler, no interview agent</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag engine">THE EXTRACTOR</span>
+      <h4 style="margin-top:8px">SpecOmagic</h4>
+      <ul>
+        <li><b>pip-installable library</b> (<code>pip install specomagic</code>)</li>
+        <li><b>10 artifact types</b> incl. the spec's exact asks: DecisionHeuristic, DataQuirk, ProcessPlaybook</li>
+        <li><b>9 extractors</b> (6 pattern + 3 LLM, HYBRID mode) over PPTX / PDF / DOCX / code / transcripts / Excel</li>
+        <li><b>KnowledgeStore</b>: YAML persistence, versioning, rollback, 9-dim tag index</li>
+        <li><b>LayeredStore</b>: base → therapy → client stacking, designed &amp; coded</li>
+        <li><b>ContextAssembler</b>: lifecycle gates, token budgets, priority tiers</li>
+        <li><b>Eval framework</b>: rubrics, LLMJudge, BatchEval, ConsistencyChecker</li>
+        <li><b>InterviewAgent</b> already exists in <code>capture/</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag harness">THE HARNESS</span>
+      <h4 style="margin-top:8px">market_zero</h4>
+      <ul>
+        <li><b>DataSteward loop</b>: signal collect → ranked → deterministic action map → execute → measure quality delta → commit/revert → audit trail</li>
+        <li><b>Scheduler</b>: APScheduler + 14 idempotent post-run phases, since-cursors, DLQ, stuck-run reaping</li>
+        <li><b>3 closed feedback loops</b>: query patterns→weights, resolution failures→ontology, low confidence→prompt flags</li>
+        <li><b>Learning</b>: EWMA source accuracy, decision calibration</li>
+        <li><b>Evidence/facts ledgers</b>, FAIR scoring, materiality</li>
+        <li><b>Dev harness</b>: <code>harness/generate.py</code> (anti-slop catalog, test reqs, codebase map) + <code>measure.py</code> (health snapshots)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <span class="tag pattern">THE PACKAGING</span>
+      <h4 style="margin-top:8px">aura.ai</h4>
+      <ul>
+        <li><b>Domain Pack pattern</b>: <code>packs/&lt;domain&gt;/v1/pack.yaml</code> with 4 layers — fingerprints, ontology, experience, guardrails. 17 packs shipped.</li>
+        <li><b>PackRegistry</b>: file-backed, cached, versioned loader</li>
+        <li><b>Quality gate</b>: golden eval datasets + thresholds in CI (95% KBQ, 85% SQL, 2% regression tolerance)</li>
+        <li><b>Trust bundle</b>: every answer ships with lineage + confidence + provenance envelope</li>
+        <li><b>sdk_export/</b>: modular ports pattern (knowledge, model_gateway, policy)</li>
+        <li><b>Deterministic-first routing</b>: exact → semantic → LLM fallback</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="muted">The spec's question "what does OntoWiz already have?" is answered: yes to Delta, Evidence, OntologyNode, Relationship, Guardrail, JudgmentPattern (all in <code>src/core/</code>); the graph is a NetworkX property graph; code mining is partial (PDF/DOCX yes, SQL/Python rule mining is the real gap); SpecOmagic extracts text+tables from PPTX/PDF/DOCX/code/transcripts/Excel.</p>
+
+  <!-- ============ SECTION 2 ============ -->
+  <h2><span class="num">02</span> The vision — one factory, many consumers</h2>
+
+  <p class="lead">Position each repo exactly as the spec recommends, and make the dependency direction explicit:</p>
+
+  <pre class="diagram">
+                        <span class="dim">┌──────────────────────────────────────────────────────┐</span>
+                        <span class="dim">│</span>          <span class="hl">ONTO_WIZ — Domain Intelligence Layer</span>        <span class="dim">│</span>
+                        <span class="dim">│</span>                                                      <span class="dim">│</span>
+  <span class="gn">SOURCES</span>               <span class="dim">│</span>  <span class="gn">MINE</span>          <span class="gd">GOVERN</span>          <span class="pp">COMPILE</span>          <span class="dim">│</span>        <span class="or">CONSUMERS</span>
+  decks, PDFs, code,    <span class="dim">│</span>  SpecOmagic    Delta model     Pack compiler    <span class="dim">│</span>        MarketZero
+  SQL, notebooks,    <span class="dim">──►│</span>  extractors ─► candidates  ─►  base+overlay  ───<span class="dim">│──►</span>     Consulting copilots
+  transcripts, wikis    <span class="dim">│</span>  (library)     blast radius    stacking         <span class="dim">│</span>        Market access agents
+                        <span class="dim">│</span>       ▲        HITL queues     pack.yaml        <span class="dim">│</span>        Any future agent
+  <span class="gd">SME JUDGEMENT</span>         <span class="dim">│</span>       │             ▲          registry         <span class="dim">│</span>             │
+  Domain Forge       <span class="dim">──►│───────┘             │             │            │</span>             │
+  missions &amp; games      <span class="dim">│</span>                 <span class="tl">EVAL GATE</span> ◄──────┘            <span class="dim">│</span>             │
+                        <span class="dim">│</span>                 eval cases, agent lift,        <span class="dim">│</span>             │
+                        <span class="dim">│</span>                 quality thresholds (CI)        <span class="dim">│</span>             │
+                        <span class="dim">└──────────────────────────────────────────────────────┘</span>             │
+                                          ▲                                             │
+                                          <span class="dim">│</span>      <span class="or">FEEDBACK LOOPS</span> (market_zero harness)    │
+                                          <span class="dim">└──────</span> telemetry, corrections, errors <span class="dim">◄──────┘</span>
+  </pre>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4>What "modular knowledge capability" means concretely</h4>
+      <ul>
+        <li><b>One import for any agent:</b> <code>from onto_wiz import get_context</code> — pass a query, pack id, token budget; get back a governed, provenance-tagged, lifecycle-gated context package. SpecOmagic's SDK already has this shape; we put governance and packs behind it.</li>
+        <li><b>Packs are versioned, compiled objects</b> — not folders of YAML. Compile = validate schema + resolve overlay stack + run eval gate + stamp version + emit manifest. An agent pins <code>commercial_analytics@1.3</code> the way it pins a pip dependency.</li>
+        <li><b>Every mutation is a Delta.</b> Extraction proposes, Forge validates, curator approves, compiler ships. Nothing jumps from a midnight PPT slide to production context.</li>
+        <li><b>Every artifact has a testable consequence.</b> Adding a DataQuirk must block a known-wrong answer; adding a heuristic must change agent behaviour in a measurable eval. No eval case, no promotion.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>The unified artifact model (merge, don't duplicate)</h4>
+      <ul>
+        <li><b>From SpecOmagic (keep as-is):</b> InstructionSet, JargonMap, EntityRegistry, Taxonomy, OverrideRule, FewShotLibrary, PromptTemplate, DecisionHeuristic, DataQuirk, ProcessPlaybook</li>
+        <li><b>From Onto_Wiz (keep as-is):</b> JudgmentPattern, Guardrail, ActionTemplate, EvidenceItem, GraphNode/Edge</li>
+        <li><b>New per spec (small builds):</b> <code>EvalCase</code> (first-class!), <code>QuestionPlaybook</code>, <code>MetricDefinition</code>, <code>SourceContract</code>, <code>AntiPattern</code>, <code>ExceptionRule</code></li>
+        <li><b>The bridge:</b> one thin adapter making SpecOmagic's lifecycle (DRAFT→REVIEW→VERIFIED→ACTIVE) transitions occur <i>only</i> via Onto_Wiz Deltas. The blueprint already maps DecisionHeuristic→JudgmentPattern, DataQuirk→Guardrail+OverrideRule, ProcessPlaybook→ActionTemplate.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============ SECTION 3 ============ -->
+  <h2><span class="num">03</span> The five loops — market_zero's harness, repurposed for knowledge</h2>
+
+  <p class="lead">market_zero's deepest pattern is not any single service — it's the <b>steward discipline</b>: <i>collect ranked signals → look up a deterministic action → execute → measure the quality delta → commit or revert → write the audit row.</i> We port that discipline to knowledge curation. Five loops, each one a thin adaptation of code that already runs in production:</p>
+
+  <div class="loop-card">
+    <span class="cadence">scheduled / on-upload</span>
+    <h4>Loop 1 — Mining loop <span class="muted">(sources → candidates)</span></h4>
+    <span class="flow">ingest docs/code → SpecOmagic HYBRID extract → dedupe/cluster → candidate artifacts as PROPOSED Deltas</span>
+    <span class="src">Port: <b>scheduler/runner.py</b> pattern (idempotent phases, since-cursors, DLQ) wrapping SpecOmagic's <b>ExtractionPipeline.extract_and_save()</b>. New build: code/SQL rule miner ("institutional judgement wearing a hoodie") + duplicate clustering.</span>
+  </div>
+
+  <div class="loop-card l2">
+    <span class="cadence">daily, autonomous</span>
+    <h4>Loop 2 — Knowledge Steward loop <span class="muted">(signals → curation actions &amp; missions)</span></h4>
+    <span class="flow">collect signals (staleness, conflicts, low confidence, missing evals, duplicate clusters) → rank by impact → deterministic action OR generate a Forge mission → measure pack-quality delta → commit/revert → audit</span>
+    <span class="src">Port: <b>services/data_steward.py</b> nearly verbatim — swap FAIR score for a <b>Pack Quality Score</b> (coverage × eval coverage × freshness × confidence). This is the loop that turns the game from a quiz into a targeted curation accelerator: weak spots become missions automatically.</span>
+  </div>
+
+  <div class="loop-card l3">
+    <span class="cadence">5-min daily / weekly / multiplayer</span>
+    <h4>Loop 3 — Forge elicitation loop <span class="muted">(SME judgement → deltas + evals)</span></h4>
+    <span class="flow">steward queues high-impact cards → SME plays mission (validate / rank / spot-the-bad-insight / same-or-different / name-the-caveat) → every round emits: pack delta + gold eval label + confidence update</span>
+    <span class="src">Build on: Onto_Wiz <b>Situation Room</b> UI + <b>delta_generator.py</b> (game session → Delta already works) + SpecOmagic <b>InterviewAgent</b> for deep-dive sessions. Score quality &amp; useful dissent, never volume.</span>
+  </div>
+
+  <div class="loop-card l4">
+    <span class="cadence">on every pack compile (CI gate)</span>
+    <h4>Loop 4 — Eval loop <span class="muted">(pack change → proof of lift)</span></h4>
+    <span class="flow">pack delta merged → BatchEval runs EvalCase suite → agent-lift benchmark (with pack vs without) → thresholds pass → version stamped &amp; promoted; fail → blocked + steward signal</span>
+    <span class="src">Port: aura.ai <b>quality-gate/run_evals.py + .quality-gate.json</b> thresholds pattern + SpecOmagic <b>eval/</b> (rubrics, LLMJudge, BatchEval). EvalCase becomes a first-class artifact so Forge rounds literally manufacture the test suite.</span>
+  </div>
+
+  <div class="loop-card l5">
+    <span class="cadence">continuous</span>
+    <h4>Loop 5 — Consumption feedback loop <span class="muted">(agent usage → better packs)</span></h4>
+    <span class="flow">agents call get_context() → telemetry (which artifacts used, hit/miss, confidence, corrections) → failed retrievals propose aliases, low-confidence answers flag artifacts, corrections become PROPOSED Deltas + new EvalCases</span>
+    <span class="src">Port: <b>services/feedback_loops.py</b> three-loop template (pattern→weight, failure→ontology, quality→flag) + <b>learning_service.py</b> EWMA for per-artifact reliability. One correction should prevent a whole class of future errors — that's the "correction reuse" metric.</span>
+  </div>
+
+  <p class="muted">Plus the meta-loop: drop market_zero's <code>harness/generate.py</code> + <code>measure.py</code> into Onto_Wiz itself so the <i>development</i> of this system runs with anti-slop catalogs, test ratchets and weekly health reports. The factory gets a factory.</p>
+
+  <!-- ============ SECTION 4 ============ -->
+  <h2><span class="num">04</span> Module design — what lives where in Onto_Wiz</h2>
+
+  <pre class="diagram">
+  <span class="hl">onto_wiz/</span> (respects ADR-007: core never imports api)
+  ├── src/core/            <span class="dim">EXISTS</span> — Delta, Judgment, Guardrail, Evidence, GraphStore, Semantic
+  ├── src/knowledge/       <span class="dim">EXISTS→GROWS</span> — becomes the SpecOmagic integration seam
+  │     ├── artifacts/     <span class="gn">NEW</span> — unified registry: SpecOmagic types + judgment types + 6 new types
+  │     └── bridge.py      <span class="gn">NEW</span> — artifact lifecycle transitions ⇄ Delta governance (one adapter)
+  ├── src/mining/          <span class="gn">NEW</span> — Loop 1: source connectors, SpecOmagic pipeline wrapper, code/SQL rule miner, dedupe clustering
+  ├── src/packs/           <span class="gn">NEW</span> — compiler (validate→stack→eval-gate→stamp), pack.yaml manifest, PackRegistry (aura pattern), LayeredStore (SpecOmagic)
+  ├── src/steward/         <span class="gn">NEW</span> — Loop 2: SignalCollector, ActionMap, PackQualityScore, mission generator  <span class="dim">(ported from market_zero)</span>
+  ├── src/evals/           <span class="gn">NEW</span> — Loop 4: EvalCase store, BatchEval runner, agent-lift benchmark, quality-gate config
+  ├── src/feedback/        <span class="gn">NEW</span> — Loop 5: usage telemetry, three closed loops, EWMA artifact reliability
+  ├── src/sdk/             <span class="gn">NEW</span> — get_context(), pack pinning, trust-bundle-style provenance envelope
+  ├── src/api/             <span class="dim">EXISTS→GROWS</span> — +pack registry routes, +mission routes, +telemetry ingest
+  ├── frontend/            <span class="dim">EXISTS→GROWS</span> — Situation Room → Forge missions; Curator → Knowledge Workbench; <span class="gn">NEW</span> Pack Registry view
+  ├── scheduler/           <span class="gn">NEW</span> — loop runner <span class="dim">(market_zero runner.py pattern)</span>
+  └── harness/             <span class="gn">NEW</span> — generate.py + measure.py <span class="dim">(dropped in from market_zero)</span>
+  </pre>
+
+  <p>Three product surfaces, exactly per the spec — and two of them already have bones: <b>Knowledge Workbench</b> (grow the Curator dashboard), <b>Domain Forge</b> (grow the Situation Room), <b>Pack Registry</b> (new, but it's a read-only catalog view — the cheap one).</p>
+
+  <!-- ============ SECTION 5 ============ -->
+  <h2><span class="num">05</span> Key decisions to brainstorm</h2>
+
+  <div class="decision">
+    <h4>D1 — How do we consume SpecOmagic: pip dependency, git submodule, or vendor the code in?</h4>
+    <p class="muted">It's already packaged (<code>pip install specomagic</code>). Vendoring gives freedom to fuse models but forks the 70-test-file codebase; depending keeps one source of truth but means cross-repo PRs when the artifact model needs to evolve.</p>
+    <p class="rec">Depend on it as a library (editable install during dev: <code>pip install -e ../SpecOmagic</code>). Onto_Wiz adds governance, packs and loops <i>around</i> it. Only fuse if the bridge gets painful.</p>
+  </div>
+
+  <div class="decision">
+    <h4>D2 — Persistence: ADR-005 says in-memory, but packs and deltas must survive restarts.</h4>
+    <p class="muted">SpecOmagic already persists to YAML; market_zero is Postgres+pgvector; Onto_Wiz core stores are in-memory by deliberate ADR.</p>
+    <p class="rec">Two-tier: packs + artifacts stay YAML/file-backed (git-versionable, diffable, reviewable — knowledge as code), while Deltas/telemetry/eval-runs go to SQLite now, Postgres when multi-user. Supersede ADR-005 with a new ADR.</p>
+  </div>
+
+  <div class="decision">
+    <h4>D3 — Two governance models exist: SpecOmagic lifecycle states vs Onto_Wiz Deltas. Who wins?</h4>
+    <p class="muted">SpecOmagic: DRAFT→REVIEW→VERIFIED→ACTIVE on the artifact. Onto_Wiz: every change is a Delta with blast radius + HITL routing + audit.</p>
+    <p class="rec">Deltas win — they're the spec's "govern through deltas" mantra. Artifact lifecycle states remain, but transitions are <i>effects</i> of merged Deltas. The bridge adapter is ~one file.</p>
+  </div>
+
+  <div class="decision">
+    <h4>D4 — First proof scope: confirm the spec's pick?</h4>
+    <p class="muted">Spec says: <b>Commercial Analytics Base Pack — brand performance diagnosis</b>, flagship question "Why did Brand X lose share this quarter?", benchmarked with-pack vs without-pack. Onto_Wiz already has <code>ontology/commercial.yaml</code> (TRx, NBRx, market_share, PA_rate, signals, rules) + synthetic Compellium dataset + scenarios — a real head start.</p>
+    <p class="rec">Yes — and use MarketZero as the first consuming agent for the benchmark, which also proves the cross-repo consumption story.</p>
+  </div>
+
+  <div class="decision">
+    <h4>D5 — Where does the graph fit in packs?</h4>
+    <p class="muted">Packs are artifact bundles; the concept graph (relationships, supports/contradicts) lives in GraphStore. Does a compiled pack embed its subgraph, or reference the central graph?</p>
+    <p class="rec">Embed a serialized subgraph snapshot per pack version (portable, pinnable), keep the live graph central for curation. Decide in Phase 2 — reversible.</p>
+  </div>
+
+  <!-- ============ SECTION 6 ============ -->
+  <h2><span class="num">06</span> Build path — six phases, loops first</h2>
+
+  <div class="card" style="padding: 8px 24px;">
+    <div class="phase">
+      <div class="ph-label">Phase 0<small>~days</small></div>
+      <div>
+        <p><b>Harness the repo itself.</b> Drop in market_zero's <code>harness/generate.py</code> + <code>measure.py</code>, wire the quality-gate config, supersede ADR-005 with the persistence ADR, add SpecOmagic as editable dependency.</p>
+        <p class="deliver">✓ Deliverable: anti-slop catalog, health report, specomagic importable from Onto_Wiz</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="ph-label">Phase 1<small>~1 wk</small></div>
+      <div>
+        <p><b>Unified artifact model + Delta bridge.</b> Artifact registry over SpecOmagic's 10 + Onto_Wiz's judgment types; add EvalCase, MetricDefinition, SourceContract, QuestionPlaybook, AntiPattern, ExceptionRule; build <code>bridge.py</code> so every lifecycle transition is a Delta.</p>
+        <p class="deliver">✓ Deliverable: one artifact API, governed end-to-end; round-trip test: extract → propose → approve → active</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="ph-label">Phase 2<small>~1–2 wks</small></div>
+      <div>
+        <p><b>Pack compiler + registry + Loop 1 (mining).</b> pack.yaml manifest (aura pattern), LayeredStore stacking, compile pipeline, PackRegistry; scheduled mining loop over a real corpus (20 brand decks + 5 methodology decks + 2 notebooks per spec). Includes the new code-rule miner.</p>
+        <p class="deliver">✓ Deliverable: <code>commercial_analytics@0.1</code> compiles from real extracted candidates</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="ph-label">Phase 3<small>~1 wk</small></div>
+      <div>
+        <p><b>Loop 4 (eval gate) + SDK.</b> EvalCase store, BatchEval in CI, agent-lift benchmark harness, <code>get_context()</code> SDK with provenance envelope. Wire MarketZero (or a thin test agent) as first consumer.</p>
+        <p class="deliver">✓ Deliverable: "Why did Brand X lose share?" answered with-pack vs without-pack, measured</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="ph-label">Phase 4<small>~1–2 wks</small></div>
+      <div>
+        <p><b>Loop 2 (steward) + Loop 3 (Forge missions).</b> Port DataSteward → KnowledgeSteward with Pack Quality Score; steward generates missions from weak spots; extend Situation Room with the daily-5-minute card loop (approve / rank / correct / caveat / uncertain), each round emitting delta + eval + confidence.</p>
+        <p class="deliver">✓ Deliverable: SME plays targeted rounds generated from real gaps; pack quality measurably moves</p>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="ph-label">Phase 5<small>ongoing</small></div>
+      <div>
+        <p><b>Loop 5 (feedback) + scale-out.</b> Usage telemetry, three closed loops, EWMA artifact reliability, weekly challenge + multiplayer consensus missions, more packs (market access overlay, oncology overlay), Pack Registry UI.</p>
+        <p class="deliver">✓ Deliverable: corrections become deltas + evals automatically; second consumer onboarded</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Metrics that prove it (the spec's list, with the two it insists on)</h3>
+  <table>
+    <tr><th>Metric</th><th>What it answers</th><th>Where it comes from</th></tr>
+    <tr><td>Agent lift</td><td>Is the pack worth anything? (with vs without)</td><td>Loop 4 benchmark — the headline number</td></tr>
+    <tr><td>Eval coverage</td><td>How much codified knowledge is testable?</td><td>EvalCase store / artifact count</td></tr>
+    <tr><td>Correction reuse</td><td>Does one fix prevent a class of errors?</td><td>Loop 5 telemetry</td></tr>
+    <tr><td>Pack Quality Score</td><td>Steward's optimization target</td><td>coverage × eval coverage × freshness × confidence</td></tr>
+    <tr><td>SME time-to-artifact</td><td>Is the Forge actually fast?</td><td>Forge session telemetry</td></tr>
+    <tr><td>Governance latency</td><td>Is review a bottleneck?</td><td>Delta queue timestamps</td></tr>
+  </table>
+
+  <!-- ============ SECTION 7 ============ -->
+  <h2><span class="num">07</span> Risks I'd watch <span class="muted" style="font-size:0.9rem; font-weight:400;">(spec's five, plus two from the code scan)</span></h2>
+  <div class="grid g2">
+    <div class="card">
+      <ul>
+        <li><b>Game as decoration</b> — every Forge round MUST emit a delta + eval, or it's theatre. Enforced in the round schema itself, not by convention.</li>
+        <li><b>Over-extraction</b> — extractors propose, never promote. Already structurally true once the Delta bridge exists.</li>
+        <li><b>One giant ontology</b> — layered packs only; the LayeredStore merge rules already encode this.</li>
+        <li><b>Points for speed</b> — score consensus-correctness, novelty, impact, useful dissent. Never volume.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <ul>
+        <li><b>Two artifact models drifting</b> (new) — if the bridge isn't built in Phase 1, SpecOmagic and Onto_Wiz models will diverge and we'll re-merge painfully later. Do D3 first.</li>
+        <li><b>Integration sprawl</b> (new) — four repos, four idioms. The harness + ADR-007 boundary checks + anti-slop catalog are the antidote; that's why Phase 0 is the harness.</li>
+        <li><b>Elicitation ≠ Q&amp;A</b> — Forge stays its own surface, never merged into analyst chat.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>Bottom line:</b> the spec asks for a five-layer domain intelligence factory. The scan shows layer 1 (mining) is SpecOmagic, layer 2 (objects) is SpecOmagic+Onto_Wiz merged via one bridge, layer 3 (compiler) is aura.ai's pattern + SpecOmagic's LayeredStore, layer 4 (Forge) is the Situation Room grown into missions, layer 5 (evals/feedback) is market_zero's steward + feedback loops ported. <b>First proof: Commercial Analytics Base Pack answering "Why did Brand X lose share?" with measured agent lift.</b> If that number moves, we have a product, not a demo.
+  </div>
+
+  <footer>
+    Prepared for brainstorm · Onto_Wiz Domain Intelligence Layer · Sources: spec_raw.md, SME_Knowledge_Codification_Blueprint.md, deep scans of Onto_Wiz / SpecOmagic / market_zero / aura.ai · 10 June 2026
+  </footer>
+
+</div>
+</body>
+</html>

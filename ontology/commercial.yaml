@@ -1,0 +1,407 @@
+ontology:
+  name: "Commercial Pharma Value Chain v2"
+  version: "2.0.0"
+  description: >
+    Core semantic layer for commercial pharma operations.
+    Covers the full value chain: brand lifecycle, market access,
+    field operations, competitive dynamics, and clinical signals.
+    Consumed by ReasoningEngine for tag-based inference.
+
+  meta_model:
+    entities:
+      # --- Core Commercial ---
+      - name: "Brand"
+        attributes: [therapeutic_area, lifecycle, asset_class, channel, indications]
+      - name: "HCP"
+        attributes: [specialty, prescribing_volume, territory, influence_tier]
+      - name: "Account"
+        attributes: [type, potential, access_status, payer_mix]
+      - name: "Payer"
+        attributes: [type, formulary_status, pa_requirements, lives_covered]
+      # --- Market Structure ---
+      - name: "Territory"
+        attributes: [region, rep_assigned, account_count, market_potential]
+      - name: "Indication"
+        attributes: [icd10_code, prevalence, line_of_therapy, standard_of_care]
+      - name: "Competitor"
+        attributes: [brand_name, company, lifecycle, price_index, modality]
+      - name: "Formulary"
+        attributes: [payer_id, tier, pa_required, step_edit, quantity_limit]
+      # --- Operations ---
+      - name: "Contract"
+        attributes: [payer_id, brand_id, rebate_pct, effective_date, term_months]
+      - name: "FieldForce"
+        attributes: [role, territory, call_plan, vacancy_status]
+      - name: "KOL"
+        attributes: [specialty, influence_tier, engagement_status, institution]
+      # --- Intelligence ---
+      - name: "Pipeline"
+        attributes: [compound, phase, expected_approval, threat_level]
+      - name: "Channel"
+        attributes: [type, volume_share, trend, specialty_pharmacy]
+      - name: "Signal"
+        attributes: [metric, direction, magnitude, time_period, geography]
+      - name: "EvidenceItem"
+        attributes: [source, confidence, date, tags, account_id]
+
+    relationships:
+      - { source: Brand, target: Indication, type: treats, attributes: [line, evidence_level] }
+      - { source: Brand, target: Competitor, type: competes_with, attributes: [overlap_indications, share_delta] }
+      - { source: Brand, target: Channel, type: distributed_via, attributes: [volume_share] }
+      - { source: HCP, target: Brand, type: prescribes, attributes: [volume, trend, loyalty] }
+      - { source: HCP, target: Account, type: affiliated_with, attributes: [role, primary] }
+      - { source: Account, target: Payer, type: covered_by, attributes: [lives_pct, contract_status] }
+      - { source: Payer, target: Formulary, type: manages, attributes: [review_cycle, last_updated] }
+      - { source: Formulary, target: Brand, type: covers, attributes: [tier, restrictions] }
+      - { source: FieldForce, target: Territory, type: covers, attributes: [call_frequency, reach] }
+      - { source: FieldForce, target: HCP, type: calls_on, attributes: [frequency, last_call_date] }
+      - { source: KOL, target: Brand, type: advocates_for, attributes: [sentiment, engagement_level] }
+      - { source: Signal, target: Brand, type: observed_for, attributes: [metric, magnitude] }
+      - { source: EvidenceItem, target: Signal, type: supports, attributes: [confidence, recency] }
+      - { source: Pipeline, target: Brand, type: threatens, attributes: [timeline, overlap_score] }
+      - { source: Contract, target: Payer, type: governs_access, attributes: [effective, terms] }
+
+  # =========================================================================
+  # INFERENCE RULES — Tag-based reasoning (consumed by ReasoningEngine)
+  #
+  # Priority scale: 100 = highest urgency, 10 = background signal
+  # Confidence modifiers: "max" = use highest signal score, "average" = mean
+  # =========================================================================
+
+  inference_rules:
+
+    # --- SAFETY (P90-100) — Always evaluate first ---
+
+    - id: "rule_safety_signal"
+      function: "base"
+      description: "Safety signals often masquerade as 'preference' or 'volume drops'."
+      priority: 90
+      conditions:
+        - name: "has_volume_drop"
+          pattern: "tag_match"
+          args: ["Commercial:VolumeDrop"]
+        - name: "has_clinical_inquiry"
+          pattern: "tag_match"
+          args: ["Clinical:Safety"]
+      logic: "has_volume_drop AND has_clinical_inquiry"
+      consequence:
+        risk: "Risk:Safety"
+        verdict: "Emerging Safety Signal detected. The volume drop is likely clinical, not commercial."
+        confidence_modifier: "max"
+
+    - id: "rule_supply_disruption"
+      function: "base"
+      description: "Supply chain disruption causes volume drops independent of demand or access."
+      priority: 95
+      conditions:
+        - name: "has_supply_issue"
+          pattern: "tag_match"
+          args: ["Supply:Shortage", "Supply:FulfillmentDelay"]
+        - name: "has_volume_impact"
+          pattern: "tag_match"
+          args: ["Commercial:VolumeDrop", "Supply:DistributionGap"]
+      logic: "has_supply_issue AND has_volume_impact"
+      consequence:
+        risk: "Risk:SupplyDisruption"
+        verdict: "Supply chain disruption confirmed. Volume impact is supply-driven, not demand or access."
+        confidence_modifier: "max"
+
+    # --- ACCESS (P80-89) — Payer and formulary barriers ---
+
+    - id: "rule_genuine_budget_crisis"
+      function: "market_access"
+      description: "Priority Rule: Hard financial evidence trumps rumors."
+      priority: 100
+      conditions:
+        - name: "has_budget_barrier"
+          pattern: "tag_match"
+          args: ["Barrier:Budget"]
+        - name: "has_financial_crisis_evidence"
+          pattern: "tag_match"
+          args: ["Financial:Crisis", "Evidence:Hard"]
+      logic: "has_budget_barrier AND has_financial_crisis_evidence"
+      consequence:
+        risk: "Constraint:Financial"
+        verdict: "Genuine Budget Crisis confirmed by hard financial evidence. Not a negotiation tactic."
+        confidence_modifier: "max"
+
+    - id: "rule_pa_access_barrier"
+      function: "market_access"
+      description: "Prior authorization rejections or formulary edits creating access friction."
+      priority: 85
+      conditions:
+        - name: "has_access_rejection"
+          pattern: "tag_match"
+          args: ["Access:PAReject", "Access:StepEdit"]
+        - name: "has_formulary_change"
+          pattern: "tag_match"
+          args: ["Access:FormularyChange", "Access:Restricted"]
+      logic: "has_access_rejection AND has_formulary_change"
+      consequence:
+        risk: "Risk:AccessBarrier"
+        verdict: "Access barrier detected. PA rejections correlate with recent formulary policy change."
+        confidence_modifier: "average"
+
+    - id: "rule_formulary_exclusion"
+      function: "market_access"
+      description: "Payer formulary exclusion or non-preferred tier creating systematic access loss."
+      priority: 80
+      conditions:
+        - name: "has_payer_action"
+          pattern: "tag_match"
+          args: ["Access:FormularyChange", "Payer:TierChange"]
+        - name: "has_volume_impact"
+          pattern: "tag_match"
+          args: ["Commercial:VolumeDrop", "Commercial:ShareLoss"]
+      logic: "has_payer_action AND has_volume_impact"
+      consequence:
+        risk: "Risk:FormularyExclusion"
+        verdict: "Formulary-driven volume loss. Payer action is the root cause, not field execution."
+        confidence_modifier: "average"
+
+    - id: "rule_copay_accumulator_impact"
+      function: "market_access"
+      description: "Copay accumulator/maximizer policy causing patient therapy abandonment mid-year."
+      priority: 83
+      conditions:
+        - name: "has_accumulator_policy"
+          pattern: "tag_match"
+          args: ["Access:CopayAccumulator"]
+        - name: "has_patient_abandonment"
+          pattern: "tag_match"
+          args: ["Demand:PatientAbandonment", "Demand:NBRxDecline"]
+      logic: "has_accumulator_policy AND has_patient_abandonment"
+      consequence:
+        risk: "Risk:CopayAccumulatorImpact"
+        verdict: "Copay accumulator barrier detected. Patient abandonment correlates with copay card benefit exhaustion."
+        confidence_modifier: "average"
+
+    # --- COMPETITIVE (P65-79) — Market dynamics ---
+
+    - id: "rule_medicare_reimbursement_squeeze"
+      function: "market_access"
+      description: "ASP-based reimbursement pressure or site-of-care policy shifting physician-administered drug volume."
+      priority: 76
+      conditions:
+        - name: "has_reimbursement_pressure"
+          pattern: "tag_match"
+          args: ["Access:ReimbursementPressure"]
+        - name: "has_channel_or_volume_shift"
+          pattern: "tag_match"
+          args: ["Commercial:ChannelShift", "Commercial:VolumeDrop"]
+      logic: "has_reimbursement_pressure AND has_channel_or_volume_shift"
+      consequence:
+        risk: "Risk:ReimbursementSqueeze"
+        verdict: "Reimbursement squeeze detected. Buy-and-bill margin compression is driving site-of-care or volume shifts."
+        confidence_modifier: "average"
+
+    - id: "rule_competitive_displacement"
+      function: "competitive_intel"
+      description: "New competitor launch or aggressive pricing causing share shift."
+      priority: 75
+      conditions:
+        - name: "has_competitor_action"
+          pattern: "tag_match"
+          args: ["Competitor:Launch", "Competitor:Pricing"]
+        - name: "has_share_impact"
+          pattern: "tag_match"
+          args: ["Commercial:ShareLoss", "Commercial:VolumeDrop"]
+      logic: "has_competitor_action AND has_share_impact"
+      consequence:
+        risk: "Risk:CompetitiveDisplacement"
+        verdict: "Competitive displacement detected. Share loss correlates with competitor market action."
+        confidence_modifier: "average"
+
+    - id: "rule_340b_contract_erosion"
+      function: "market_access"
+      description: "340B covered entity utilization growth compressing manufacturer margins."
+      priority: 67
+      conditions:
+        - name: "has_340b_growth"
+          pattern: "tag_match"
+          args: ["Access:340BUtilization"]
+        - name: "has_margin_pressure"
+          pattern: "tag_match"
+          args: ["Financial:MarginPressure", "Commercial:ShareLoss"]
+      logic: "has_340b_growth AND has_margin_pressure"
+      consequence:
+        risk: "Risk:340BErosion"
+        verdict: "340B margin erosion detected. Growing covered entity utilization is compressing net revenue."
+        confidence_modifier: "average"
+
+    - id: "rule_biosimilar_erosion"
+      function: "competitive_intel"
+      description: "Biosimilar entry eroding originator brand share through price pressure."
+      priority: 65
+      conditions:
+        - name: "has_biosimilar_entry"
+          pattern: "tag_match"
+          args: ["Competitor:Biosimilar"]
+        - name: "has_price_or_share_pressure"
+          pattern: "tag_match"
+          args: ["Commercial:ShareLoss", "Competitor:Pricing"]
+      logic: "has_biosimilar_entry AND has_price_or_share_pressure"
+      consequence:
+        risk: "Risk:BiosimilarErosion"
+        verdict: "Biosimilar erosion pattern. Price-driven switching is accelerating share loss."
+        confidence_modifier: "average"
+
+    - id: "rule_competitor_lockout"
+      function: "market_access"
+      description: "Fallback Rule: Rumor + Budget Barrier suggests Lockout."
+      priority: 50
+      conditions:
+        - name: "has_rumor_pricing"
+          pattern: "tag_match"
+          args: ["Competitor:Pricing"]
+        - name: "has_budget_barrier"
+          pattern: "tag_match"
+          args: ["Barrier:Budget"]
+      logic: "has_rumor_pricing AND has_budget_barrier"
+      consequence:
+        risk: "Risk:Lockout"
+        verdict: "The budget objection is likely a secondary effect of a competitor Lock-out negotiation."
+        confidence_modifier: "average"
+
+    # --- DEMAND & EXECUTION (P55-74) ---
+
+    - id: "rule_demand_erosion"
+      function: "brand_performance"
+      description: "Genuine demand decline evidenced by NBRx drop plus HCP disengagement."
+      priority: 70
+      conditions:
+        - name: "has_demand_decline"
+          pattern: "tag_match"
+          args: ["Demand:NBRxDecline"]
+        - name: "has_engagement_drop"
+          pattern: "tag_match"
+          args: ["Demand:EngagementDrop", "Field:KOLDisengaged"]
+      logic: "has_demand_decline AND has_engagement_drop"
+      consequence:
+        risk: "Risk:DemandErosion"
+        verdict: "Demand erosion confirmed. NBRx decline plus HCP disengagement indicates genuine loss of clinical preference."
+        confidence_modifier: "average"
+
+    - id: "rule_launch_stall"
+      function: "brand_performance"
+      description: "New brand failing to gain traction post-launch due to awareness or access gaps."
+      priority: 70
+      conditions:
+        - name: "has_low_adoption"
+          pattern: "tag_match"
+          args: ["Commercial:LowAdoption"]
+        - name: "has_awareness_gap"
+          pattern: "tag_match"
+          args: ["Demand:AwarenessGap", "Field:LowCoverage"]
+      logic: "has_low_adoption AND has_awareness_gap"
+      consequence:
+        risk: "Risk:LaunchStall"
+        verdict: "Launch trajectory at risk. Low adoption correlates with awareness or coverage gaps, not market rejection."
+        confidence_modifier: "average"
+
+    - id: "rule_field_execution_gap"
+      function: "brand_performance"
+      description: "Territory underperformance linked to field force gaps, not market conditions."
+      priority: 60
+      conditions:
+        - name: "has_territory_underperformance"
+          pattern: "tag_match"
+          args: ["Commercial:VolumeDrop", "Commercial:ShareLoss"]
+        - name: "has_field_gap"
+          pattern: "tag_match"
+          args: ["Field:RepVacancy", "Field:LowCoverage"]
+      logic: "has_territory_underperformance AND has_field_gap"
+      consequence:
+        risk: "Risk:ExecutionGap"
+        verdict: "Field execution gap detected. Territory underperformance correlates with rep vacancy or low call coverage."
+        confidence_modifier: "average"
+
+    - id: "rule_rebate_trap"
+      function: "market_access"
+      description: "Brand locked into unfavorable rebate contract with share penalties or exclusivity clauses."
+      priority: 57
+      conditions:
+        - name: "has_contract_risk"
+          pattern: "tag_match"
+          args: ["Access:RebateContractRisk"]
+        - name: "has_volume_or_margin_impact"
+          pattern: "tag_match"
+          args: ["Commercial:VolumeDrop", "Financial:MarginPressure"]
+      logic: "has_contract_risk AND has_volume_or_margin_impact"
+      consequence:
+        risk: "Risk:RebateTrap"
+        verdict: "Rebate trap detected. Unfavorable contract terms are constraining pricing flexibility and eroding margin."
+        confidence_modifier: "average"
+
+    - id: "rule_channel_shift"
+      function: "brand_performance"
+      description: "Dispensing pattern shift from one channel to another affecting volume measurement."
+      priority: 55
+      conditions:
+        - name: "has_channel_change"
+          pattern: "tag_match"
+          args: ["Commercial:ChannelShift"]
+        - name: "has_volume_anomaly"
+          pattern: "tag_match"
+          args: ["Commercial:VolumeDrop", "Commercial:ShareLoss"]
+      logic: "has_channel_change AND has_volume_anomaly"
+      consequence:
+        risk: "Risk:ChannelShift"
+        verdict: "Channel shift detected. Apparent volume decline may reflect dispensing migration, not true demand loss."
+        confidence_modifier: "average"
+
+    # --- ONCOLOGY-SPECIFIC (P60-78) ---
+
+    - id: "rule_guideline_driven_shift"
+      function: "brand_performance"
+      therapy_area: "oncology"
+      description: "Clinical guideline update (NCCN/ESMO) shifts standard of care away from brand."
+      priority: 78
+      conditions:
+        - name: "has_guideline_change"
+          pattern: "tag_match"
+          args: ["Clinical:Guideline"]
+        - name: "has_share_loss"
+          pattern: "tag_match"
+          args: ["Commercial:ShareLoss", "Commercial:VolumeDrop"]
+      logic: "has_guideline_change AND has_share_loss"
+      consequence:
+        risk: "Risk:GuidelineShift"
+        verdict: "Guideline-driven displacement. NCCN/ESMO update has shifted prescribing away from brand."
+        confidence_modifier: "average"
+
+    - id: "rule_biomarker_testing_gap"
+      function: "brand_performance"
+      therapy_area: "oncology"
+      description: "Low biomarker testing rates reduce eligible patient identification for targeted therapies."
+      priority: 62
+      conditions:
+        - name: "has_testing_gap"
+          pattern: "tag_match"
+          args: ["Demand:AwarenessGap", "Demand:NBRxDecline"]
+        - name: "has_biomarker_context"
+          pattern: "tag_match"
+          args: ["Clinical:Efficacy", "Commercial:MarketExpansion"]
+      logic: "has_testing_gap AND has_biomarker_context"
+      consequence:
+        risk: "Risk:TestingGap"
+        verdict: "Biomarker testing gap detected. Low testing rates are suppressing patient identification for the targeted therapy."
+        confidence_modifier: "average"
+
+    - id: "rule_pathway_exclusion"
+      function: "market_access"
+      therapy_area: "oncology"
+      description: "Clinical pathway committee excludes brand from institutional treatment protocol."
+      priority: 72
+      conditions:
+        - name: "has_pathway_restriction"
+          pattern: "tag_match"
+          args: ["Access:Restricted", "Clinical:Guideline"]
+        - name: "has_institutional_impact"
+          pattern: "tag_match"
+          args: ["Commercial:ShareLoss", "Demand:NBRxDecline"]
+      logic: "has_pathway_restriction AND has_institutional_impact"
+      consequence:
+        risk: "Risk:PathwayExclusion"
+        verdict: "Institutional pathway exclusion. Clinical pathway committee has deprioritized brand, blocking new starts."
+        confidence_modifier: "average"

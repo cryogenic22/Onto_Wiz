@@ -1,0 +1,52 @@
+id: rule_rebate_trap
+kind: decision_heuristic
+name: Rebate Trap
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 442097e7-5a3a-4449-b546-bd7f86b25982
+  at: '2026-06-14T00:06:14.835613+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835613+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: market_access
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835613+00:00'
+trigger_signals:
+- signal_name: has_contract_risk
+  threshold: Access:RebateContractRisk
+  data_source: tag_match
+- signal_name: has_volume_or_margin_impact
+  threshold: Commercial:VolumeDrop | Financial:MarginPressure
+  data_source: tag_match
+trigger_context:
+- Brand locked into unfavorable rebate contract with share penalties or exclusivity
+  clauses.
+decision_logic: has_contract_risk AND has_volume_or_margin_impact => Rebate trap detected.
+  Unfavorable contract terms are constraining pricing flexibility and eroding margin.
+judgment_type: empirical
+exceptions: []
+anti_patterns: []
+evidence_required: []
+typical_outcome: Rebate trap detected. Unfavorable contract terms are constraining
+  pricing flexibility and eroding margin.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '57'
+valid_for_days: 180

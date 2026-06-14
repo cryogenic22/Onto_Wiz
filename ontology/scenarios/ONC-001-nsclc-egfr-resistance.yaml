@@ -1,0 +1,21 @@
+id: "ONC-001"
+name: "NSCLC EGFR T790M Resistance Emergence"
+description: >
+  An EGFR+ NSCLC patient population on first-generation TKI (erlotinib/gefitinib)
+  develops T790M resistance mutation. Osimertinib captures 2L share. Brand faces
+  declining 1L starts as physicians move to osimertinib 1L (FLAURA data).
+therapeutic_area: "oncology"
+indication: "NSCLC — EGFR-mutated"
+molecular_context: "EGFR exon 19 del / L858R → T790M resistance"
+brand_context:
+  brand: "First-generation EGFR TKI"
+  lifecycle: "maturity"
+  channel: "specialty_pharmacy"
+account_context:
+  type: "Academic Center"
+  biomarker_testing: "Reflex EGFR testing at diagnosis"
+trigger_signal: "Declining 1L starts as T790M-directed 2L therapy shifts to 1L use"
+expected_hypothesis: "competitive_pressure"
+expected_drivers: ["competitor_data_superiority", "guideline_update", "resistance_mechanism_published"]
+inference_rules_exercised: ["rule_competitive_displacement", "rule_guideline_driven_shift"]
+complexity_level: "high"

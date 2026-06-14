@@ -1,0 +1,207 @@
+name: "Market Access — Payer Archetypes & Contracting Dynamics"
+version: "1.0.0"
+description: >
+  Payer decision-making archetypes, contracting lifecycle patterns,
+  340B covered entity dynamics, copay accumulator/maximizer mechanics,
+  and buy-and-bill reimbursement pressure models. Complements
+  market_access.yaml with behavioral and strategic layers.
+
+# =========================================================================
+# PAYER DECISION ARCHETYPES
+# =========================================================================
+
+payer_archetypes:
+
+  cost_containment_driven:
+    description: "Payer prioritizes lowest net cost. Aggressive formulary management."
+    decision_criteria:
+      primary: net_cost_per_member_per_month
+      secondary: rebate_yield
+    typical_actions:
+      - step_therapy_enforcement
+      - narrow_formulary
+      - copay_accumulator_adoption
+      - biosimilar_preferred_status
+    examples: ["Large PBMs (Express Scripts, CVS Caremark)", "Cost-focused MCOs"]
+
+  outcomes_driven:
+    description: "Payer evaluates total cost of care including downstream events."
+    decision_criteria:
+      primary: total_cost_of_care
+      secondary: hospitalization_avoidance
+    typical_actions:
+      - value_based_contracts
+      - outcomes_tracking_requirements
+      - medical_exception_pathways
+    examples: ["Integrated delivery networks", "Kaiser-model HMOs", "Some Medicare Advantage plans"]
+
+  access_permissive:
+    description: "Payer maintains broad formulary with minimal restrictions."
+    decision_criteria:
+      primary: provider_satisfaction
+      secondary: network_adequacy
+    typical_actions:
+      - open_formulary
+      - minimal_pa
+      - broad_specialty_access
+    examples: ["Large employer self-insured plans", "Academic medical center captive plans"]
+
+  government_regulated:
+    description: "Payer access governed by statute (Medicaid, VA, Medicare Part B)."
+    decision_criteria:
+      primary: statutory_requirements
+      secondary: best_price_or_federal_ceiling
+    typical_actions:
+      - mandatory_coverage_with_rebate
+      - federal_supply_schedule
+      - cms_price_negotiation
+    examples: ["State Medicaid agencies", "VA VISN committees", "CMS Part B"]
+
+# =========================================================================
+# CONTRACTING LIFECYCLE
+# =========================================================================
+
+contracting_lifecycle:
+
+  stages:
+    - stage: "RFP / Bid"
+      description: "Payer solicits rebate offers from manufacturers in therapeutic class"
+      key_metrics: [class_competition_level, current_market_share, brand_differentiation]
+      risk: "Underbidding erodes margin; overbidding loses position"
+
+    - stage: "Negotiation"
+      description: "Rebate terms, exclusivity clauses, price protection, tier guarantees"
+      key_metrics: [base_rebate_pct, tier_guarantee, exclusivity_scope, price_cap]
+      risk: "Exclusivity clause locks out future entrants; price protection limits increases"
+
+    - stage: "Implementation"
+      description: "Formulary update, PA criteria publication, claims adjudication setup"
+      key_metrics: [time_to_formulary_update, claims_rejection_rate, pa_turnaround]
+      risk: "Slow implementation creates access gap between contract signing and patient access"
+
+    - stage: "Performance"
+      description: "Market share tracking, rebate true-up, utilization management"
+      key_metrics: [actual_vs_target_share, rebate_liability, step_edit_compliance]
+      risk: "Share erosion triggers escalator penalties; payer adds restrictions mid-contract"
+
+    - stage: "Renewal / Rebid"
+      description: "Contract renegotiation with updated competitive landscape"
+      key_metrics: [new_entrants, biosimilar_availability, payer_consolidation]
+      risk: "Biosimilar entry resets pricing floor; payer demands deeper rebates"
+
+  contract_risk_signals:
+    - signal: "Exclusivity clause expiring within 6 months"
+      risk_level: high
+      tags: ["Access:RebateContractRisk"]
+    - signal: "Competitor signed deeper rebate with same payer"
+      risk_level: high
+      tags: ["Access:RebateContractRisk", "Competitor:Pricing"]
+    - signal: "Payer consolidation (M&A) changes negotiating leverage"
+      risk_level: medium
+      tags: ["Access:RebateContractRisk"]
+
+# =========================================================================
+# 340B COVERED ENTITY DYNAMICS
+# =========================================================================
+
+program_340b:
+
+  description: >
+    The 340B Drug Pricing Program requires manufacturers to provide
+    outpatient drugs at discounted prices to eligible healthcare
+    organizations (covered entities). Originally for safety-net hospitals,
+    program growth has created significant margin compression for
+    specialty and oncology brands.
+
+  entity_types:
+    disproportionate_share_hospital:
+      description: "DSH hospitals — largest 340B segment"
+      margin_impact: "Manufacturer sells at 340B ceiling price; entity dispenses at commercial rates"
+    federally_qualified_health_center:
+      description: "FQHCs — community health centers"
+      margin_impact: "High discount, lower volume per entity"
+    contract_pharmacy:
+      description: "Non-entity pharmacies dispensing 340B-acquired drugs via contract"
+      margin_impact: "Controversial expansion — extends 340B discount to retail pharmacy network"
+
+  commercial_impact_signals:
+    - signal: "340B utilization growing >10% YoY at key accounts"
+      risk: "Margin erosion as more volume flows through discounted channel"
+      tags: ["Access:340BUtilization", "Financial:MarginPressure"]
+    - signal: "New contract pharmacy arrangement at covered entity"
+      risk: "Volume migration from commercial to 340B channel"
+      tags: ["Access:340BUtilization", "Commercial:ChannelShift"]
+
+# =========================================================================
+# COPAY ACCUMULATOR / MAXIMIZER PROGRAMS
+# =========================================================================
+
+copay_programs:
+
+  accumulator:
+    description: >
+      Payer policy that prevents manufacturer copay card assistance from
+      counting toward patient deductible or out-of-pocket maximum.
+      Patient faces full cost after copay card benefit exhausts mid-year.
+    patient_impact: "Therapy abandonment in Q3-Q4 when copay card exhausts"
+    commercial_impact: "Volume drop concentrated in second half of year"
+    prevalence: "~50% of commercial plans by 2025"
+    tags: ["Access:CopayAccumulator", "Demand:PatientAbandonment"]
+
+  maximizer:
+    description: >
+      PBM redirects manufacturer copay assistance to cover full patient
+      responsibility, maximizing use of copay card benefit. Patient cost
+      stays low, but manufacturer pays both drug cost AND copay subsidy.
+    patient_impact: "Patient cost remains low — no abandonment signal"
+    commercial_impact: "Manufacturer margin erosion — double payment"
+    prevalence: "Growing rapidly, especially Express Scripts SaveOnSP"
+    tags: ["Access:CopayMaximizer", "Financial:MarginPressure"]
+
+# =========================================================================
+# BUY-AND-BILL REIMBURSEMENT (PART B)
+# =========================================================================
+
+buy_and_bill:
+
+  description: >
+    Physician-administered drugs reimbursed under Medicare Part B at
+    ASP + 6% (sequestration reduces to ~ASP + 4.3%). Margin squeeze
+    when ASP rises slower than acquisition cost, or when CMS imposes
+    site-of-care policies shifting volume from hospital outpatient to
+    lower-reimbursement settings.
+
+  reimbursement_model:
+    formula: "ASP + 6% (statutory) minus sequestration (2%)"
+    effective_rate: "~ASP + 4.3%"
+    lag: "ASP recalculated quarterly with 2-quarter lag"
+    risk: "Acquisition cost above reimbursement in rising-price environment"
+
+  pressure_signals:
+    - signal: "CMS proposes site-of-care differential reimbursement"
+      impact: "Hospital outpatient volume shifts to physician office or home infusion"
+      tags: ["Access:ReimbursementPressure", "Commercial:ChannelShift"]
+    - signal: "ASP-based reimbursement falls below acquisition cost"
+      impact: "Physicians stop stocking drug; referral to hospital infusion center"
+      tags: ["Access:ReimbursementPressure", "Commercial:VolumeDrop"]
+    - signal: "Sequestration increase or new CMS payment model"
+      impact: "Further margin compression on physician-administered drugs"
+      tags: ["Access:ReimbursementPressure", "Financial:MarginPressure"]
+
+# =========================================================================
+# SIGNALS — Market Access Events
+# =========================================================================
+
+additional_signals:
+  - signal: "Access:CopayAccumulatorAdoption"
+    commercial_impact: "Major payer adopts accumulator — patient abandonment expected in H2"
+    tags: ["Access:CopayAccumulator"]
+  - signal: "Access:340BGrowth"
+    commercial_impact: "Covered entity adds contract pharmacy — 340B volume expanding"
+    tags: ["Access:340BUtilization"]
+  - signal: "Access:ASPReimbursementCut"
+    commercial_impact: "CMS reduces Part B reimbursement — buy-and-bill margin compressed"
+    tags: ["Access:ReimbursementPressure"]
+  - signal: "Access:RebateEscalatorTriggered"
+    commercial_impact: "Market share fell below contract threshold — escalator penalty activated"
+    tags: ["Access:RebateContractRisk", "Financial:MarginPressure"]

@@ -1,0 +1,19 @@
+id: "GOLD-007-breast-her2-sequencing"
+name: "HER2+ Breast Cancer Competitive Displacement by ADC"
+description: >
+  T-DXd (trastuzumab deruxtecan) launches aggressively in HER2+ breast 2L
+  at Frankfurt Breast Center, rapidly displacing the established regimen.
+  Tumor board updated protocol. Engine should detect competitive displacement
+  (rule_competitive_displacement) driven by a new market entrant.
+
+input:
+  signal: "Established HER2+ regimen share dropped 40% at Frankfurt Breast Center after ADC competitor entry."
+  context:
+    account_id: "frankfurt_breast_center"
+    brand_id: "brand_oncovance"
+
+expected:
+  min_confidence: 0.80
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "competitive"

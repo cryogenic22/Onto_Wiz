@@ -1,0 +1,51 @@
+id: rule_340b_contract_erosion
+kind: decision_heuristic
+name: 340B Contract Erosion
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 9671fc61-70f6-4959-b6b1-7c696b0952d1
+  at: '2026-06-14T00:06:14.835556+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835556+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: market_access
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835556+00:00'
+trigger_signals:
+- signal_name: has_340b_growth
+  threshold: Access:340BUtilization
+  data_source: tag_match
+- signal_name: has_margin_pressure
+  threshold: Financial:MarginPressure | Commercial:ShareLoss
+  data_source: tag_match
+trigger_context:
+- 340B covered entity utilization growth compressing manufacturer margins.
+decision_logic: has_340b_growth AND has_margin_pressure => 340B margin erosion detected.
+  Growing covered entity utilization is compressing net revenue.
+judgment_type: empirical
+exceptions: []
+anti_patterns: []
+evidence_required: []
+typical_outcome: 340B margin erosion detected. Growing covered entity utilization
+  is compressing net revenue.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '67'
+valid_for_days: 180

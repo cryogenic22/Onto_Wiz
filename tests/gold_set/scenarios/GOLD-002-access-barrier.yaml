@@ -1,0 +1,18 @@
+id: GOLD-002
+name: "Access barrier detection at Riverside Clinic"
+description: >
+  When PA rejection signals and formulary change signals co-occur
+  at an account, the reasoning engine should identify an access
+  barrier risk. Tests rule_pa_access_barrier (priority 85).
+
+input:
+  question: "Why is OncoVance losing volume at Riverside Clinic?"
+  context:
+    account_id: "riverside_clinic"
+    brand_id: "brand_oncovance"
+
+expected:
+  min_confidence: 0.5
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "access"

@@ -1,0 +1,20 @@
+id: "GOLD-010-pathway-exclusion"
+name: "Institutional Pathway Exclusion Blocks New Starts"
+description: >
+  Freiburg Cancer Center pathway committee excludes OncoVance from NSCLC 1L
+  institutional protocol despite national guideline support. All new patients
+  started on competitor regimen. Engine should detect pathway exclusion
+  (rule_pathway_exclusion) — an institutional access barrier distinct from
+  payer formulary actions or guideline downgrades.
+
+input:
+  signal: "OncoVance NBRx at Freiburg dropped to zero after pathway committee exclusion."
+  context:
+    account_id: "freiburg_cancer_institute"
+    brand_id: "brand_oncovance"
+
+expected:
+  min_confidence: 0.85
+  reasoning_not_empty: true
+  must_contain_tags:
+    - "pathway"

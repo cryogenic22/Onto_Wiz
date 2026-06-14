@@ -1,0 +1,22 @@
+id: "ONC-005"
+name: "TNBC IO Access Barrier — PD-L1 CPS Testing Requirement"
+description: >
+  Pembrolizumab approved for TNBC 1L requires PD-L1 CPS ≥10 (Dako 22C3 assay).
+  Payer imposes strict PA requiring documented CPS score before IO approval.
+  PA rejection rate high at community sites where CPS testing turnaround is slow,
+  leading to patients starting chemo-only before IO approval comes through.
+therapeutic_area: "oncology"
+indication: "Breast Cancer — Triple-Negative (TNBC)"
+molecular_context: "PD-L1 CPS ≥10 (22C3 assay specific)"
+brand_context:
+  brand: "Checkpoint inhibitor for TNBC 1L"
+  lifecycle: "launch"
+  channel: "buy_and_bill"
+account_context:
+  type: "Community Oncology with Limited Pathology"
+  biomarker_testing: "PD-L1 CPS requires send-out; 7-10 day turnaround"
+trigger_signal: "PA rejection rate 40% at community sites due to missing PD-L1 CPS documentation"
+expected_hypothesis: "market_access"
+expected_drivers: ["pa_documentation_burden", "testing_turnaround_delay", "payer_stringent_cdx_criteria"]
+inference_rules_exercised: ["rule_pa_access_barrier", "rule_biomarker_testing_gap"]
+complexity_level: "high"

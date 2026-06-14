@@ -1,0 +1,36 @@
+{
+  "version": "0.1.0",
+  "name": "Cathedral Keeper (Default)",
+  "paths": {
+    "include": [],
+    "extensions": [".py"],
+    "exclude": [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/output/**",
+      "**/.git/**",
+      "**/__pycache__/**",
+      "**/.pytest_cache/**",
+      "**/.venv/**",
+      "**/.venv*/**",
+      "**/venv/**",
+      "**/venv*/**",
+      "**/site-packages/**",
+      "**/.quality-reports/**"
+    ]
+  },
+  "integrations": {
+    "quality_gate": { "enabled": true, "qg_path": "quality-gate/quality_gate.py" },
+    "external_findings_json": { "enabled": false, "argv": [], "cwd": null }
+  },
+  "policies": {
+    "CK-PY-CYCLES": { "enabled": true, "type": "python_cycles", "severity": "high", "config": {} },
+    "CK-PY-ASYNC-BLOCKING": { "enabled": true, "type": "python_async_blocking", "severity": "high", "config": {} },
+    "CK-PY-REQUESTS-TIMEOUT": { "enabled": true, "type": "python_requests_timeout", "severity": "high", "config": {} },
+    "CK-PY-SYSPATH": { "enabled": true, "type": "python_syspath_hacks", "severity": "medium", "config": {} },
+    "CK-PY-BOUNDARIES": { "enabled": false, "type": "python_boundaries", "severity": "high", "config": { "rules": [] } }
+  },
+  "reporting": { "top_findings": 50, "top_files": 30 },
+  "thresholds": { "fail_on_severity_at_or_above": "high" }
+}

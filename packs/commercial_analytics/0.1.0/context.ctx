@@ -1,0 +1,143 @@
+§CTX v1.0 L2 DOMAIN:commercial
+PACK:commercial_analytics VERSION:0.1.0
+
+±ENTITY_REGISTRY-COMMERCIAL-ENTITIES
+ID:commercial-entities
+NAME:Commercial Entities
+KIND:entity_registry
+LIFECYCLE:active
+CONFIDENCE:1.00
+BODY:entities=id=brand; entity_type=commercial; name=Brand; attributes=fields=therapeutic_area, lifecycle, asset_class, channel, indications; aliases=; relationships=type=treats; target=Indication; attributes=line, evidence_level, type=competes_with; target=Competitor; attributes=overlap_indications, share_delta, type=distributed_via; target=Channel; attributes=volume_share, id=hcp; entity_type=commercial; name=HCP; attributes=fields=specialty, prescribing_volume, territory, influence_tier; aliases=; relationships=type=prescribes; target=Brand; attributes=volume, trend, loyalty, type=affiliated_with; target=Account; attributes=role, primary, id=account; entity_type=commercial; name=Account; attributes=fields=type, potential, access_status, payer_mix; aliases=; relationships=type=covered_by; target=Payer; attributes=lives_pct, contract_status, id=payer; entity_type=commercial; name=Payer; attributes=fields=type, formulary_status, pa_requirements, lives_covered; aliases=; relationships=type=manages; target=Formulary; attributes=review_cycle, last_updated, id=territory; entity_type=commercial; name=Territory; attributes=fields=region, rep_assigned, account_count, market_potential; aliases=; relationships=, id=indication; entity_type=commercial; name=Indication; attributes=fields=icd10_code, prevalence, line_of_therapy, standard_of_care; aliases=; relationships=, id=competitor; entity_type=commercial; name=Competitor; attributes=fields=brand_name, company, lifecycle, price_index, modality; aliases=; relationships=, id=formulary; entity_type=commercial; name=Formulary; attributes=fields=payer_id, tier, pa_required, step_edit, quantity_limit; aliases=; relationships=type=covers; target=Brand; attributes=tier, restrictions, id=contract; entity_type=commercial; name=Contract; attributes=fields=payer_id, brand_id, rebate_pct, effective_date, term_months; aliases=; relationships=type=governs_access; target=Payer; attributes=effective, terms, id=fieldforce; entity_type=commercial; name=FieldForce; attributes=fields=role, territory, call_plan, vacancy_status; aliases=; relationships=type=covers; target=Territory; attributes=call_frequency, reach, type=calls_on; target=HCP; attributes=frequency, last_call_date, id=kol; entity_type=commercial; name=KOL; attributes=fields=specialty, influence_tier, engagement_status, institution; aliases=; relationships=type=advocates_for; target=Brand; attributes=sentiment, engagement_level, id=pipeline; entity_type=commercial; name=Pipeline; attributes=fields=compound, phase, expected_approval, threat_level; aliases=; relationships=type=threatens; target=Brand; attributes=timeline, overlap_score, id=channel; entity_type=commercial; name=Channel; attributes=fields=type, volume_share, trend, specialty_pharmacy; aliases=; relationships=, id=signal; entity_type=commercial; name=Signal; attributes=fields=metric, direction, magnitude, time_period, geography; aliases=; relationships=type=observed_for; target=Brand; attributes=metric, magnitude, id=evidenceitem; entity_type=commercial; name=EvidenceItem; attributes=fields=source, confidence, date, tags, account_id; aliases=; relationships=type=supports; target=Signal; attributes=confidence, recency
+±DECISION_HEURISTIC-RULE_SAFETY_SIGNAL
+ID:rule_safety_signal
+NAME:Safety Signal
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_volume_drop; threshold=Commercial:VolumeDrop; data_source=tag_match, signal_name=has_clinical_inquiry; threshold=Clinical:Safety; data_source=tag_match; trigger_context=Safety signals often masquerade as 'preference' or 'volume drops'.; decision_logic=has_volume_drop AND has_clinical_inquiry => Emerging Safety Signal detected. The volume drop is likely clinical, not commercial.; judgment_type=empirical; anti_patterns=wrong_conclusion=Competitive pressure or a pricing/commercial cause; why_wrong=A volume drop coinciding with clinical safety inquiries is most likely a SAFETY signal — clinical, not commercial.; unless_evidence=; typical_outcome=Emerging Safety Signal detected. The volume drop is likely clinical, not commercial.; sme_confidence=0.5; scope=priority=90; valid_for_days=180
+±DECISION_HEURISTIC-RULE_SUPPLY_DISRUPTION
+ID:rule_supply_disruption
+NAME:Supply Disruption
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_supply_issue; threshold=Supply:Shortage | Supply:FulfillmentDelay; data_source=tag_match, signal_name=has_volume_impact; threshold=Commercial:VolumeDrop | Supply:DistributionGap; data_source=tag_match; trigger_context=Supply chain disruption causes volume drops independent of demand or access.; decision_logic=has_supply_issue AND has_volume_impact => Supply chain disruption confirmed. Volume impact is supply-driven, not demand or access.; judgment_type=empirical; anti_patterns=wrong_conclusion=A demand or access problem; why_wrong=A volume drop tied to a manufacturing/fill-finish interruption with no demand-signal change is supply-driven — not demand or access.; unless_evidence=; typical_outcome=Supply chain disruption confirmed. Volume impact is supply-driven, not demand or access.; sme_confidence=0.5; scope=priority=95; valid_for_days=180
+±DECISION_HEURISTIC-RULE_GENUINE_BUDGET_CRISIS
+ID:rule_genuine_budget_crisis
+NAME:Genuine Budget Crisis
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_budget_barrier; threshold=Barrier:Budget; data_source=tag_match, signal_name=has_financial_crisis_evidence; threshold=Financial:Crisis | Evidence:Hard; data_source=tag_match; trigger_context=Priority Rule: Hard financial evidence trumps rumors.; decision_logic=has_budget_barrier AND has_financial_crisis_evidence => Genuine Budget Crisis confirmed by hard financial evidence. Not a negotiation tactic.; judgment_type=empirical; anti_patterns=wrong_conclusion=A competitor lockout or a negotiation tactic; why_wrong=HARD financial evidence (audited distress) makes the budget constraint genuine — not a bargaining lever or a competitor lockout.; unless_evidence=; typical_outcome=Genuine Budget Crisis confirmed by hard financial evidence. Not a negotiation tactic.; sme_confidence=0.5; scope=priority=100; valid_for_days=180
+±DECISION_HEURISTIC-RULE_PA_ACCESS_BARRIER
+ID:rule_pa_access_barrier
+NAME:Pa Access Barrier
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_access_rejection; threshold=Access:PAReject | Access:StepEdit; data_source=tag_match, signal_name=has_formulary_change; threshold=Access:FormularyChange | Access:Restricted; data_source=tag_match; trigger_context=Prior authorization rejections or formulary edits creating access friction.; decision_logic=has_access_rejection AND has_formulary_change => Access barrier detected. PA rejections correlate with recent formulary policy change.; judgment_type=empirical; typical_outcome=Access barrier detected. PA rejections correlate with recent formulary policy change.; sme_confidence=0.5; scope=priority=85; valid_for_days=180
+±DECISION_HEURISTIC-RULE_FORMULARY_EXCLUSION
+ID:rule_formulary_exclusion
+NAME:Formulary Exclusion
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_payer_action; threshold=Access:FormularyChange | Payer:TierChange; data_source=tag_match, signal_name=has_volume_impact; threshold=Commercial:VolumeDrop | Commercial:ShareLoss; data_source=tag_match; trigger_context=Payer formulary exclusion or non-preferred tier creating systematic access loss.; decision_logic=has_payer_action AND has_volume_impact => Formulary-driven volume loss. Payer action is the root cause, not field execution.; judgment_type=empirical; anti_patterns=wrong_conclusion=A field-execution or sales-force performance problem; why_wrong=Volume falling in lockstep across one payer's book after a tier/formulary action is payer-driven — not local rep execution.; unless_evidence=; typical_outcome=Formulary-driven volume loss. Payer action is the root cause, not field execution.; sme_confidence=0.5; scope=priority=80; valid_for_days=180
+±DECISION_HEURISTIC-RULE_COPAY_ACCUMULATOR_IMPACT
+ID:rule_copay_accumulator_impact
+NAME:Copay Accumulator Impact
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_accumulator_policy; threshold=Access:CopayAccumulator; data_source=tag_match, signal_name=has_patient_abandonment; threshold=Demand:PatientAbandonment | Demand:NBRxDecline; data_source=tag_match; trigger_context=Copay accumulator/maximizer policy causing patient therapy abandonment mid-year.; decision_logic=has_accumulator_policy AND has_patient_abandonment => Copay accumulator barrier detected. Patient abandonment correlates with copay card benefit exhaustion.; judgment_type=empirical; typical_outcome=Copay accumulator barrier detected. Patient abandonment correlates with copay card benefit exhaustion.; sme_confidence=0.5; scope=priority=83; valid_for_days=180
+±DECISION_HEURISTIC-RULE_MEDICARE_REIMBURSEMENT_SQUEEZE
+ID:rule_medicare_reimbursement_squeeze
+NAME:Medicare Reimbursement Squeeze
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_reimbursement_pressure; threshold=Access:ReimbursementPressure; data_source=tag_match, signal_name=has_channel_or_volume_shift; threshold=Commercial:ChannelShift | Commercial:VolumeDrop; data_source=tag_match; trigger_context=ASP-based reimbursement pressure or site-of-care policy shifting physician-administered drug volume.; decision_logic=has_reimbursement_pressure AND has_channel_or_volume_shift => Reimbursement squeeze detected. Buy-and-bill margin compression is driving site-of-care or volume shifts.; judgment_type=empirical; typical_outcome=Reimbursement squeeze detected. Buy-and-bill margin compression is driving site-of-care or volume shifts.; sme_confidence=0.5; scope=priority=76; valid_for_days=180
+±DECISION_HEURISTIC-RULE_COMPETITIVE_DISPLACEMENT
+ID:rule_competitive_displacement
+NAME:Competitive Displacement
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_competitor_action; threshold=Competitor:Launch | Competitor:Pricing; data_source=tag_match, signal_name=has_share_impact; threshold=Commercial:ShareLoss | Commercial:VolumeDrop; data_source=tag_match; trigger_context=New competitor launch or aggressive pricing causing share shift.; decision_logic=has_competitor_action AND has_share_impact => Competitive displacement detected. Share loss correlates with competitor market action.; judgment_type=empirical; typical_outcome=Competitive displacement detected. Share loss correlates with competitor market action.; sme_confidence=0.5; scope=priority=75; valid_for_days=180
+±DECISION_HEURISTIC-RULE_340B_CONTRACT_EROSION
+ID:rule_340b_contract_erosion
+NAME:340B Contract Erosion
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_340b_growth; threshold=Access:340BUtilization; data_source=tag_match, signal_name=has_margin_pressure; threshold=Financial:MarginPressure | Commercial:ShareLoss; data_source=tag_match; trigger_context=340B covered entity utilization growth compressing manufacturer margins.; decision_logic=has_340b_growth AND has_margin_pressure => 340B margin erosion detected. Growing covered entity utilization is compressing net revenue.; judgment_type=empirical; typical_outcome=340B margin erosion detected. Growing covered entity utilization is compressing net revenue.; sme_confidence=0.5; scope=priority=67; valid_for_days=180
+±DECISION_HEURISTIC-RULE_BIOSIMILAR_EROSION
+ID:rule_biosimilar_erosion
+NAME:Biosimilar Erosion
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_biosimilar_entry; threshold=Competitor:Biosimilar; data_source=tag_match, signal_name=has_price_or_share_pressure; threshold=Commercial:ShareLoss | Competitor:Pricing; data_source=tag_match; trigger_context=Biosimilar entry eroding originator brand share through price pressure.; decision_logic=has_biosimilar_entry AND has_price_or_share_pressure => Biosimilar erosion pattern. Price-driven switching is accelerating share loss.; judgment_type=empirical; typical_outcome=Biosimilar erosion pattern. Price-driven switching is accelerating share loss.; sme_confidence=0.5; scope=priority=65; valid_for_days=180
+±DECISION_HEURISTIC-RULE_COMPETITOR_LOCKOUT
+ID:rule_competitor_lockout
+NAME:Competitor Lockout
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_rumor_pricing; threshold=Competitor:Pricing; data_source=tag_match, signal_name=has_budget_barrier; threshold=Barrier:Budget; data_source=tag_match; trigger_context=Fallback Rule: Rumor + Budget Barrier suggests Lockout.; decision_logic=has_rumor_pricing AND has_budget_barrier => The budget objection is likely a secondary effect of a competitor Lock-out negotiation.; judgment_type=empirical; anti_patterns=wrong_conclusion=A genuine budget crisis; why_wrong=A pricing rumor plus a budget objection WITHOUT hard financial evidence is a competitor lockout; the budget claim is a secondary effect, not a real funding crisis.; unless_evidence=; typical_outcome=The budget objection is likely a secondary effect of a competitor Lock-out negotiation.; sme_confidence=0.5; scope=priority=50; valid_for_days=180
+±DECISION_HEURISTIC-RULE_DEMAND_EROSION
+ID:rule_demand_erosion
+NAME:Demand Erosion
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_demand_decline; threshold=Demand:NBRxDecline; data_source=tag_match, signal_name=has_engagement_drop; threshold=Demand:EngagementDrop | Field:KOLDisengaged; data_source=tag_match; trigger_context=Genuine demand decline evidenced by NBRx drop plus HCP disengagement.; decision_logic=has_demand_decline AND has_engagement_drop => Demand erosion confirmed. NBRx decline plus HCP disengagement indicates genuine loss of clinical preference.; judgment_type=empirical; anti_patterns=wrong_conclusion=A channel-shift measurement artifact or an access barrier; why_wrong=NBRx decline PLUS prescriber/KOL disengagement is a genuine loss of clinical preference — not a dispensing artifact and not coverage.; unless_evidence=; typical_outcome=Demand erosion confirmed. NBRx decline plus HCP disengagement indicates genuine loss of clinical preference.; sme_confidence=0.5; scope=priority=70; valid_for_days=180
+±DECISION_HEURISTIC-RULE_LAUNCH_STALL
+ID:rule_launch_stall
+NAME:Launch Stall
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_low_adoption; threshold=Commercial:LowAdoption; data_source=tag_match, signal_name=has_awareness_gap; threshold=Demand:AwarenessGap | Field:LowCoverage; data_source=tag_match; trigger_context=New brand failing to gain traction post-launch due to awareness or access gaps.; decision_logic=has_low_adoption AND has_awareness_gap => Launch trajectory at risk. Low adoption correlates with awareness or coverage gaps, not market rejection.; judgment_type=empirical; typical_outcome=Launch trajectory at risk. Low adoption correlates with awareness or coverage gaps, not market rejection.; sme_confidence=0.5; scope=priority=70; valid_for_days=180
+±DECISION_HEURISTIC-RULE_FIELD_EXECUTION_GAP
+ID:rule_field_execution_gap
+NAME:Field Execution Gap
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_territory_underperformance; threshold=Commercial:VolumeDrop | Commercial:ShareLoss; data_source=tag_match, signal_name=has_field_gap; threshold=Field:RepVacancy | Field:LowCoverage; data_source=tag_match; trigger_context=Territory underperformance linked to field force gaps, not market conditions.; decision_logic=has_territory_underperformance AND has_field_gap => Field execution gap detected. Territory underperformance correlates with rep vacancy or low call coverage.; judgment_type=empirical; anti_patterns=wrong_conclusion=A payer/formulary access barrier or market-wide demand loss; why_wrong=Underperformance isolated to a territory with a rep vacancy / low coverage, while neighbors are fine, is a field-execution gap — not payer action.; unless_evidence=; typical_outcome=Field execution gap detected. Territory underperformance correlates with rep vacancy or low call coverage.; sme_confidence=0.5; scope=priority=60; valid_for_days=180
+±DECISION_HEURISTIC-RULE_REBATE_TRAP
+ID:rule_rebate_trap
+NAME:Rebate Trap
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_contract_risk; threshold=Access:RebateContractRisk; data_source=tag_match, signal_name=has_volume_or_margin_impact; threshold=Commercial:VolumeDrop | Financial:MarginPressure; data_source=tag_match; trigger_context=Brand locked into unfavorable rebate contract with share penalties or exclusivity clauses.; decision_logic=has_contract_risk AND has_volume_or_margin_impact => Rebate trap detected. Unfavorable contract terms are constraining pricing flexibility and eroding margin.; judgment_type=empirical; typical_outcome=Rebate trap detected. Unfavorable contract terms are constraining pricing flexibility and eroding margin.; sme_confidence=0.5; scope=priority=57; valid_for_days=180
+±DECISION_HEURISTIC-RULE_CHANNEL_SHIFT
+ID:rule_channel_shift
+NAME:Channel Shift
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_channel_change; threshold=Commercial:ChannelShift; data_source=tag_match, signal_name=has_volume_anomaly; threshold=Commercial:VolumeDrop | Commercial:ShareLoss; data_source=tag_match; trigger_context=Dispensing pattern shift from one channel to another affecting volume measurement.; decision_logic=has_channel_change AND has_volume_anomaly => Channel shift detected. Apparent volume decline may reflect dispensing migration, not true demand loss.; judgment_type=empirical; anti_patterns=wrong_conclusion=A genuine loss of patient demand; why_wrong=A dispensing/channel migration is a measurement artifact in the tracked source — apparent volume loss, not true demand erosion.; unless_evidence=; typical_outcome=Channel shift detected. Apparent volume decline may reflect dispensing migration, not true demand loss.; sme_confidence=0.5; scope=priority=55; valid_for_days=180
+±DECISION_HEURISTIC-RULE_GUIDELINE_DRIVEN_SHIFT
+ID:rule_guideline_driven_shift
+NAME:Guideline Driven Shift
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_guideline_change; threshold=Clinical:Guideline; data_source=tag_match, signal_name=has_share_loss; threshold=Commercial:ShareLoss | Commercial:VolumeDrop; data_source=tag_match; trigger_context=Clinical guideline update (NCCN/ESMO) shifts standard of care away from brand.; decision_logic=has_guideline_change AND has_share_loss => Guideline-driven displacement. NCCN/ESMO update has shifted prescribing away from brand.; judgment_type=empirical; anti_patterns=wrong_conclusion=A single institution's pathway-committee decision; why_wrong=This is a national guideline body (NCCN/ESMO) changing standard of care across institutions at once — not one center's pathway exclusion.; unless_evidence=; typical_outcome=Guideline-driven displacement. NCCN/ESMO update has shifted prescribing away from brand.; sme_confidence=0.5; scope=priority=78; valid_for_days=180
+±DECISION_HEURISTIC-RULE_BIOMARKER_TESTING_GAP
+ID:rule_biomarker_testing_gap
+NAME:Biomarker Testing Gap
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_testing_gap; threshold=Demand:AwarenessGap | Demand:NBRxDecline; data_source=tag_match, signal_name=has_biomarker_context; threshold=Clinical:Efficacy | Commercial:MarketExpansion; data_source=tag_match; trigger_context=Low biomarker testing rates reduce eligible patient identification for targeted therapies.; decision_logic=has_testing_gap AND has_biomarker_context => Biomarker testing gap detected. Low testing rates are suppressing patient identification for the targeted therapy.; judgment_type=empirical; typical_outcome=Biomarker testing gap detected. Low testing rates are suppressing patient identification for the targeted therapy.; sme_confidence=0.5; scope=priority=62; valid_for_days=180
+±DECISION_HEURISTIC-RULE_PATHWAY_EXCLUSION
+ID:rule_pathway_exclusion
+NAME:Pathway Exclusion
+KIND:decision_heuristic
+LIFECYCLE:active
+CONFIDENCE:0.80
+BODY:trigger_signals=signal_name=has_pathway_restriction; threshold=Access:Restricted | Clinical:Guideline; data_source=tag_match, signal_name=has_institutional_impact; threshold=Commercial:ShareLoss | Demand:NBRxDecline; data_source=tag_match; trigger_context=Clinical pathway committee excludes brand from institutional treatment protocol.; decision_logic=has_pathway_restriction AND has_institutional_impact => Institutional pathway exclusion. Clinical pathway committee has deprioritized brand, blocking new starts.; judgment_type=empirical; anti_patterns=wrong_conclusion=An external clinical-guideline (NCCN/ESMO) shift; why_wrong=This is an INSTITUTIONAL pathway-committee deprioritization at specific centers — not a national guideline-body update. The governed label is pathway exclusion, not guideline shift.; unless_evidence=; typical_outcome=Institutional pathway exclusion. Clinical pathway committee has deprioritized brand, blocking new starts.; sme_confidence=0.5; scope=priority=72; valid_for_days=180

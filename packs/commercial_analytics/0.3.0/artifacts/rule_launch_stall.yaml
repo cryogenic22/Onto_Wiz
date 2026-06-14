@@ -1,0 +1,51 @@
+id: rule_launch_stall
+kind: decision_heuristic
+name: Launch Stall
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 2f1c7ed4-4ef8-47d7-9ee0-7bde7aac4ce0
+  at: '2026-06-14T00:06:14.835595+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835595+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: brand_performance
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835595+00:00'
+trigger_signals:
+- signal_name: has_low_adoption
+  threshold: Commercial:LowAdoption
+  data_source: tag_match
+- signal_name: has_awareness_gap
+  threshold: Demand:AwarenessGap | Field:LowCoverage
+  data_source: tag_match
+trigger_context:
+- New brand failing to gain traction post-launch due to awareness or access gaps.
+decision_logic: has_low_adoption AND has_awareness_gap => Launch trajectory at risk.
+  Low adoption correlates with awareness or coverage gaps, not market rejection.
+judgment_type: empirical
+exceptions: []
+anti_patterns: []
+evidence_required: []
+typical_outcome: Launch trajectory at risk. Low adoption correlates with awareness
+  or coverage gaps, not market rejection.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '70'
+valid_for_days: 180

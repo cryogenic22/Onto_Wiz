@@ -1,0 +1,53 @@
+- id: fs-action-001
+  task_type: action_recommendation
+  input_text: "Access friction confirmed as primary driver for NBRx decline in oncology launch brand"
+  output_text: |
+    Brand: Escalate to payer relations team for formulary negotiation
+    Field: Target high-PA-edit accounts with access support materials
+    Access: File medical exception requests for denied patients
+    Medical: Prepare HEOR data package for payer medical directors
+    Timeline: Immediate (within 2 weeks)
+  tags:
+    therapeutic_area: ["oncology"]
+    signal_type: ["NBRx_Drop", "PA_Edit_Increase"]
+    driver: ["Access_Friction"]
+  quality_score: 0.93
+  status: approved
+  created_at: "2025-12-20T10:00:00"
+  version: "1.0.0"
+
+- id: fs-action-002
+  task_type: action_recommendation
+  input_text: "Field execution gap identified in new territory expansion for immunology brand"
+  output_text: |
+    Brand: Deploy targeted digital campaigns in uncovered territories
+    Field: Prioritize high-decile HCPs in gap territories for face-to-face
+    Access: Ensure formulary coverage confirmed before field push
+    Medical: Schedule speaker programs with local KOLs
+    Timeline: 4-6 weeks ramp
+  tags:
+    therapeutic_area: ["immunology"]
+    signal_type: ["Call_Activity_Low", "NBRx_Drop"]
+    driver: ["Field_Execution_Gap"]
+  quality_score: 0.88
+  status: approved
+  created_at: "2025-12-22T10:00:00"
+  version: "1.0.0"
+
+- id: fs-action-003
+  task_type: action_recommendation
+  input_text: "Supply disruption causing fill rate decline in rare disease hub channel"
+  output_text: |
+    Brand: Communicate supply update to enrolled patients
+    Field: Alert key accounts about expected resolution timeline
+    Access: Coordinate with hub to prioritize critical patients
+    Medical: No action required unless safety implications
+    Timeline: Immediate triage, 1-2 week resolution target
+  tags:
+    therapeutic_area: ["rare_disease"]
+    signal_type: ["Fill_Rate_Down"]
+    driver: ["Supply_Disruption"]
+  quality_score: 0.86
+  status: approved
+  created_at: "2025-12-25T10:00:00"
+  version: "1.0.0"

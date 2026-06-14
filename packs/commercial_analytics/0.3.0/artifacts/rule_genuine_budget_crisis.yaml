@@ -1,0 +1,55 @@
+id: rule_genuine_budget_crisis
+kind: decision_heuristic
+name: Genuine Budget Crisis
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 40d8b2a1-621f-4cd4-b741-fa03a143f8f9
+  at: '2026-06-14T00:06:14.835486+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835486+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: market_access
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835486+00:00'
+trigger_signals:
+- signal_name: has_budget_barrier
+  threshold: Barrier:Budget
+  data_source: tag_match
+- signal_name: has_financial_crisis_evidence
+  threshold: Financial:Crisis | Evidence:Hard
+  data_source: tag_match
+trigger_context:
+- 'Priority Rule: Hard financial evidence trumps rumors.'
+decision_logic: has_budget_barrier AND has_financial_crisis_evidence => Genuine Budget
+  Crisis confirmed by hard financial evidence. Not a negotiation tactic.
+judgment_type: empirical
+exceptions: []
+anti_patterns:
+- wrong_conclusion: A competitor lockout or a negotiation tactic
+  why_wrong: "HARD financial evidence (audited distress) makes the budget constraint\
+    \ genuine \u2014 not a bargaining lever or a competitor lockout."
+  unless_evidence: ''
+evidence_required: []
+typical_outcome: Genuine Budget Crisis confirmed by hard financial evidence. Not a
+  negotiation tactic.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '100'
+valid_for_days: 180

@@ -1,0 +1,55 @@
+id: rule_analog_launch_trajectory
+kind: decision_heuristic
+name: Analog Launch Trajectory
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 8a804c0d-9016-4bf7-a45d-5a32d342f807
+  at: '2026-06-14T00:06:14.835677+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835677+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: forecasting
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835677+00:00'
+trigger_signals:
+- signal_name: has_launch_phase
+  threshold: Commercial:LowAdoption | Lifecycle:Launch
+  data_source: tag_match
+- signal_name: has_analog_gap
+  threshold: Demand:AwarenessGap | Field:LowCoverage
+  data_source: tag_match
+trigger_context:
+- "A new launch under-indexing its pre-agreed analog trajectory is an early, forecastable\
+  \ trajectory miss (awareness/access ramp), distinct from a post-hoc launch-stall\
+  \ diagnosis \u2014 re-forecast the curve against the analog.\n"
+decision_logic: "has_launch_phase AND has_analog_gap => Analog launch-trajectory miss.\
+  \ The uptake curve is tracking below the analog band \u2014 re-forecast against\
+  \ the analog and isolate the ramp driver early."
+judgment_type: empirical
+exceptions: []
+anti_patterns: []
+evidence_required: []
+typical_outcome: "Analog launch-trajectory miss. The uptake curve is tracking below\
+  \ the analog band \u2014 re-forecast against the analog and isolate the ramp driver\
+  \ early."
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '68'
+valid_for_days: 180

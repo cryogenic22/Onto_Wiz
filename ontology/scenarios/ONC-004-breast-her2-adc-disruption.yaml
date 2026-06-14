@@ -1,0 +1,22 @@
+id: "ONC-004"
+name: "HER2+ Breast Cancer ADC Disrupts Treatment Sequencing"
+description: >
+  Trastuzumab deruxtecan (T-DXd) DESTINY-Breast03 data shifts HER2+ 2L standard
+  of care from T-DM1. Additionally, DESTINY-Breast04 creates new HER2-low
+  category (~55% of breast cancers), massively expanding the addressable market
+  for ADC-based therapy and disrupting existing regimen economics.
+therapeutic_area: "oncology"
+indication: "Breast Cancer — HER2+"
+molecular_context: "HER2 amplification (IHC 3+ or IHC 2+/FISH+) and HER2-low (IHC 1+ or IHC 2+/FISH-)"
+brand_context:
+  brand: "Prior-generation HER2 ADC or mAb combination"
+  lifecycle: "maturity"
+  channel: "buy_and_bill"
+account_context:
+  type: "Academic Breast Cancer Center"
+  biomarker_testing: "HER2 IHC/FISH at diagnosis, with reflex HER2-low scoring"
+trigger_signal: "2L HER2+ share shifts rapidly to new ADC; HER2-low expands competitive landscape"
+expected_hypothesis: "competitive_pressure"
+expected_drivers: ["superior_pfs_data", "new_patient_segment_her2_low", "tumor_board_protocol_change"]
+inference_rules_exercised: ["rule_competitive_displacement"]
+complexity_level: "high"

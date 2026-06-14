@@ -1,0 +1,56 @@
+id: rule_competitor_lockout
+kind: decision_heuristic
+name: Competitor Lockout
+version: 1
+lifecycle: active
+lifecycle_history:
+- from_state: draft
+  to_state: active
+  changed_by: system:seed
+  reason: seed import from commercial.yaml
+  delta_id: 63f926a1-0f5f-4d99-a851-12c6596164c3
+  at: '2026-06-14T00:06:14.835576+00:00'
+created_by: system
+reviewed_by: null
+approved_at: '2026-06-14T00:06:14.835576+00:00'
+tags:
+- dimension: analytics_domain
+  value: commercial
+  parent: null
+- dimension: function
+  value: market_access
+  parent: null
+layer: base
+source_document_ids: []
+confidence: 0.8
+created_at: null
+updated_at: '2026-06-14T00:06:14.835576+00:00'
+trigger_signals:
+- signal_name: has_rumor_pricing
+  threshold: Competitor:Pricing
+  data_source: tag_match
+- signal_name: has_budget_barrier
+  threshold: Barrier:Budget
+  data_source: tag_match
+trigger_context:
+- 'Fallback Rule: Rumor + Budget Barrier suggests Lockout.'
+decision_logic: has_rumor_pricing AND has_budget_barrier => The budget objection is
+  likely a secondary effect of a competitor Lock-out negotiation.
+judgment_type: empirical
+exceptions: []
+anti_patterns:
+- wrong_conclusion: A genuine budget crisis
+  why_wrong: A pricing rumor plus a budget objection WITHOUT hard financial evidence
+    is a competitor lockout; the budget claim is a secondary effect, not a real funding
+    crisis.
+  unless_evidence: ''
+evidence_required: []
+typical_outcome: The budget objection is likely a secondary effect of a competitor
+  Lock-out negotiation.
+recommended_actions: []
+captured_from: ''
+sme_id: ''
+sme_confidence: 0.5
+scope:
+  priority: '50'
+valid_for_days: 180
