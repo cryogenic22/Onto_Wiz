@@ -1,0 +1,14 @@
+# Production deploy dependency set for the ontowiz-serve API service.
+#
+# Installs TIER A ONLY (spec -> ctx -> runtime -> serve), in dependency order.
+# Tier B (ontowiz-core, ontowiz-factory) is the secret IP per ADR-012 and is
+# DELIBERATELY ABSENT — the serve layer reads precompiled packs/ and never needs
+# it. This keeps the shipped image free of the proprietary engine.
+#
+# No Anthropic SDK here: the serve REST/MCP path returns governed context and
+# does not call an LLM (that path lives in Tier B / scripts).
+
+./packages/ontowiz-spec
+./packages/ontowiz-ctx
+./packages/ontowiz-runtime
+./packages/ontowiz-serve

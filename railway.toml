@@ -1,11 +1,18 @@
+# Railway config for the ontowiz-serve API service (Tier A only).
+# Frontend and Postgres are separate Railway services (see docs/DEPLOYMENT.md).
+
 [build]
 builder = "nixpacks"
 
 [build.nixpacks]
-installCmd = "pip install -e '.[dev]'"
+# Tier A only — Tier B (the IP) never enters the image. See requirements-deploy.txt.
+installCmd = "pip install -r requirements-deploy.txt"
 
 [deploy]
-startCommand = "uvicorn src.api.server:app --host 0.0.0.0 --port ${PORT:-8098}"
+# Factory app; uvicorn calls create_app() -> packs_root="packs" (repo root),
+# allow_dev_context=False (safe default). $PORT is injected by Railway.
+startCommand = "uvicorn ontowiz_serve.api:create_app --factory --host 0.0.0.0 --port ${PORT:-8080}"
 healthcheckPath = "/health"
+healthcheckTimeout = 100
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
