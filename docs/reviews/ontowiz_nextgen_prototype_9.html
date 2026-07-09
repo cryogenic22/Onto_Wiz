@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onto_Wiz — Domain Knowledge Foundry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0A1519; --carbon:#0E1D22; --slab:#15282E; --slab2:#1C333A;
+    --edge:#26414A; --edge2:#365660;
+    --ink:#E8EFEC; --ink2:#9FB4B2; --ink3:#647C7B;
+    --cyan:#4CC6D4; --cyan-soft:rgba(76,198,212,.12);
+    --molten:#EDA93C; --molten-hot:#FFC44D; --molten-soft:rgba(237,169,60,.13);
+    --jade:#46C08A; --jade-soft:rgba(70,192,138,.12);
+    --ember:#EF6A50; --ember-soft:rgba(239,106,80,.12);
+    --info:#6BA8E8; --info-soft:rgba(107,168,232,.12);
+    --iris:#9E8BEE; --iris-soft:rgba(158,139,238,.13);
+    --disp:"Space Grotesk",system-ui,sans-serif;
+    --body:"IBM Plex Sans",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--void);color:var(--ink);font:14.5px/1.5 var(--body);height:100vh;display:flex;overflow:hidden;-webkit-font-smoothing:antialiased}
+  ::selection{background:var(--cyan-soft);color:var(--ink)}
+  a{color:inherit;text-decoration:none}
+  :focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:4px}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:var(--edge);border-radius:6px;border:2px solid var(--void)}
+  ::-webkit-scrollbar-thumb:hover{background:var(--edge2)}
+
+  /* ------------- sidebar ------------- */
+  #side{width:236px;min-width:236px;background:linear-gradient(180deg,#081114,#0A1519);border-right:1px solid var(--edge);display:flex;flex-direction:column;padding:18px 12px 14px}
+  .brand{display:flex;align-items:baseline;gap:0;font-family:var(--disp);font-weight:700;font-size:19px;letter-spacing:-.3px;padding:2px 10px 0}
+  .brand .mark{color:var(--cyan)}
+  .brand .u{color:var(--ink3);font-weight:400}
+  .tagline{font-size:11px;color:var(--ink3);padding:3px 10px 18px;letter-spacing:.2px}
+  .nav{display:flex;flex-direction:column;gap:2px}
+  .nav a{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;color:var(--ink2);cursor:pointer;font-size:14px;position:relative}
+  .nav a .g{width:18px;text-align:center;font-size:15px;opacity:.85}
+  .nav a:hover{background:var(--slab)}
+  .nav a.on{background:var(--cyan-soft);color:var(--cyan);font-weight:600}
+  .nav a.on::before{content:"";position:absolute;left:-12px;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--cyan)}
+  .nav a.dis{opacity:.34;cursor:not-allowed}
+  .nav .count{margin-left:auto;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink3);background:var(--slab);border:1px solid var(--edge);border-radius:7px;padding:0 6px}
+  .nav a.on .count{color:var(--cyan);border-color:rgba(76,198,212,.35)}
+  .nav .count.hot{color:var(--molten);border-color:rgba(237,169,60,.4);background:var(--molten-soft)}
+  .nav .phase{margin-left:auto;font-size:10px;color:var(--ink3);font-family:var(--mono)}
+  .navgroup{font-size:10px;text-transform:uppercase;letter-spacing:1.4px;color:var(--ink3);padding:16px 11px 6px;font-weight:600}
+  .roleWrap{margin-top:auto;border-top:1px solid var(--edge);padding-top:14px}
+  .roleWrap .lbl{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink3);padding:0 10px 7px}
+  .seg{display:flex;background:var(--carbon);border:1px solid var(--edge);border-radius:9px;padding:3px;margin:0 6px}
+  .seg button{flex:1;border:0;background:transparent;color:var(--ink2);padding:6px 0;border-radius:6px;cursor:pointer;font:600 12.5px var(--body)}
+  .seg button.on{background:var(--slab2);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.3)}
+  .me{display:flex;gap:9px;align-items:center;padding:13px 10px 2px;font-size:12.5px;color:var(--ink2)}
+  .av{width:26px;height:26px;border-radius:50%;background:var(--cyan);color:#06121a;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center;font-family:var(--disp);flex:none}
+  .av.rm{background:var(--info)} .av.as{background:var(--iris)} .av.kb{background:var(--jade)}
+
+  /* ------------- shell / topbar ------------- */
+  #shell{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  #top{height:54px;min-height:54px;border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:18px;padding:0 22px;background:rgba(10,21,25,.72);backdrop-filter:blur(8px)}
+  .spine{display:flex;align-items:center;gap:2px}
+  .spine .node{display:flex;align-items:center;gap:7px;padding:6px 11px;border-radius:8px;color:var(--ink3);cursor:pointer;font-size:12.5px}
+  .spine .node .nk{font-family:var(--mono);font-size:10.5px;color:var(--ink3);border:1px solid var(--edge);border-radius:5px;padding:0 4px}
+  .spine .node:hover{color:var(--ink2);background:var(--slab)}
+  .spine .node.on{color:var(--ink);background:var(--slab)}
+  .spine .node.on .nk{color:var(--cyan);border-color:rgba(76,198,212,.4)}
+  .spine .flow{width:22px;height:1px;background:linear-gradient(90deg,var(--edge),var(--edge2));position:relative}
+  .spine .flow::after{content:"";position:absolute;right:-1px;top:-2px;border-left:4px solid var(--edge2);border-top:2.5px solid transparent;border-bottom:2.5px solid transparent}
+  .topR{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .status{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink2);font-family:var(--mono)}
+  .status .dotm{width:7px;height:7px;border-radius:50%}
+  .gsearch{background:var(--carbon);border:1px solid var(--edge);border-radius:8px;color:var(--ink3);padding:7px 12px;font:13px var(--body);width:210px}
+  .gsearch:focus{outline:none;border-color:var(--cyan);color:var(--ink)}
+
+  /* ------------- main ------------- */
+  #main{flex:1;overflow-y:auto;padding:26px 30px 80px}
+  .head{margin-bottom:20px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--cyan);margin-bottom:7px;display:flex;align-items:center;gap:8px}
+  .eyebrow .step{color:var(--ink3)}
+  h1{font-family:var(--disp);font-size:26px;font-weight:600;letter-spacing:-.5px;margin-bottom:6px}
+  .lede{font-size:14px;color:var(--ink2);max-width:70ch}
+  .lede b{color:var(--ink)}
+  .grid{display:grid;gap:16px}
+  .tiles{grid-template-columns:repeat(4,1fr)}
+  .two{display:grid;grid-template-columns:1.55fr 1fr;gap:16px}
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{background:var(--carbon);border:1px solid var(--edge);border-radius:14px;padding:16px 18px}
+  .card.tight{padding:14px 16px}
+  .sec{margin-top:24px}
+  .kicker{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:1.2px;color:var(--ink3);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .kicker .line{flex:1;height:1px;background:var(--edge)}
+
+  .tile .k{font-size:12px;color:var(--ink2);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .tile .v{font-family:var(--disp);font-size:30px;font-weight:600;letter-spacing:-1px;line-height:1}
+  .tile .d{font-size:11.5px;color:var(--ink3);margin-top:8px}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{text-align:left;color:var(--ink3);font:600 10.5px var(--mono);text-transform:uppercase;letter-spacing:.6px;padding:8px 11px;border-bottom:1px solid var(--edge)}
+  td{padding:10px 11px;border-bottom:1px solid rgba(38,65,74,.5);vertical-align:middle}
+  tr.row:hover{background:var(--slab);cursor:pointer}
+  tbody tr:last-child td{border-bottom:0}
+
+  .bar{height:6px;border-radius:3px;background:#0c2027;position:relative;width:66px;display:inline-block;vertical-align:middle;overflow:hidden}
+  .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,rgba(76,198,212,.55),var(--cyan))}
+
+  /* badges + chips */
+  .b{display:inline-flex;align-items:center;gap:4px;font:600 10.5px var(--mono);border-radius:6px;padding:2px 7px;letter-spacing:.3px}
+  .b.draft{background:rgba(100,124,123,.12);color:var(--ink3);border:1px solid var(--edge)}
+  .b.prop{background:var(--info-soft);color:var(--info);border:1px solid rgba(107,168,232,.32)}
+  .b.appr{background:var(--jade-soft);color:var(--jade);border:1px solid rgba(70,192,138,.32)}
+  .b.act{background:var(--jade-soft);color:var(--jade);border:1px solid rgba(70,192,138,.3)}
+  .b.pass{background:var(--jade-soft);color:var(--jade);border:1px solid rgba(70,192,138,.36)}
+  .b.fail{background:var(--ember-soft);color:var(--ember);border:1px solid rgba(239,106,80,.36)}
+  .b.warn{background:var(--molten-soft);color:var(--molten);border:1px solid rgba(237,169,60,.32)}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:var(--slab);border:1px solid var(--edge);border-radius:20px;padding:2px 10px 2px 3px;font-size:11.5px;color:var(--ink2)}
+  .chip .av{width:17px;height:17px;font-size:8.5px}
+  .chip.src{padding:2px 9px;border-radius:7px;font-family:var(--mono);font-size:11px}
+  .chip.unval{border-color:rgba(237,169,60,.4);color:var(--molten);background:var(--molten-soft);border-radius:7px;padding:2px 9px}
+  .tag{display:inline-block;background:var(--slab);border:1px solid var(--edge);color:var(--ink2);border-radius:6px;font:500 11px var(--mono);padding:2px 7px;margin-right:5px}
+  .tag.l1{border-color:rgba(76,198,212,.3);color:var(--cyan)}
+  .tag.l3{border-color:rgba(237,169,60,.3);color:var(--molten)}
+
+  .btn{background:var(--cyan);border:0;color:#06121a;font:600 13.5px var(--body);padding:9px 16px;border-radius:9px;cursor:pointer;transition:filter .12s,transform .05s}
+  .btn:hover{filter:brightness(1.08)} .btn:active{transform:translateY(1px)}
+  .btn.forge{background:var(--molten)} .btn.forge:hover{filter:brightness(1.08)}
+  .btn.sec{background:var(--slab2);color:var(--ink);border:1px solid var(--edge2)}
+  .btn.ghost{background:transparent;color:var(--ink2);border:1px solid var(--edge)}
+  .btn.danger{background:transparent;color:var(--ember);border:1px solid rgba(239,106,80,.4)}
+  .btn.iris{background:var(--iris);color:#100a24}
+  .btn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+  .btn.sm{padding:6px 12px;font-size:12.5px;border-radius:8px}
+
+  .feed{list-style:none}
+  .feed li{padding:9px 4px;border-bottom:1px solid rgba(38,65,74,.5);font-size:13px;display:flex;gap:10px;align-items:flex-start}
+  .feed li:last-child{border-bottom:0}
+  .feed .dot{margin-top:6px;width:7px;height:7px;border-radius:50%;flex:none}
+  .note{font-size:11.5px;color:var(--ink3);line-height:1.55}
+  .callout{border:1px solid rgba(237,169,60,.32);background:var(--molten-soft);border-radius:10px;padding:11px 13px;font-size:13px;margin:12px 0}
+  .callout.blue{border-color:rgba(107,168,232,.32);background:var(--info-soft)}
+  .callout.red{border-color:rgba(239,106,80,.32);background:var(--ember-soft)}
+  .callout.jade{border-color:rgba(70,192,138,.32);background:var(--jade-soft)}
+  .quote{background:#0b171c;border-left:3px solid var(--edge2);padding:9px 13px;font-size:12.5px;color:var(--ink2);border-radius:0 8px 8px 0;margin:9px 0}
+  .quote.evi{border-left-color:var(--cyan)}
+  h3.mini{font:600 10.5px var(--mono);color:var(--ink3);text-transform:uppercase;letter-spacing:1px;margin:18px 0 9px}
+
+  /* tabs */
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--edge);margin-bottom:18px}
+  .tabs button{background:none;border:0;color:var(--ink2);padding:9px 15px;cursor:pointer;font:500 13.5px var(--body);border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tabs button.on{color:var(--cyan);border-bottom-color:var(--cyan);font-weight:600}
+
+  /* ============ FORGE ============ */
+  .forgeHero{position:relative;overflow:hidden;border-radius:16px;border:1px solid var(--edge);background:radial-gradient(120% 160% at 12% -20%,rgba(237,169,60,.14),transparent 55%),linear-gradient(180deg,#12222826,#0e1d22);padding:20px 22px;margin-bottom:18px}
+  .forgeHero .h1row{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  .instr{display:grid;grid-template-columns:1.05fr 1.2fr 1.35fr .9fr;gap:14px;margin-top:18px}
+  .gauge{border:1px solid var(--edge);border-radius:12px;background:#0b171c;padding:13px 15px}
+  .gauge .gl{font:600 10px var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin-bottom:9px;display:flex;align-items:center;gap:6px}
+  .gnum{font-family:var(--disp);font-size:27px;font-weight:600;letter-spacing:-1px;line-height:1}
+  .gnum .up{font-size:12px;color:var(--jade);font-family:var(--mono);margin-left:6px}
+  .gsub{font-size:11px;color:var(--ink3);margin-top:6px}
+  .heatbar{height:11px;border-radius:6px;background:#0a161a;border:1px solid var(--edge);position:relative;overflow:hidden;margin:11px 0 6px}
+  .heatbar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,#7a3d0e,var(--molten),var(--molten-hot));box-shadow:0 0 14px rgba(237,169,60,.5)}
+  .heatbar .tgt{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink2);opacity:.6}
+  .heatbar .tgt::after{content:"target";position:absolute;top:-13px;left:-14px;font:10px var(--mono);color:var(--ink3)}
+  .shimmer{position:absolute;top:0;bottom:0;width:40px;background:linear-gradient(90deg,transparent,rgba(255,196,77,.4),transparent);animation:sweep 3.2s ease-in-out infinite}
+  @keyframes sweep{0%{left:-40px}60%,100%{left:100%}}
+
+  .shiftbar{display:flex;align-items:center;gap:12px;margin:6px 0 16px;font-size:12.5px;color:var(--ink2)}
+  .prog{flex:1;height:8px;border-radius:5px;background:#0b171c;border:1px solid var(--edge);overflow:hidden;max-width:340px}
+  .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--molten),var(--molten-hot));transition:width .4s ease;border-radius:5px}
+
+  .station{position:relative;border:1px solid var(--edge);border-radius:14px;background:var(--carbon);padding:16px 18px 16px 20px;margin-bottom:14px;overflow:hidden}
+  .station::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
+  .station.assay::before{background:var(--molten)} .station.duel::before{background:var(--ember)}
+  .station.cal::before{background:var(--iris)} .station.hunt::before{background:var(--cyan)}
+  .station.temper::before{background:var(--jade)}
+  .station.done{opacity:.5}
+  .sthead{display:flex;align-items:center;gap:9px;margin-bottom:11px;flex-wrap:wrap}
+  .stn{display:inline-flex;align-items:center;gap:6px;font:600 11px var(--mono);letter-spacing:.6px;text-transform:uppercase;border-radius:7px;padding:3px 9px}
+  .assay .stn{color:var(--molten);background:var(--molten-soft);border:1px solid rgba(237,169,60,.32)}
+  .duel .stn{color:var(--ember);background:var(--ember-soft);border:1px solid rgba(239,106,80,.32)}
+  .cal .stn{color:var(--iris);background:var(--iris-soft);border:1px solid rgba(158,139,238,.32)}
+  .hunt .stn{color:var(--cyan);background:var(--cyan-soft);border:1px solid rgba(76,198,212,.32)}
+  .temper .stn{color:var(--jade);background:var(--jade-soft);border:1px solid rgba(70,192,138,.32)}
+  .stq{font-size:15.5px;font-weight:500;margin:4px 0 6px;line-height:1.45}
+  .stactions{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap}
+  .pick{border:1px solid var(--edge);background:#0b171c;border-radius:10px;padding:11px 13px;cursor:pointer;transition:border-color .12s,background .12s}
+  .pick:hover{border-color:var(--edge2);background:var(--slab)}
+  .pick.sel{border-color:var(--iris);background:var(--iris-soft)}
+  .pick .pt{font-weight:600;font-size:13px;margin-bottom:3px}
+  .stake{display:flex;align-items:center;gap:12px;margin-top:12px;font-size:12.5px;color:var(--ink2)}
+  input[type=range]{-webkit-appearance:none;appearance:none;height:5px;border-radius:4px;background:var(--edge);flex:1;max-width:220px}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--iris);cursor:pointer;border:2px solid #0b171c}
+  input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--iris);cursor:pointer;border:2px solid #0b171c}
+  .stakeval{font-family:var(--mono);font-weight:600;color:var(--iris);min-width:42px}
+
+  .trace{border:1px solid var(--edge);border-radius:10px;background:#0b171c;overflow:hidden;margin-top:8px}
+  .tstep{display:flex;gap:11px;align-items:flex-start;padding:10px 13px;border-bottom:1px solid rgba(38,65,74,.5);cursor:pointer;font-size:13px}
+  .tstep:last-child{border-bottom:0}
+  .tstep:hover{background:var(--slab)}
+  .tstep .ti{font:600 11px var(--mono);color:var(--ink3);margin-top:1px}
+  .tstep.bad{background:var(--ember-soft);border-left:3px solid var(--ember)}
+  .tstep.good{background:var(--jade-soft)}
+  .flowline{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--ink2);background:#0b171c;border:1px solid var(--edge);border-radius:9px;padding:9px 12px;margin-top:10px}
+  .caveatrow{display:flex;align-items:center;gap:9px;padding:8px 11px;border:1px solid var(--edge);border-radius:9px;background:#0b171c;margin-bottom:7px;font-size:12.5px}
+  .caveatrow .h{cursor:grab;color:var(--ink3);font-family:var(--mono)}
+
+  .calchart{border:1px solid var(--edge);border-radius:12px;background:#0b171c;padding:13px 15px}
+  .board{list-style:none}
+  .board li{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(38,65,74,.4);font-size:12.5px}
+  .board li:last-child{border-bottom:0}
+  .board .rk{font-family:var(--mono);color:var(--ink3);width:16px}
+  .board .cal{margin-left:auto;font-family:var(--mono);color:var(--jade)}
+  .board li.you{background:var(--cyan-soft);border-radius:8px;padding:7px 8px;border-bottom:0}
+  .bounty{border:1px solid var(--edge);border-radius:10px;padding:11px 13px;margin-bottom:9px}
+  .bounty .rew{font-family:var(--mono);font-size:11px;color:var(--molten)}
+
+  /* ============ INTAKE ============ */
+  .drop{border:1.5px dashed var(--edge2);border-radius:14px;background:linear-gradient(180deg,#10222826,#0e1d22);padding:26px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+  .drop:hover{border-color:var(--cyan);background:var(--cyan-soft)}
+  .drop .di{font-size:26px;margin-bottom:8px}
+  .drop h3{font-family:var(--disp);font-weight:500;font-size:16px;margin-bottom:5px}
+  .drop p{font-size:12.5px;color:var(--ink2)}
+  .drop .types{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-top:9px}
+
+  .srcrow{display:grid;grid-template-columns:26px 1.6fr 1fr 1.4fr 90px 30px;gap:12px;align-items:center;padding:11px 14px;border-bottom:1px solid rgba(38,65,74,.5);cursor:pointer;font-size:13px}
+  .srcrow:hover{background:var(--slab)}
+  .srcrow.on{background:var(--cyan-soft)}
+  .srcrow .ico{font-size:16px;text-align:center}
+  .srcrow .nm{font-weight:600} .srcrow .mt{font-size:11px;color:var(--ink3)}
+  .yield{display:flex;gap:5px;flex-wrap:wrap}
+  .yb{font:600 10.5px var(--mono);border-radius:5px;padding:1px 6px;background:var(--slab);border:1px solid var(--edge);color:var(--ink2)}
+
+  .sheet{display:grid;grid-template-columns:1fr 1.15fr;gap:16px}
+  .sourcepane{border:1px solid var(--edge);border-radius:12px;background:#0b171c;overflow:hidden}
+  .sourcepane .sph{padding:11px 14px;border-bottom:1px solid var(--edge);font-size:12.5px;color:var(--ink2);display:flex;align-items:center;gap:8px}
+  .turn{padding:9px 14px;border-bottom:1px solid rgba(38,65,74,.4);font-size:12.5px}
+  .turn .who{font:600 11px var(--mono);color:var(--cyan);margin-bottom:2px;display:flex;gap:8px;align-items:center}
+  .turn .who .ts{color:var(--ink3);font-weight:400}
+  .turn.hl{background:var(--molten-soft);border-left:3px solid var(--molten)}
+  .turn mark{background:rgba(237,169,60,.22);color:var(--ink);border-radius:3px;padding:0 2px}
+  .slide{padding:10px 14px;border-bottom:1px solid rgba(38,65,74,.4);font-size:12.5px;display:flex;gap:10px}
+  .slide .sn{font:600 11px var(--mono);color:var(--ink3);flex:none;width:52px}
+  .slide.hl{background:var(--molten-soft)}
+
+  .lyrgroup{margin-bottom:8px}
+  .lyrhead{display:flex;align-items:center;gap:8px;font:600 11px var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);padding:10px 2px 8px}
+  .lyrhead .lc{color:var(--ink);background:var(--slab);border:1px solid var(--edge);border-radius:6px;padding:1px 7px}
+  .lyrhead .line{flex:1;height:1px;background:var(--edge)}
+  .cand{border:1px solid var(--edge);border-radius:11px;padding:13px;background:var(--carbon);margin-bottom:9px}
+  .cand .ch{display:flex;gap:7px;align-items:center;margin-bottom:7px;flex-wrap:wrap}
+  .cand .cb{font-weight:600;font-size:13.5px;line-height:1.4}
+  .cand .cx{font-size:12px;color:var(--ink2);margin-top:6px}
+  .cand .acts{display:flex;gap:7px;margin-top:11px;flex-wrap:wrap}
+  .conf{font-family:var(--mono);font-size:11px;color:var(--ink3);margin-left:auto}
+  .conf.lo{color:var(--molten)}
+
+  /* workspace */
+  .ws{display:grid;grid-template-columns:224px 1fr;gap:18px}
+  .tree{font-size:13px}
+  .tree .dom{padding:7px 9px;border-radius:8px;color:var(--ink2);cursor:pointer}
+  .tree .dom.on{background:var(--cyan-soft);color:var(--cyan);font-weight:600}
+  .tree .layers{margin:8px 0 0 6px;border-left:1px solid var(--edge);padding-left:11px}
+  .tree .lay{padding:5px 9px;border-radius:7px;cursor:pointer;color:var(--ink2);font-size:12.5px;display:flex;gap:6px}
+  .tree .lay.on{background:var(--slab);color:var(--ink)}
+  .tree .lay .n{margin-left:auto;color:var(--ink3);font:11px var(--mono)}
+  .mapwrap{display:grid;grid-template-columns:1fr 128px 1fr;gap:0;align-items:stretch}
+  .mapcol{background:#0b171c;border:1px solid var(--edge);border-radius:11px;padding:11px}
+  .mapcol h4{font:600 10.5px var(--mono);color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;padding:4px 6px 9px}
+  .mapitem{padding:8px 10px;border-radius:8px;font-size:12.5px;border:1px solid transparent;margin-bottom:5px}
+  .mapitem.hl{border-color:var(--cyan);background:var(--cyan-soft)}
+  .maplink{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;font:11px var(--mono);color:var(--ink3);text-align:center}
+  .maplink .rel{background:var(--slab);border:1px solid var(--edge2);border-radius:7px;padding:2px 9px;color:var(--ink2)}
+  .legend{display:flex;gap:18px;font-size:11.5px;color:var(--ink2);margin-top:12px;flex-wrap:wrap}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+  .diff{background:#0b171c;border:1px solid var(--edge);border-radius:9px;font:12px var(--mono);padding:11px 13px;margin:9px 0}
+  .diff span{display:block}
+  .diff .del{color:var(--ember)} .diff .add{color:var(--jade)} .diff .ctx{color:var(--ink3)}
+  .search2{background:#0b171c;border:1px solid var(--edge);border-radius:9px;color:var(--ink3);padding:8px 13px;font:13px var(--body);width:280px;margin-bottom:16px}
+  .search2:focus{outline:none;border-color:var(--cyan);color:var(--ink)}
+
+  /* drawer */
+  #drawer{position:fixed;top:0;right:-640px;width:620px;max-width:92vw;height:100vh;background:#101f25;border-left:1px solid var(--edge2);box-shadow:-20px 0 50px rgba(0,0,0,.5);transition:right .28s cubic-bezier(.4,0,.2,1);z-index:60;display:flex;flex-direction:column}
+  #drawer.open{right:0}
+  #drawer .dh{padding:17px 22px;border-bottom:1px solid var(--edge);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  #drawer .db{flex:1;overflow-y:auto;padding:20px 22px}
+  #drawer .df{padding:15px 22px;border-top:1px solid var(--edge);display:flex;gap:10px;flex-wrap:wrap}
+  .x{margin-left:auto;background:none;border:0;color:var(--ink3);font-size:19px;cursor:pointer;line-height:1}
+
+  /* toasts */
+  #toasts{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99;display:flex;flex-direction:column;gap:9px;align-items:center;pointer-events:none}
+  .toast{background:#132630;border:1px solid var(--edge2);border-radius:11px;padding:11px 18px;font-size:13px;box-shadow:0 10px 34px rgba(0,0,0,.55);display:flex;gap:10px;align-items:center;animation:up .25s ease;max-width:560px}
+  .toast b{color:var(--ink)}
+  @keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
+  .spin{width:13px;height:13px;border:2px solid var(--edge2);border-top-color:var(--cyan);border-radius:50%;animation:rot .8s linear infinite;flex:none}
+  @keyframes rot{to{transform:rotate(360deg)}}
+
+  /* ============ STUDIO ============ */
+  .studio{display:grid;grid-template-columns:.95fr 1.15fr;gap:16px}
+  .chatpane{border:1px solid var(--edge);border-radius:14px;background:var(--carbon);display:flex;flex-direction:column;height:560px;overflow:hidden}
+  .chatscroll{flex:1;overflow-y:auto;padding:16px 16px 8px;display:flex;flex-direction:column;gap:13px}
+  .msg{display:flex;gap:9px;max-width:94%}
+  .msg.sme{align-self:flex-end;flex-direction:row-reverse}
+  .msg .ava{width:27px;height:27px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;font:700 12px var(--disp)}
+  .msg.ai .ava{background:var(--iris-soft);color:var(--iris);border:1px solid rgba(158,139,238,.4)}
+  .msg.sme .ava{background:var(--cyan);color:#06121a}
+  .bubble{border:1px solid var(--edge);border-radius:12px;padding:10px 13px;font-size:13.5px;line-height:1.55}
+  .msg.ai .bubble{background:#0b171c;border-top-left-radius:4px}
+  .msg.sme .bubble{background:var(--cyan-soft);border-color:rgba(76,198,212,.3);border-top-right-radius:4px}
+  .staged{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .staged .sc{font:600 10.5px var(--mono);border-radius:6px;padding:2px 7px;background:var(--iris-soft);color:var(--iris);border:1px solid rgba(158,139,238,.32)}
+  .chatinput{border-top:1px solid var(--edge);padding:12px 14px;display:flex;gap:9px;align-items:center}
+  .chatinput input{flex:1;background:#0b171c;border:1px solid var(--edge);border-radius:9px;color:var(--ink);padding:9px 12px;font:13.5px var(--body)}
+  .chatinput input:focus{outline:none;border-color:var(--cyan)}
+  .canvaswrap{display:flex;flex-direction:column;gap:14px}
+  .canvas{border:1px solid var(--edge);border-radius:14px;background:radial-gradient(120% 130% at 82% -12%,rgba(158,139,238,.09),transparent 55%),#0b171c;padding:10px 10px 2px}
+  #studioCanvas .prop{opacity:0;transition:opacity .55s ease}
+  #studioCanvas .prop.on{opacity:1}
+  .stagetray{border:1px solid var(--edge);border-radius:14px;background:var(--carbon);padding:15px 17px}
+  .strow{display:none;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid rgba(38,65,74,.5);font-size:12.5px}
+  .strow.on{display:flex}
+  .strow:last-of-type{border-bottom:0}
+  .strow .discard{margin-left:auto;color:var(--ink3);cursor:pointer;font:11px var(--mono)}
+  .strow .discard:hover{color:var(--ember)}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  }
+  @media (max-width:1180px){
+    .tiles{grid-template-columns:repeat(2,1fr)} .two,.instr{grid-template-columns:1fr}
+    .sheet,.studio{grid-template-columns:1fr} .three{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ SIDEBAR ============ -->
+<nav id="side">
+  <div class="brand"><span class="mark">Onto</span><span class="u">_Wiz</span></div>
+  <div class="tagline">Domain Knowledge Foundry</div>
+
+  <div class="nav" id="nav">
+    <a data-s="home" class="on"><span class="g">◧</span>Overview</a>
+    <div class="navgroup">Production line</div>
+    <a data-s="intake"><span class="g">⛏</span>Intake <span class="count" id="cIntake">3</span></a>
+    <a data-s="forge"><span class="g">⚒</span>The Forge <span class="count hot" id="cForge">5</span></a>
+    <a data-s="queue"><span class="g">☰</span>Curation Queue <span class="count">12</span></a>
+    <a data-s="ontology"><span class="g">⬡</span>Ontology <span class="count">88</span></a>
+    <a data-s="packs"><span class="g">▣</span>Packs &amp; Releases</a>
+    <div class="navgroup">Author</div>
+    <a data-s="studio"><span class="g">◎</span>Studio <span class="count" style="color:var(--iris);border-color:rgba(158,139,238,.4);background:var(--iris-soft)">new</span></a>
+    <a data-s="capture"><span class="g">✎</span>Capture</a>
+    <a class="dis"><span class="g">⚙</span>Admin <span class="phase">Phase&nbsp;4</span></a>
+  </div>
+
+  <div class="roleWrap">
+    <div class="lbl">Viewing as</div>
+    <div class="seg">
+      <button id="roleC" class="on" onclick="setRole('curator')">Curator</button>
+      <button id="roleS" onclick="setRole('sme')">SME</button>
+    </div>
+    <div class="me"><div class="av">PK</div><div>Priya K. · <span id="roleLbl">Curator</span><br><span style="color:var(--ink3);font-size:11px">Commercial Analytics</span></div></div>
+  </div>
+</nav>
+
+<!-- ============ SHELL ============ -->
+<div id="shell">
+  <div id="top">
+    <div class="spine" id="spine">
+      <a class="node" data-s="intake"><span class="nk">01</span>Intake</a>
+      <span class="flow"></span>
+      <a class="node" data-s="forge"><span class="nk">02</span>Forge</a>
+      <span class="flow"></span>
+      <a class="node" data-s="queue"><span class="nk">03</span>Queue</a>
+      <span class="flow"></span>
+      <a class="node" data-s="ontology"><span class="nk">04</span>Ontology</a>
+      <span class="flow"></span>
+      <a class="node" data-s="packs"><span class="nk">05</span>Packs</a>
+    </div>
+    <div class="topR">
+      <input class="gsearch" placeholder="Search corpus, deltas, sources…">
+      <div class="status"><span class="dotm" style="background:var(--molten)"></span>8% validated</div>
+      <div class="status"><span class="dotm" style="background:var(--ember)"></span>pack gate ✕</div>
+    </div>
+  </div>
+
+  <main id="main">
+
+  <!-- ============ OVERVIEW ============ -->
+  <section id="s-home">
+    <div class="head">
+      <div class="eyebrow">Corpus state <span class="step">· pharma · 11 domains · updated 2 min ago</span></div>
+      <h1>Overview</h1>
+      <div class="lede">One factory floor, five stations. Raw source material and tacit expert judgment enter on the left and leave as a <b>gated, versioned pack</b> that agents consume — with provenance on every object.</div>
+    </div>
+
+    <div class="grid tiles">
+      <div class="card tile"><div class="k">Active artifacts</div><div class="v">88</div><div class="d">L1–L5 across 3 domains with rules</div></div>
+      <div class="card tile"><div class="k">SME-validated</div><div class="v" style="color:var(--molten)">8%</div><div class="d">⚠ 81 of 88 are Claude-drafted, unsigned</div></div>
+      <div class="card tile"><div class="k">Pending deltas</div><div class="v">12</div><div class="d">median age 3.2 days</div></div>
+      <div class="card tile"><div class="k">Shipping gate</div><div class="v"><span class="b fail" style="font-size:14px;padding:5px 11px">✕ FAILED</span></div><div class="d">commercial_analytics 0.3.0 · lift unmeasured</div></div>
+    </div>
+
+    <div class="sec two">
+      <div class="card">
+        <div class="kicker">Domain coverage — depth per layer <span class="line"></span></div>
+        <table>
+          <tr><th>Domain</th><th>Entities</th><th>Relations</th><th>Rules</th><th>Metrics</th><th>Evals</th><th></th></tr>
+          <tbody id="covBody"></tbody>
+        </table>
+        <div class="note" style="margin-top:10px">Bars show relative depth per layer. Rules and evals are where value lives — 8 of 11 domains are taxonomy stubs. Click a domain to open it in the Ontology workspace.</div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="kicker">Needs attention <span class="line"></span></div>
+          <ul class="feed">
+            <li><span class="dot" style="background:var(--ember)"></span><div><b>Pack 0.3.0 fails its gate</b> — 0 eval cases attached. Re-run the suite or roll back to 0.1.0. <a style="color:var(--cyan);cursor:pointer" onclick="go('packs')">Open release gate →</a></div></li>
+            <li><span class="dot" style="background:var(--molten)"></span><div><b>7 rules have zero linked eval cases</b> — unfalsifiable judgment cannot ship.</div></li>
+            <li><span class="dot" style="background:var(--molten)"></span><div><b>4 German gold accounts carry US payer mechanics</b> (340B, copay accumulator) — fix before the SME demo.</div></li>
+            <li><span class="dot" style="background:var(--info)"></span><div><b>3 deltas stuck in PROPOSED &gt; 7 days</b> — oldest from R. Mehta's session.</div></li>
+          </ul>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <div class="kicker">Recent activity <span class="line"></span></div>
+          <ul class="feed">
+            <li><span class="dot" style="background:var(--jade)"></span><div><span class="chip"><span class="av">PK</span>Priya K.</span> approved <b>DELTA-142</b> → recompile queued</div></li>
+            <li><span class="dot" style="background:var(--iris)"></span><div><span class="chip"><span class="av rm">RM</span>R. Mehta</span> caught a mis-fired rule in <b>Hunt</b> → correction delta drafted</div></li>
+            <li><span class="dot" style="background:var(--info)"></span><div>Intake extracted <b>11 candidates</b> from <i>Field Force QBR — 12 Jun.vtt</i> across 4 layers</div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INTAKE ============ -->
+  <section id="s-intake" hidden>
+    <div class="head">
+      <div class="eyebrow"><span class="step">01 ·</span> Production line</div>
+      <h1>Intake</h1>
+      <div class="lede">Load decks, call transcripts, SOPs and spreadsheets. Claude reads each source and <b>extracts candidates by ontology layer</b> — entities, relations, rules, metrics and scenarios — with the exact sentence and provenance that seeded each one. Nothing is captured until a human promotes it.</div>
+    </div>
+
+    <div class="drop" onclick="intakeAdd()">
+      <div class="di">⛏</div>
+      <h3>Drop a source, or click to select</h3>
+      <p>Claude parses it, then proposes layer-classified candidates you triage.</p>
+      <div class="types">.pptx · .docx · .pdf · .vtt / .txt transcripts · .xlsx · .eml — max 200&nbsp;MB</div>
+    </div>
+
+    <div class="sec">
+      <div class="kicker">Source library — every source is a durable, managed object <span class="line"></span></div>
+      <div class="card" style="padding:0">
+        <div class="srcrow" style="color:var(--ink3);font:600 10.5px var(--mono);text-transform:uppercase;letter-spacing:.6px;cursor:default">
+          <div></div><div>Source</div><div>Ingested by</div><div>Yield by layer</div><div>Promoted</div><div></div>
+        </div>
+        <div id="srcList">
+          <div class="srcrow on" data-src="transcript" onclick="intakeShow('transcript',this)">
+            <div class="ico">🎙</div>
+            <div><div class="nm">Field Force QBR — 12 Jun 2025.vtt</div><div class="mt">transcript · 47 min · 5 speakers</div></div>
+            <div><span class="chip"><span class="av">PK</span>Priya K.</span></div>
+            <div class="yield"><span class="yb">L1·4</span><span class="yb">L2·2</span><span class="yb">L3·3</span><span class="yb">L4·1</span><span class="yb">L5·1</span></div>
+            <div style="font-family:var(--mono);font-size:12px;color:var(--ink2)">2 / 11</div>
+            <div style="color:var(--ink3)">→</div>
+          </div>
+          <div class="srcrow" data-src="deck" onclick="intakeShow('deck',this)">
+            <div class="ico">📊</div>
+            <div><div class="nm">Q2 Brand Review.pptx</div><div class="mt">deck · 46 slides · parsed</div></div>
+            <div><span class="chip"><span class="av rm">RM</span>R. Mehta</span></div>
+            <div class="yield"><span class="yb">L1·2</span><span class="yb">L3·3</span><span class="yb">L5·2</span></div>
+            <div style="font-family:var(--mono);font-size:12px;color:var(--ink2)">3 / 7</div>
+            <div style="color:var(--ink3)">→</div>
+          </div>
+          <div class="srcrow" data-src="sop" onclick="intakeShow('sop',this)">
+            <div class="ico">📄</div>
+            <div><div class="nm">Access Triage SOP v3.docx</div><div class="mt">SOP · 12 pages · parsed</div></div>
+            <div><span class="chip"><span class="av">PK</span>Priya K.</span></div>
+            <div class="yield"><span class="yb">L1·3</span><span class="yb">L3·2</span></div>
+            <div style="font-family:var(--mono);font-size:12px;color:var(--ink2)">1 / 5</div>
+            <div style="color:var(--ink3)">→</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- extraction sheet -->
+    <div class="sec">
+      <div class="kicker" id="sheetTitle">Extraction sheet — Field Force QBR · 11 candidates across 4 layers · 2 flagged low-confidence <span class="line"></span></div>
+
+      <!-- TRANSCRIPT SHEET -->
+      <div class="sheet" data-sheet="transcript">
+        <div class="sourcepane">
+          <div class="sph">🎙 <b>Transcript</b> · seeding sentences highlighted · click a candidate to jump</div>
+          <div class="turn"><div class="who">R. Mehta <span class="ts">00:12:04</span></div>The Midwest IDN keeps coming up. New-to-brand is down eighteen points but total scripts are flat.</div>
+          <div class="turn hl"><div class="who">R. Mehta <span class="ts">00:12:31</span></div>Here's the thing — <mark>their prior-auth rejection rate jumped eleven points the same month. That's not us losing share, that's access erosion.</mark> If NBRx falls while TRx holds and rejections climb, I go to payer access before I touch the competitive story.</div>
+          <div class="turn"><div class="who">A. Shah <span class="ts">00:13:10</span></div>Agreed, but watch the timing near copay-card expiry — that fakes the same signal.</div>
+          <div class="turn hl"><div class="who">A. Shah <span class="ts">00:13:44</span></div><mark>Two of my plans adopted an accumulator and abandonment went up fourteen points within two refill cycles — before any TRx move showed.</mark></div>
+          <div class="turn"><div class="who">K. Bose <span class="ts">00:15:02</span></div>On the 3PL transition — we had about eleven days of intermittent stockouts and the field read it as soft demand.</div>
+        </div>
+
+        <div>
+          <div class="lyrgroup">
+            <div class="lyrhead">L1 · Entities <span class="lc">4</span><span class="line"></span></div>
+            <div class="cand">
+              <div class="ch"><span class="b prop">CANDIDATE</span><span class="tag l1">L1 entity</span><span class="chip src">🎙 00:12:31 · R. Mehta</span><span class="conf">conf 0.94</span></div>
+              <div class="cb">prior_auth_rejection_rate</div>
+              <div class="cx">New term. Claude proposes binding synonyms “PA rejects”, “rejection rate”. Not yet in the Commercial entity set.</div>
+              <div class="acts">
+                <button class="btn sm" onclick="triage(this,'promoted')">✓ Promote</button>
+                <button class="btn sm sec" onclick="triage(this,'fixed')">✎ Fix</button>
+                <button class="btn sm danger" onclick="triage(this,'rejected')">✕ Reject</button>
+              </div>
+            </div>
+            <div class="cand">
+              <div class="ch"><span class="b prop">CANDIDATE</span><span class="tag l1">L1 entity</span><span class="chip src">🎙 00:13:44 · A. Shah</span><span class="conf">conf 0.91</span></div>
+              <div class="cb">copay_accumulator</div>
+              <div class="cx">Programme entity. Claude flags a gold-set hygiene issue: 4 German accounts currently carry this US-only mechanic.</div>
+              <div class="acts">
+                <button class="btn sm" onclick="triage(this,'promoted')">✓ Promote</button>
+                <button class="btn sm sec" onclick="triage(this,'fixed')">✎ Fix</button>
+                <button class="btn sm danger" onclick="triage(this,'rejected')">✕ Reject</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lyrgroup">
+            <div class="lyrhead">L2 · Relations <span class="lc">2</span><span class="line"></span></div>
+            <div class="cand">
+              <div class="ch"><span class="b prop">CANDIDATE</span><span class="tag">L2 relation</span><span class="chip src">🎙 00:13:44 · A. Shah</span><span class="conf">conf 0.88</span></div>
+              <div class="cb">copay_accumulator <span style="color:var(--cyan)">— precedes →</span> patient_abandonment</div>
+              <div class="cx">Typed, directional, lagged relation (~2 refill cycles). Would connect Patient Services to Payer / Access.</div>
+              <div class="acts">
+                <button class="btn sm" onclick="triage(this,'promoted')">✓ Promote</button>
+                <button class="btn sm sec" onclick="triage(this,'fixed')">✎ Fix</button>
+                <button class="btn sm danger" onclick="triage(this,'rejected')">✕ Reject</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lyrgroup">
+            <div class="lyrhead">L3 · Rules / judgments <span class="lc">3</span><span class="line"></span></div>
+            <div class="cand">
+              <div class="ch"><span class="b prop">CANDIDATE</span><span class="tag l3">L3 rule</span><span class="chip src">🎙 00:12:31 · R. Mehta</span><span class="conf">conf 0.92</span></div>
+              <div class="cb">NBRx↓ + TRx→ + PA rejects↑ → access erosion, not share loss</div>
+              <div class="quote evi">“That's not us losing share, that's access erosion… I go to payer access before I touch the competitive story.”</div>
+              <div class="cx"><b>+ 1 paired eval case auto-drafted.</b> Anti-pattern also detected in the same source (copay-card expiry) — attached as a caveat.</div>
+              <div class="acts">
+                <button class="btn sm" onclick="triage(this,'promoted')">✓ Promote</button>
+                <button class="btn sm sec" onclick="triage(this,'fixed')">✎ Fix</button>
+                <button class="btn sm iris" onclick="sendToForge(this)">⚒ Send to Forge</button>
+                <button class="btn sm danger" onclick="triage(this,'rejected')">✕ Reject</button>
+              </div>
+            </div>
+            <div class="cand">
+              <div class="ch"><span class="b prop">CANDIDATE</span><span class="tag l3">L3 rule</span><span class="chip src">🎙 00:15:02 · K. Bose</span><span class="conf lo">conf 0.61 · weak evidence</span></div>
+              <div class="cb">Volume drop + normal leading indicators → check distribution before demand</div>
+              <div class="cx">Claude flags this as anecdotal in-source (single mention, no figure). Best routed to the Forge for SME judgment rather than promoted directly.</div>
+              <div class="acts">
+                <button class="btn sm iris" onclick="sendToForge(this)">⚒ Send to Forge</button>
+                <button class="btn sm sec" onclick="triage(this,'fixed')">✎ Fix</button>
+                <button class="btn sm danger" onclick="triage(this,'rejected')">✕ Reject</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lyrgroup">
+            <div class="lyrhead">L4 · Metrics <span class="lc">1</span><span class="line"></span></div>
+            <div class="cand">
+              <div class="ch"><span class="b prop">CANDIDATE</span><span class="tag">L4 metric</span><span class="chip src">🎙 00:13:44</span><span class="conf">conf 0.86</span></div>
+              <div class="cb">abandonment_rate · Δ +14pts over 2 refill cycles</div>
+              <div class="cx">Observed magnitude. Claude proposes this as the threshold in the paired eval case for the accumulator rule.</div>
+              <div class="acts">
+                <button class="btn sm" onclick="triage(this,'promoted')">✓ Promote</button>
+                <button class="btn sm sec" onclick="triage(this,'fixed')">✎ Fix</button>
+                <button class="btn sm danger" onclick="triage(this,'rejected')">✕ Reject</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lyrgroup">
+            <div class="lyrhead">L5 · Scenarios <span class="lc">1</span><span class="line"></span></div>
+            <div class="cand">
+              <div class="ch"><span class="b prop">CANDIDATE</span><span class="tag">L5 scenario → eval</span><span class="chip src">🎙 00:12:04–00:12:31</span><span class="conf">conf 0.90</span></div>
+              <div class="cb">Midwest IDN: NBRx −18%, TRx flat, PA rejections +11pts</div>
+              <div class="cx">A ready-made worked example. Promoting it seeds a <b>held-out eval case</b> — the metric the dashboard actually tracks.</div>
+              <div class="acts">
+                <button class="btn sm" onclick="triage(this,'promoted')">✓ Promote to gold set</button>
+                <button class="btn sm sec" onclick="triage(this,'fixed')">✎ Fix</button>
+                <button class="btn sm danger" onclick="triage(this,'rejected')">✕ Reject</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DECK SHEET -->
+      <div class="sheet" data-sheet="deck" hidden>
+        <div class="sourcepane">
+          <div class="sph">📊 <b>Q2 Brand Review.pptx</b> · 46 slides · seeding slides highlighted</div>
+          <div class="slide"><span class="sn">slide 22</span>Quarterly access summary — formulary wins and losses by region.</div>
+          <div class="slide hl"><span class="sn">slide 23</span>Plans adopting accumulator programmes showed abandonment +14pts within two refill cycles, before any TRx signal.</div>
+          <div class="slide hl"><span class="sn">slide 31</span>3PL transition caused 11 days of intermittent stockouts; field reported it as softening demand.</div>
+          <div class="slide hl"><span class="sn">slide 38</span>Anecdotal — three districts flagged heavy competitor sampling.</div>
+        </div>
+        <div>
+          <div class="lyrgroup">
+            <div class="lyrhead">L3 · Rules / judgments <span class="lc">3</span><span class="line"></span></div>
+            <div class="cand">
+              <div class="ch"><span class="b prop">CANDIDATE</span><span class="tag l3">L3 rule</span><span class="chip src">📊 slide 23</span><span class="conf">conf 0.89</span></div>
+              <div class="cb">Accumulator adoption precedes abandonment spike by ~2 cycles</div>
+              <div class="cx">Corroborates the transcript candidate from a second source — confidence rises when two independent sources agree. <b>+ 1 paired eval.</b></div>
+              <div class="acts">
+                <button class="btn sm" onclick="triage(this,'promoted')">✓ Promote</button>
+                <button class="btn sm iris" onclick="sendToForge(this)">⚒ Send to Forge</button>
+                <button class="btn sm danger" onclick="triage(this,'rejected')">✕ Reject</button>
+              </div>
+            </div>
+            <div class="cand">
+              <div class="ch"><span class="b prop">CANDIDATE</span><span class="tag l3">L3 rule</span><span class="chip src">📊 slide 31</span><span class="conf">conf 0.84</span></div>
+              <div class="cb">Specialty-pharmacy stockouts masquerade as demand decline</div>
+              <div class="cx">Volume drop + normal leading indicators → check distribution before demand hypotheses.</div>
+              <div class="acts">
+                <button class="btn sm" onclick="triage(this,'promoted')">✓ Promote</button>
+                <button class="btn sm sec" onclick="triage(this,'fixed')">✎ Fix</button>
+                <button class="btn sm danger" onclick="triage(this,'rejected')">✕ Reject</button>
+              </div>
+            </div>
+            <div class="cand">
+              <div class="ch"><span class="b prop">CANDIDATE</span><span class="tag l3">L3 rule</span><span class="chip src">📊 slide 38 · low conf</span><span class="conf lo">conf 0.52 · weak evidence</span></div>
+              <div class="cb">Rep-reported competitor sampling predicts NBRx erosion</div>
+              <div class="cx"><i style="color:var(--molten)">Claude flags anecdotal source language.</i> Route to the Forge rather than promote.</div>
+              <div class="acts">
+                <button class="btn sm iris" onclick="sendToForge(this)">⚒ Send to Forge</button>
+                <button class="btn sm danger" onclick="triage(this,'rejected')">✕ Reject</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOP SHEET -->
+      <div class="sheet" data-sheet="sop" hidden>
+        <div class="sourcepane">
+          <div class="sph">📄 <b>Access Triage SOP v3.docx</b> · 12 pages · seeding clauses highlighted</div>
+          <div class="slide hl"><span class="sn">§3.2</span>Where prior-authorisation rejection exceeds threshold, escalate to the market-access lead before commercial action.</div>
+          <div class="slide"><span class="sn">§4.1</span>Definitions: “access erosion”, “formulary displacement”, “utilisation management”.</div>
+        </div>
+        <div>
+          <div class="lyrgroup">
+            <div class="lyrhead">L3 · Rules / judgments <span class="lc">2</span><span class="line"></span></div>
+            <div class="cand">
+              <div class="ch"><span class="b prop">CANDIDATE</span><span class="tag l3">L3 rule</span><span class="chip src">📄 §3.2</span><span class="conf">conf 0.90</span></div>
+              <div class="cb">PA rejection over threshold → escalate to market-access lead first</div>
+              <div class="cx">A codified procedure, not tacit judgment. Good corroboration for the access-erosion rule; promote as an ordered-action rule.</div>
+              <div class="acts">
+                <button class="btn sm" onclick="triage(this,'promoted')">✓ Promote</button>
+                <button class="btn sm sec" onclick="triage(this,'fixed')">✎ Fix</button>
+                <button class="btn sm danger" onclick="triage(this,'rejected')">✕ Reject</button>
+              </div>
+            </div>
+          </div>
+          <div class="note" style="padding:6px 2px">SOPs give clean definitions and procedures; transcripts give the tacit “it depends”. Intake keeps both, tagged by source type, so curators can weight them differently.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FORGE ============ -->
+  <section id="s-forge" hidden>
+    <div class="forgeHero">
+      <div class="h1row">
+        <div style="flex:1;min-width:280px">
+          <div class="eyebrow"><span class="step">02 ·</span> Production line — where judgment gets forged</div>
+          <h1>The Forge</h1>
+          <div class="lede">Today's shift — <b>5 tasks, about 3 minutes</b>. Every answer ships a governed artifact and a paired eval, or it doesn't count. <b>The game is the validation engine:</b> your score and the corpus's quality are the same number, so you cannot win without hardening the ontology.</div>
+        </div>
+      </div>
+
+      <div class="instr">
+        <div class="gauge">
+          <div class="gl">◆ Your ForgeRating</div>
+          <div class="gnum">1,284<span class="up">▲ 22</span></div>
+          <div class="gsub">Calibration-weighted, dissent-preserving — never volume.</div>
+        </div>
+        <div class="gauge">
+          <div class="gl">◆ Your calibration</div>
+          <svg viewBox="0 0 220 96" style="width:100%;height:74px" aria-label="reliability diagram">
+            <line x1="26" y1="82" x2="210" y2="82" stroke="#26414a"/>
+            <line x1="26" y1="82" x2="26" y2="8" stroke="#26414a"/>
+            <line x1="26" y1="82" x2="200" y2="12" stroke="#365660" stroke-dasharray="3 3"/>
+            <text x="200" y="24" fill="#647c7b" font-size="8" font-family="monospace">ideal</text>
+            <polyline points="26,82 70,66 114,52 158,26 200,16" fill="none" stroke="#9E8BEE" stroke-width="2"/>
+            <circle cx="70" cy="66" r="2.5" fill="#9E8BEE"/><circle cx="114" cy="52" r="2.5" fill="#9E8BEE"/>
+            <circle cx="158" cy="26" r="2.5" fill="#9E8BEE"/><circle cx="200" cy="16" r="2.5" fill="#9E8BEE"/>
+          </svg>
+          <div class="gsub">Well-calibrated up high; slightly over-confident in the 60–70% band.</div>
+        </div>
+        <div class="gauge">
+          <div class="gl">◆ Corpus heat — Commercial Analytics</div>
+          <div class="heatbar"><i style="width:8%"><span class="shimmer"></span></i><span class="tgt" style="left:60%"></span></div>
+          <div class="gsub"><b style="color:var(--molten)">8% SME-validated.</b> Every ratification you make heats this bar. Quarter target: 60%.</div>
+        </div>
+        <div class="gauge">
+          <div class="gl">◆ Crew standing</div>
+          <div class="gnum" style="font-size:22px">#2<span class="up" style="color:var(--ink3)"> of 9 SMEs</span></div>
+          <div class="gsub">Ranked on calibration this cycle, not answer count.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="shiftbar">
+      <span style="font-family:var(--mono);color:var(--ink3)">TODAY'S SHIFT</span>
+      <div class="prog"><i id="progFill"></i></div>
+      <span id="progTxt" style="font-family:var(--mono)">0 / 5 forged</span>
+    </div>
+
+    <div class="two" style="grid-template-columns:1.5fr 1fr">
+      <div>
+        <!-- STATION 1: ASSAY -->
+        <div class="station assay" id="st-assay">
+          <div class="sthead">
+            <span class="stn">⚒ Assay · verify a draft</span>
+            <span class="tag">Payer / Access</span>
+            <span class="chip unval">⚠ Claude-drafted — never SME-checked</span>
+          </div>
+          <div class="stq">“NBRx↓ while TRx holds + PA rejects↑ → treat as access erosion, not share loss.”</div>
+          <div class="quote">Currently fires on <b>Account #14 (Midwest IDN)</b> — NBRx −18%, TRx flat, PA rejections +11pts.</div>
+          <div class="stactions">
+            <button class="btn sm forge" onclick="assay(this,'agree')">✓ Sound</button>
+            <button class="btn sm sec" onclick="assayDepends()">〜 It depends…</button>
+            <button class="btn sm danger" onclick="assayDepends('dis')">✕ Wrong</button>
+          </div>
+          <div id="dependsBox" hidden style="margin-top:12px">
+            <input class="search2" style="width:100%" id="dependsInput" placeholder="When does it NOT hold? One line — e.g. “not during copay-card expiry season”">
+            <div class="flowline">🤖 I'll structure this into a governed <b>anti-pattern on R-110</b> plus a paired eval case — you confirm before it ships.<button class="btn sm forge" style="margin-left:auto" onclick="assayConfirm()">Confirm &amp; ship to review</button></div>
+          </div>
+        </div>
+
+        <!-- STATION 2: DUEL -->
+        <div class="station duel" id="st-duel">
+          <div class="sthead"><span class="stn">⚔ Duel · adjudicate a split</span><span class="tag">2 SMEs disagree</span></div>
+          <div style="font-size:13.5px;color:var(--ink2);margin-bottom:11px">Hospital account: volume −22%, formulary unchanged, clinical inquiries +40%. <b>Which judgment wins — and what would flip you?</b></div>
+          <div class="three" style="grid-template-columns:1fr 1fr">
+            <div class="pick" onclick="duelPick(this)">
+              <div class="pt">A · Safety first</div>
+              <div class="note">“Inquiry spike outranks everything — triage safety before any commercial read.”</div>
+              <span class="chip" style="margin-top:8px"><span class="av rm">RM</span>R. Mehta · 0.9</span>
+            </div>
+            <div class="pick" onclick="duelPick(this)">
+              <div class="pt">B · Budget freeze</div>
+              <div class="note">“Hospital + across-the-board drop = budget-freeze pattern; inquiries are noise.”</div>
+              <span class="chip" style="margin-top:8px"><span class="av as">AS</span>A. Shah · 0.7</span>
+            </div>
+          </div>
+          <div class="stake"><span>Stake your confidence:</span><input type="range" min="50" max="100" value="75" oninput="document.getElementById('duelStake').textContent=this.value+'%'"><span class="stakeval" id="duelStake">75%</span></div>
+          <div class="note" style="margin-top:8px">If the room stays split, both positions become a governed <b>ExceptionRule</b> — “it depends” is knowledge, never averaged away.</div>
+        </div>
+
+        <!-- STATION 3: CALIBRATE -->
+        <div class="station cal" id="st-cal">
+          <div class="sthead"><span class="stn">◎ Calibrate · wager before the reveal</span><span class="tag">authors a held-out eval</span></div>
+          <div style="font-size:13.5px;color:var(--ink2);margin-bottom:11px">Before you see what the pack does — a covered plan adopts a copay accumulator this month. <b>What should the agent raise first over the next two cycles?</b></div>
+          <div class="three" style="grid-template-columns:1fr 1fr" id="calPicks">
+            <div class="pick" onclick="calPick(this,'good')"><div class="pt">Patient abandonment</div><div class="note">Accumulator hits out-of-pocket at refill.</div></div>
+            <div class="pick" onclick="calPick(this,'bad')"><div class="pt">Competitive share loss</div><div class="note">Treat as a share story first.</div></div>
+          </div>
+          <div class="stake"><span>How sure?</span><input type="range" min="50" max="100" value="80" oninput="document.getElementById('calStake').textContent=this.value+'%'"><span class="stakeval" id="calStake">80%</span>
+            <button class="btn sm iris" style="margin-left:auto" onclick="calReveal()">Lock &amp; reveal</button></div>
+          <div id="calResult" hidden></div>
+        </div>
+
+        <!-- STATION 4: HUNT -->
+        <div class="station hunt" id="st-hunt">
+          <div class="sthead"><span class="stn">⌖ Hunt · find the flaw</span><span class="tag">red-team the agent</span></div>
+          <div style="font-size:13.5px;color:var(--ink2);margin-bottom:9px">Here's how the agent reasoned on a hospital account with a volume drop and a clinical-inquiry spike. <b>Click the step where it goes wrong.</b></div>
+          <div class="trace" id="huntTrace">
+            <div class="tstep" onclick="huntPick(this,false)"><span class="ti">01</span>Detect −22% volume, formulary unchanged → open diagnosis.</div>
+            <div class="tstep" onclick="huntPick(this,false)"><span class="ti">02</span>Fire R-100 (budget-freeze pattern), priority 100.</div>
+            <div class="tstep" onclick="huntPick(this,true)"><span class="ti">03</span>Rank competitive-response rule above R-090 safety-signal triage.</div>
+            <div class="tstep" onclick="huntPick(this,false)"><span class="ti">04</span>Conclude: engage account on price before rep push.</div>
+          </div>
+          <div id="huntResult" hidden></div>
+        </div>
+
+        <!-- STATION 5: TEMPER -->
+        <div class="station temper" id="st-temper">
+          <div class="sthead"><span class="stn">🜂 Temper · consolidate the ore</span><span class="tag">craft credit</span></div>
+          <div style="font-size:13.5px;color:var(--ink2);margin-bottom:11px">Three SMEs have added boundary conditions to <b>R-110</b> over the last fortnight. Order and merge them into one clean ExceptionRule set.</div>
+          <div id="temperList">
+            <div class="caveatrow"><span class="h">⋮⋮</span><div>Not during copay-card expiry season — check patient-services data first.<span class="chip" style="margin-left:8px"><span class="av rm">RM</span></span></div></div>
+            <div class="caveatrow"><span class="h">⋮⋮</span><div>Excludes 340B accounts — different rejection dynamics.<span class="chip" style="margin-left:8px"><span class="av as">AS</span></span></div></div>
+            <div class="caveatrow"><span class="h">⋮⋮</span><div>If rejections trace to a single plan's system outage, treat as transient.<span class="chip" style="margin-left:8px"><span class="av">PK</span></span></div></div>
+          </div>
+          <div class="stactions"><button class="btn sm" style="background:var(--jade);color:#04140d" onclick="temper(this)">🜂 Temper into R-110</button></div>
+        </div>
+
+        <!-- SHIFT COMPLETE -->
+        <div class="station temper" id="shiftComplete" hidden style="text-align:center;padding:26px">
+          <div style="font-family:var(--disp);font-size:20px;font-weight:600;margin-bottom:6px">Shift complete 🜂</div>
+          <div class="lede" style="margin:0 auto">You forged <b>3 artifacts</b> and authored <b>2 held-out evals</b>. Commercial Analytics validation moved <b style="color:var(--jade)">8% → 11%</b>. Everything you touched is attributed to you in the Curation Queue.</div>
+          <div class="stactions" style="justify-content:center"><button class="btn sm" onclick="go('queue')">See your deltas →</button><button class="btn sm ghost" onclick="resetShift()">Reset demo</button></div>
+        </div>
+      </div>
+
+      <!-- RIGHT RAIL -->
+      <div>
+        <div class="card">
+          <div class="kicker">Your assay — impact this cycle <span class="line"></span></div>
+          <ul class="feed">
+            <li><span class="dot" style="background:var(--jade)"></span><div style="font-size:12.5px">Your caveat on <b>R-090</b> shipped in <b>pack 0.4.0-rc</b> and now guards eval COMP-SAF-09.</div></li>
+            <li><span class="dot" style="background:var(--cyan)"></span><div style="font-size:12.5px">You caught a priority inversion in <b>Hunt</b> → correction DELTA-149 drafted.</div></li>
+            <li><span class="dot" style="background:var(--iris)"></span><div style="font-size:12.5px">Your wager on the accumulator scenario became <b>held-out eval COMP-ACC-15</b>.</div></li>
+          </ul>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="kicker">Ratification ladder — corpus <span class="line"></span></div>
+          <div style="font-size:12.5px;line-height:2.2">
+            <span class="chip unval">⚠ unvalidated</span> 81 &nbsp;→&nbsp; <span class="b prop">endorsed</span> 21 &nbsp;→&nbsp; <span class="b act">✓ ratified</span> 7<br>
+            <span class="b warn">⚔ contested</span> 3 → in adjudication
+          </div>
+          <div class="note" style="margin-top:9px">Ratifying moves the dashboard's “SME-validated %”. There is no path to a high rating that doesn't raise this number.</div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="kicker">Open bounties — curator-directed <span class="line"></span></div>
+          <div class="bounty">
+            <div style="font-weight:600;font-size:13px">Patient Services needs judgment</div>
+            <div class="note" style="margin:4px 0 6px">6 thin rules, 0 SME signatures. The weakest node in the graph.</div>
+            <div style="display:flex;align-items:center;gap:10px"><span class="rew">◆ 3× rating on ratify</span><button class="btn sm ghost" style="margin-left:auto" onclick="toast('Bounty taken — Patient Services tasks added to your next shift')">Take bounty</button></div>
+          </div>
+          <div class="bounty">
+            <div style="font-weight:600;font-size:13px">German gold accounts carry US mechanics</div>
+            <div class="note" style="margin:4px 0 6px">4 accounts with 340B / accumulator — flag and fix.</div>
+            <div style="display:flex;align-items:center;gap:10px"><span class="rew">◆ 2× rating</span><button class="btn sm ghost" style="margin-left:auto" onclick="toast('Bounty taken — added to your shift')">Take bounty</button></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="kicker">Crew standing — calibration <span class="line"></span></div>
+          <ul class="board">
+            <li><span class="rk">1</span><span class="chip"><span class="av rm">RM</span>R. Mehta</span><span class="cal">0.91</span></li>
+            <li class="you"><span class="rk">2</span><span class="chip"><span class="av">PK</span>You</span><span class="cal">0.88</span></li>
+            <li><span class="rk">3</span><span class="chip"><span class="av as">AS</span>A. Shah</span><span class="cal">0.84</span></li>
+            <li><span class="rk">4</span><span class="chip"><span class="av kb">KB</span>K. Bose</span><span class="cal">0.79</span></li>
+          </ul>
+          <div class="note" style="margin-top:8px">Calibration = were you as right as you said you were, scored against gold outcomes. It rewards honesty about uncertainty.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CAPTURE ============ -->
+  <section id="s-capture" hidden>
+    <div class="head">
+      <div class="eyebrow">Author directly</div>
+      <h1>Capture</h1>
+      <div class="lede">Codify your own judgment without a source. Everything lands as a <b>governed proposal</b> — nothing publishes itself.</div>
+    </div>
+    <div class="three">
+      <div class="card" style="cursor:pointer" onclick="toast('Guided session would launch the 9-step Situation Room flow (existing, rewired)')">
+        <div style="font-size:22px;margin-bottom:8px">🎯</div><h3 style="font-family:var(--disp);font-weight:500;font-size:16px;margin-bottom:6px">Guided session</h3>
+        <p class="note" style="font-size:12.5px">Work a realistic scenario end-to-end. ~15 min. Best for deep triage judgment — hypothesis ordering, disconfirming evidence, common mistakes.</p>
+      </div>
+      <div class="card" style="cursor:pointer" onclick="go('intake')">
+        <div style="font-size:22px;margin-bottom:8px">⛏</div><h3 style="font-family:var(--disp);font-weight:500;font-size:16px;margin-bottom:6px">From a source →</h3>
+        <p class="note" style="font-size:12.5px">Have a deck, transcript or SOP? Use <b>Intake</b> — Claude extracts candidates by layer and you triage them.</p>
+      </div>
+      <div class="card" style="cursor:pointer" onclick="document.getElementById('quickForm').scrollIntoView({behavior:'smooth'})">
+        <div style="font-size:22px;margin-bottom:8px">⚡</div><h3 style="font-family:var(--disp);font-weight:500;font-size:16px;margin-bottom:6px">Quick capture</h3>
+        <p class="note" style="font-size:12.5px">One judgment in 60 seconds. A structured sentence — no forms about forms, never YAML.</p>
+      </div>
+    </div>
+
+    <div class="sec card" style="max-width:760px" id="quickForm">
+      <div class="kicker">Quick capture — When / Then / Because <span class="line"></span></div>
+      <label class="note" style="display:block;margin-bottom:5px">Where does this judgment live? <span style="color:var(--ink3)">(pre-filled — curators can re-scope in review)</span></label>
+      <select class="search2" style="width:100%;color:var(--ink)">
+        <optgroup label="Commercial"><option>Commercial › Payer / Access interface</option><option>Commercial › Field Force</option><option>Commercial › Patient Services</option><option>Commercial (domain-wide)</option></optgroup>
+        <optgroup label="Other domains"><option>Market Access</option><option>Forecasting</option><option>Oncology (TA)</option></optgroup>
+      </select>
+      <label class="note" style="display:block;margin:14px 0 5px">When … <span style="color:var(--ink3)">(the situation / signals)</span></label>
+      <input class="search2" style="width:100%" placeholder="e.g. NBRx falls while TRx holds and PA rejection rate rises in the same geography">
+      <label class="note" style="display:block;margin:14px 0 5px">Then … <span style="color:var(--ink3)">(your judgment / what to do first)</span></label>
+      <input class="search2" style="width:100%" placeholder="e.g. investigate payer access before any competitive response">
+      <label class="note" style="display:block;margin:14px 0 5px">Because … <span style="color:var(--ink3)">(the rationale a colleague would need)</span></label>
+      <input class="search2" style="width:100%" placeholder="e.g. new-to-brand scripts are the first casualty of a formulary change; TRx lags 6–8 weeks">
+      <label class="note" style="display:block;margin:14px 0 5px">Watch out for … <span style="color:var(--ink3)">(anti-pattern — when this does NOT apply)</span></label>
+      <input class="search2" style="width:100%" placeholder="e.g. does not apply during co-pay card expiry season">
+      <div style="margin-top:18px;display:flex;gap:11px;align-items:center">
+        <button class="btn" onclick="toast('✓ <b>DELTA-148 proposed</b> — attributed to you, provenance: quick capture → Curation Queue',false,4200)">Propose judgment</button>
+        <span class="note">Creates a PROPOSED delta attributed to you → Curation Queue</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STUDIO ============ -->
+  <section id="s-studio" hidden>
+    <div class="head">
+      <div class="eyebrow">Author by conversation</div>
+      <h1>Studio</h1>
+      <div class="lede">Talk through your judgment in plain language. Claude structures it onto the <b>canvas</b> as you speak — dashed, because it is <b>proposed, not committed</b>. Nothing touches the corpus until you commit, and a curator still ratifies. The conversation itself is stored as a source, so every object traces back to the turn that produced it.</div>
+    </div>
+
+    <div class="studio">
+      <!-- CHAT -->
+      <div class="chatpane">
+        <div class="chatscroll" id="chatScroll">
+          <div class="msg sme" id="sm-t1">
+            <div class="ava">PK</div>
+            <div class="bubble">When a covered plan adopts a copay accumulator, I raise patient abandonment before share loss — usually inside two refill cycles.</div>
+          </div>
+          <div class="msg ai" id="sm-t2" hidden>
+            <div class="ava">◎</div>
+            <div class="bubble">I've staged that on the canvas — a rule, plus the entity and relation it needs. See the dashed nodes on the right.
+              <div class="staged"><span class="sc">L1 copay_accumulator</span><span class="sc">L2 → abandonment</span><span class="sc">L3 rule + eval</span><span class="sc">L4 +14pts</span></div>
+              One thing I won't guess at: <b>when does this not hold?</b> What would make you not raise abandonment first?</div>
+          </div>
+          <div class="msg sme" id="sm-t3" hidden>
+            <div class="ava">PK</div>
+            <div class="bubble">If it's a 340B account, skip it — the rejection dynamics are different there.</div>
+          </div>
+          <div class="msg ai" id="sm-t4" hidden>
+            <div class="ava">◎</div>
+            <div class="bubble">Staged as an anti-pattern on the rule, with a paired held-out eval so the boundary is testable — not just asserted.
+              <div class="staged"><span class="sc">L3 anti-pattern · except 340B</span><span class="sc">L5 eval COMP-ACC-15</span></div>
+              I've structured only what you said. Nothing invented.</div>
+          </div>
+          <div class="msg ai" id="sm-t5" hidden>
+            <div class="ava">◎</div>
+            <div class="bubble">That's six proposals, all grounded in this conversation. None are in the corpus yet — commit when you're happy and they land in the Curation Queue, attributed to you.</div>
+          </div>
+        </div>
+        <div class="chatinput">
+          <input placeholder="Describe a judgment, a boundary, a correction…" onkeydown="if(event.key==='Enter')studioStep()">
+          <button class="btn sm iris" onclick="studioPlay()">▶ Play</button>
+          <button class="btn sm sec" onclick="studioStep()">Step</button>
+        </div>
+      </div>
+
+      <!-- CANVAS + STAGING -->
+      <div class="canvaswrap">
+        <div class="canvas">
+          <svg id="studioCanvas" viewBox="0 0 500 300" style="width:100%">
+            <defs><marker id="ar2" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6" fill="none" stroke="#9E8BEE"/></marker></defs>
+            <!-- committed corpus (solid) -->
+            <line x1="72" y1="196" x2="72" y2="78" stroke="#647c7b" stroke-width="1.4" marker-end="url(#ar2)" style="marker-end:none"/>
+            <text x="80" y="140" fill="#9fb4b2" font-size="10" font-family="monospace">covered_by</text>
+            <g><rect x="28" y="36" width="88" height="42" rx="9" fill="#15282e" stroke="#4CC6D4"/><text x="72" y="56" fill="#e8efec" font-size="12" text-anchor="middle">Payer</text><text x="72" y="70" fill="#647c7b" font-size="9" text-anchor="middle">L1 · in corpus</text></g>
+            <g><rect x="28" y="196" width="88" height="42" rx="9" fill="#15282e" stroke="#4CC6D4"/><text x="72" y="216" fill="#e8efec" font-size="12" text-anchor="middle">Patient</text><text x="72" y="230" fill="#647c7b" font-size="9" text-anchor="middle">L1 · in corpus</text></g>
+
+            <!-- proposed this session (dashed, revealed by conversation) -->
+            <line id="e-acc" class="prop" x1="300" y1="72" x2="380" y2="196" stroke="#9E8BEE" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ar2)"/>
+            <text id="e-acc-l" class="prop" x="318" y="150" fill="#9E8BEE" font-size="10" font-family="monospace">precedes</text>
+            <g id="n-acc" class="prop"><rect x="196" y="36" width="120" height="42" rx="9" fill="rgba(158,139,238,.08)" stroke="#9E8BEE" stroke-dasharray="5 4"/><text x="256" y="56" fill="#e8efec" font-size="11.5" text-anchor="middle">copay_accumulator</text><text x="256" y="70" fill="#9E8BEE" font-size="9" text-anchor="middle">L1 · proposed</text></g>
+            <g id="n-aband" class="prop"><rect x="372" y="196" width="102" height="42" rx="9" fill="rgba(158,139,238,.08)" stroke="#9E8BEE" stroke-dasharray="5 4"/><text x="423" y="216" fill="#e8efec" font-size="11" text-anchor="middle">abandonment_rate</text><text x="423" y="230" fill="#9E8BEE" font-size="9" text-anchor="middle">L4 · +14pts</text></g>
+            <g id="r-acc" class="prop"><rect x="182" y="112" width="176" height="26" rx="13" fill="rgba(158,139,238,.1)" stroke="#9E8BEE" stroke-dasharray="4 3"/><text x="270" y="129" fill="#c9bdf5" font-size="10.5" text-anchor="middle">⚖ raise abandonment · 2 cycles</text></g>
+            <g id="b-anti" class="prop"><rect x="206" y="150" width="128" height="24" rx="12" fill="rgba(239,106,80,.08)" stroke="#EF6A50" stroke-dasharray="4 3"/><text x="270" y="166" fill="#f0a495" font-size="10" text-anchor="middle">⊘ except 340B accounts</text></g>
+            <g id="n-eval" class="prop"><rect x="196" y="196" width="120" height="42" rx="9" fill="rgba(158,139,238,.08)" stroke="#9E8BEE" stroke-dasharray="5 4"/><text x="256" y="216" fill="#e8efec" font-size="11" text-anchor="middle">COMP-ACC-15</text><text x="256" y="230" fill="#9E8BEE" font-size="9" text-anchor="middle">L5 · held-out eval</text></g>
+          </svg>
+          <div class="legend" style="padding:2px 8px 8px"><span><i style="background:#4CC6D4"></i>In corpus (committed)</span><span><i style="background:#9E8BEE"></i>Proposed this session</span></div>
+        </div>
+
+        <div class="stagetray" id="stageTray">
+          <div class="kicker">Staged proposals — <span id="stageCount">0</span> ready to commit <span class="line"></span></div>
+          <div id="studioHint" class="note" style="padding:8px 0 4px">Press <b>▶ Play</b> to watch proposals appear on the canvas as the conversation unfolds — or <b>Step</b> through one turn at a time.</div>
+          <div class="strow" id="sg-l1"><span class="tag l1">L1</span> copay_accumulator <span class="discard" onclick="discardStage(this)">discard</span></div>
+          <div class="strow" id="sg-l2"><span class="tag">L2</span> copay_accumulator → patient_abandonment <span class="discard" onclick="discardStage(this)">discard</span></div>
+          <div class="strow" id="sg-l3"><span class="tag l3">L3</span> Accumulator adoption → raise abandonment (2 cycles) <b style="color:var(--jade);font:11px var(--mono);margin-left:2px">+ eval</b> <span class="discard" onclick="discardStage(this)">discard</span></div>
+          <div class="strow" id="sg-l4"><span class="tag">L4</span> abandonment_rate · Δ +14pts <span class="discard" onclick="discardStage(this)">discard</span></div>
+          <div class="strow" id="sg-anti"><span class="tag l3">L3</span> Anti-pattern · except 340B accounts <span class="discard" onclick="discardStage(this)">discard</span></div>
+          <div class="strow" id="sg-eval"><span class="tag">L5</span> Held-out eval · COMP-ACC-15 <span class="discard" onclick="discardStage(this)">discard</span></div>
+          <div style="display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap">
+            <button class="btn iris" id="btnCommit" disabled onclick="commitStudio()">Commit 0 proposals to Curation Queue</button>
+            <button class="btn sm ghost" onclick="studioResetC()">Reset</button>
+          </div>
+          <div class="note" style="margin-top:11px">Committing creates PROPOSED deltas in the queue and stores this conversation as a managed source — the same governance every other surface uses. A curator still ratifies before anything ships.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUEUE ============ -->
+  <section id="s-queue" hidden>
+    <div class="head">
+      <div class="eyebrow"><span class="step">03 ·</span> Production line</div>
+      <h1>Curation Queue</h1>
+      <div class="lede">12 pending. <b>One pipe</b> — every change from every surface (Intake, Forge, Capture, workspace edits) passes through here before it touches the corpus.</div>
+    </div>
+    <input class="search2" placeholder="Filter: domain, layer, source, SME…">
+    <div class="card" style="padding:0">
+      <table>
+        <tr><th>Delta</th><th>Change</th><th>Layer</th><th>Source</th><th>Proposed by</th><th>Age</th><th>Status</th></tr>
+        <tr class="row" onclick="openDrawer()">
+          <td><b>DELTA-147</b></td><td>Raise priority: safety-signal triage above competitive</td>
+          <td><span class="tag l3">L3 · Rules</span></td><td><span class="chip src">🎯 session</span></td>
+          <td><span class="chip"><span class="av rm">RM</span>R. Mehta</span></td><td style="font-family:var(--mono)">2d</td><td><span class="b prop">PROPOSED</span></td>
+        </tr>
+        <tr class="row" onclick="toast('Prototype: DELTA-147 opens the full drawer')">
+          <td><b>DELTA-149</b></td><td>Correction: fix priority inversion caught in Hunt</td>
+          <td><span class="tag l3">L3 · Rules</span></td><td><span class="chip src">⚒ forge · hunt</span></td>
+          <td><span class="chip"><span class="av">PK</span>Priya K.</span></td><td style="font-family:var(--mono)">3m</td><td><span class="b prop">PROPOSED</span></td>
+        </tr>
+        <tr class="row" onclick="toast('Prototype: DELTA-147 opens the full drawer')">
+          <td><b>DELTA-150</b></td><td>New rule + anti-pattern: accumulator → abandonment, except 340B</td>
+          <td><span class="tag l3">L3 · Rules</span></td><td><span class="chip src" style="border-color:rgba(158,139,238,.4);color:var(--iris)">◎ studio</span></td>
+          <td><span class="chip"><span class="av">PK</span>Priya K.</span></td><td style="font-family:var(--mono)">just now</td><td><span class="b prop">PROPOSED</span></td>
+        </tr>
+        <tr class="row" onclick="toast('Prototype: DELTA-147 opens the full drawer')">
+          <td><b>DELTA-146</b></td><td>New rule: accumulator adoption → abandonment hypothesis</td>
+          <td><span class="tag l3">L3 · Rules</span></td><td><span class="chip src">⛏ intake · mined</span></td>
+          <td><span class="chip"><span class="av rm">RM</span>R. Mehta ✓</span></td><td style="font-family:var(--mono)">4h</td><td><span class="b prop">PROPOSED</span></td>
+        </tr>
+        <tr class="row" onclick="toast('Prototype: DELTA-147 opens the full drawer')">
+          <td><b>DELTA-145</b></td><td>Synonym bind: “PA rejects” → prior_auth_rejection_rate</td>
+          <td><span class="tag l1">L1 · Entities</span></td><td><span class="chip src">⛏ intake</span></td>
+          <td><span class="chip"><span class="av">PK</span>Priya K.</span></td><td style="font-family:var(--mono)">1d</td><td><span class="b prop">PROPOSED</span></td>
+        </tr>
+        <tr class="row" style="opacity:.55" onclick="toast('Approved deltas stay browsable in the audit trail')">
+          <td><b>DELTA-142</b></td><td>Add anti-pattern to LOE-erosion forecast rule</td>
+          <td><span class="tag l3">L3 · Rules</span></td><td><span class="chip src">🎯 session</span></td>
+          <td><span class="chip"><span class="av as">AS</span>A. Shah</span></td><td style="font-family:var(--mono)">—</td><td><span class="b appr">APPROVED</span></td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ ONTOLOGY ============ -->
+  <section id="s-ontology" hidden>
+    <div class="head">
+      <div class="eyebrow"><span class="step">04 ·</span> Production line</div>
+      <h1>Ontology</h1>
+      <div class="lede">Browse, edit and map the layers. Editing here still creates a delta through the one pipe — no back doors.</div>
+    </div>
+    <div class="ws">
+      <div class="card" style="padding:13px 11px">
+        <div class="tree">
+          <div class="dom on">▾ Commercial <span style="float:right;color:var(--ink3);font:11px var(--mono)">Σ 88</span></div>
+          <div style="margin:2px 0 4px 8px;border-left:1px solid var(--edge);padding-left:9px">
+            <div class="lay on" onclick="toast('Scopes everything to the parent node — counts roll up from subdomains')">All commercial <span class="n">roll-up</span></div>
+            <div class="lay" onclick="scopeNode(this,'Field Force')">Field Force <span class="n">4</span></div>
+            <div class="lay" onclick="scopeNode(this,'Marketing &amp; Omnichannel')">Marketing &amp; Omni. <span class="n">3</span></div>
+            <div class="lay" onclick="scopeNode(this,'Payer / Access')">Payer / Access <span class="n">6</span></div>
+            <div class="lay" onclick="scopeNode(this,'Patient Services')">Patient Services <span class="n">2</span></div>
+            <div class="lay" onclick="scopeNode(this,'Analytics &amp; Insights')">Analytics &amp; Insights <span class="n">5</span></div>
+          </div>
+          <div class="layers">
+            <div class="lay" onclick="wsTab('layers')">L1 Entities <span class="n">15</span></div>
+            <div class="lay" onclick="wsTab('layers')">L2 Relations <span class="n">15</span></div>
+            <div class="lay on" onclick="wsTab('layers')">L3 Rules <span class="n">20</span></div>
+            <div class="lay" onclick="wsTab('layers')">L4 Metrics <span class="n">16</span></div>
+            <div class="lay" onclick="wsTab('layers')">L5 Scenarios <span class="n">22</span></div>
+          </div>
+          <div class="dom" style="margin-top:10px" onclick="toast('Domain switch — content-driven, no frontend release needed')">▸ Market Access</div>
+          <div class="dom" onclick="toast('Domain switch')">▸ Forecasting</div>
+          <div class="dom" onclick="toast('Domain switch')">▸ Oncology (TA)</div>
+          <div class="dom" style="color:var(--ink3)" onclick="toast('Seed-status domain: taxonomy stub, no rules yet — visible honesty')">+ 7 seed domains…</div>
+          <button class="btn sm ghost" style="width:100%;margin-top:12px" onclick="toast('Manage hierarchy: add / rename / move / merge — every change is a governed delta, because moving a node changes what compiles into which pack',false,5200)">✎ Manage hierarchy</button>
+        </div>
+      </div>
+      <div>
+        <div class="tabs" id="wsTabs">
+          <button data-t="layers" class="on" onclick="wsTab('layers')">Layer browser</button>
+          <button data-t="graph" onclick="wsTab('graph')">Graph</button>
+          <button data-t="map" onclick="wsTab('map')">Mapping Workbench</button>
+          <button data-t="lineage" onclick="wsTab('lineage')">Lineage</button>
+        </div>
+
+        <div data-p="layers" class="card" style="padding:0">
+          <div id="scopeBar" style="padding:10px 15px;border-bottom:1px solid var(--edge);font-size:12.5px;color:var(--ink2)">Scope: <b>Commercial</b> (roll-up of 5 subdomains) — select a subdomain in the tree to narrow.</div>
+          <table>
+            <tr><th>P</th><th>Rule (L3 · priority-ordered)</th><th>Node</th><th>Anti</th><th>Evals</th><th>Validation</th><th>Lifecycle</th></tr>
+            <tr class="row" onclick="toast('Opens the structured rule editor — form fields mirroring the schema, never YAML-first')">
+              <td style="font-family:var(--mono)"><b>90</b></td><td>Volume drop + clinical inquiry spike → safety signal, not competitive</td>
+              <td><span class="tag">Commercial</span></td><td>2</td><td><span class="b pass">✓ 4</span></td><td><span class="chip unval">⚠ unvalidated</span></td><td><span class="b act">ACTIVE</span></td>
+            </tr>
+            <tr class="row" onclick="toast('Structured rule editor')">
+              <td style="font-family:var(--mono)"><b>95</b></td><td>Volume drop + normal leading indicators → check supply first</td>
+              <td><span class="tag">Commercial</span></td><td>1</td><td><span class="b pass">✓ 3</span></td><td><span class="chip"><span class="av rm">RM</span>R. Mehta ✓</span></td><td><span class="b act">ACTIVE</span></td>
+            </tr>
+            <tr class="row" onclick="toast('Structured rule editor')">
+              <td style="font-family:var(--mono)"><b>100</b></td><td>Hospital budget-crisis pattern → engage account before rep push</td>
+              <td><span class="tag">Payer / Access</span></td><td>1</td><td><span class="b warn">⚠ 0</span></td><td><span class="chip unval">⚠ unvalidated</span></td><td><span class="b act">ACTIVE</span></td>
+            </tr>
+            <tr class="row" onclick="toast('Structured rule editor')">
+              <td style="font-family:var(--mono)"><b>110</b></td><td>NBRx↓ TRx→ + PA rejects↑ → access erosion, not share loss</td>
+              <td><span class="tag">Payer / Access</span></td><td>3</td><td><span class="b pass">✓ 2</span></td><td><span class="chip unval">⚠ unvalidated</span></td><td><span class="b act">ACTIVE</span></td>
+            </tr>
+            <tr class="row" onclick="toast('PROPOSED objects are browsable in place — governance is ambient, not a separate module')">
+              <td style="font-family:var(--mono)"><b>112</b></td><td>Accumulator adoption → abandonment hypothesis for 2 cycles</td>
+              <td><span class="tag">Patient Services</span></td><td>0</td><td><span class="b warn">⚠ 1 draft</span></td><td><span class="chip"><span class="av rm">RM</span>R. Mehta ✓</span></td><td><span class="b prop">PROPOSED</span></td>
+            </tr>
+          </table>
+          <div class="note" style="padding:11px 15px">“⚠ unvalidated” = Claude-drafted, no SME signature yet — the dashboard's 8% is exactly this column. Reparenting a rule to a subdomain is a delta too.</div>
+        </div>
+
+        <div data-p="graph" hidden class="card">
+          <svg viewBox="0 0 760 340" style="width:100%;max-width:860px">
+            <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6" fill="none" stroke="#647c7b"/></marker></defs>
+            <line x1="150" y1="90" x2="330" y2="90" stroke="#647c7b" stroke-width="1.5" marker-end="url(#ar)"/>
+            <line x1="150" y1="90" x2="330" y2="210" stroke="#647c7b" stroke-width="1.5" marker-end="url(#ar)"/>
+            <line x1="390" y1="90" x2="560" y2="90" stroke="#647c7b" stroke-width="1.5" marker-end="url(#ar)"/>
+            <line x1="390" y1="210" x2="560" y2="110" stroke="#647c7b" stroke-width="1.5" marker-end="url(#ar)"/>
+            <line x1="390" y1="210" x2="560" y2="250" stroke="#EDA93C" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+            <text x="228" y="78" fill="#9fb4b2" font-size="11">prescribed_by</text>
+            <text x="205" y="165" fill="#9fb4b2" font-size="11">covered_by</text>
+            <text x="455" y="78" fill="#9fb4b2" font-size="11">influences</text>
+            <text x="440" y="168" fill="#9fb4b2" font-size="11">gates</text>
+            <text x="430" y="248" fill="#EDA93C" font-size="11">cross-domain ↗</text>
+            <g><rect x="70" y="68" width="80" height="44" rx="9" fill="#15282e" stroke="#4CC6D4"/><text x="110" y="88" fill="#e8efec" font-size="12" text-anchor="middle">Brand</text><text x="110" y="103" fill="#647c7b" font-size="9.5" text-anchor="middle">L1 entity</text></g>
+            <g><rect x="330" y="68" width="80" height="44" rx="9" fill="#15282e" stroke="#4CC6D4"/><text x="370" y="88" fill="#e8efec" font-size="12" text-anchor="middle">HCP</text><text x="370" y="103" fill="#647c7b" font-size="9.5" text-anchor="middle">L1 entity</text></g>
+            <g><rect x="560" y="68" width="90" height="44" rx="9" fill="#15282e" stroke="#4CC6D4"/><text x="605" y="88" fill="#e8efec" font-size="12" text-anchor="middle">NBRx</text><text x="605" y="103" fill="#647c7b" font-size="9.5" text-anchor="middle">L4 metric</text></g>
+            <g><rect x="330" y="188" width="80" height="44" rx="9" fill="#15282e" stroke="#4CC6D4"/><text x="370" y="208" fill="#e8efec" font-size="12" text-anchor="middle">Payer</text><text x="370" y="223" fill="#647c7b" font-size="9.5" text-anchor="middle">L1 entity</text></g>
+            <g><rect x="560" y="228" width="128" height="44" rx="9" fill="#15282e" stroke="#EDA93C"/><text x="624" y="248" fill="#e8efec" font-size="11.5" text-anchor="middle">Payer archetype</text><text x="624" y="263" fill="#647c7b" font-size="9.5" text-anchor="middle">market_access · L1</text></g>
+            <g><rect x="548" y="120" width="118" height="30" rx="15" fill="rgba(70,192,138,.14)" stroke="#46C08A"/><text x="607" y="139" fill="#46C08A" font-size="10.5" text-anchor="middle">⚖ R-110 access rule</text></g>
+          </svg>
+          <div class="legend"><span><i style="background:#4CC6D4"></i>Entity / metric (this domain)</span><span><i style="background:#EDA93C"></i>Cross-domain mapping</span><span><i style="background:#46C08A"></i>Rule attached to edge</span></div>
+          <div class="note">Read-first comprehension surface. Phase 3: drawing an edge creates a PROPOSED relationship delta. Tables remain the fast editor.</div>
+        </div>
+
+        <div data-p="map" hidden>
+          <div class="mapwrap">
+            <div class="mapcol">
+              <h4>Commercial Analytics</h4>
+              <div class="mapitem hl">Payer <span class="tag" style="margin-left:6px">L1</span></div>
+              <div class="mapitem">Prior-auth rejection rate <span class="tag" style="margin-left:6px">L4</span></div>
+              <div class="mapitem">Formulary position <span class="tag" style="margin-left:6px">L1</span></div>
+              <div class="mapitem">Copay programme <span class="tag" style="margin-left:6px">L1</span></div>
+            </div>
+            <div class="maplink">
+              <div class="rel">same_as · 0.95</div>
+              <svg width="108" height="14"><line x1="0" y1="7" x2="108" y2="7" stroke="#EDA93C" stroke-width="1.5"/><circle cx="54" cy="7" r="3" fill="#EDA93C"/></svg>
+              <div>governed as<br>DELTA-141 <span class="b prop" style="font-size:9px">PROPOSED</span></div>
+            </div>
+            <div class="mapcol">
+              <h4>Market Access</h4>
+              <div class="mapitem hl">Payer archetype <span class="tag" style="margin-left:6px">L1</span></div>
+              <div class="mapitem">Utilisation management <span class="tag" style="margin-left:6px">L1</span></div>
+              <div class="mapitem">Benefit design <span class="tag" style="margin-left:6px">L1</span></div>
+              <div class="mapitem">Gross-to-net driver <span class="tag" style="margin-left:6px">L4</span></div>
+            </div>
+          </div>
+          <div class="note" style="margin-top:14px">Every mapping is a governed artifact: typed link + confidence + rationale, approved through the queue. Cross-domain maps are what turn 11 silos into an <i>organisation</i> ontology — and what agent traversal follows at runtime.</div>
+        </div>
+
+        <div data-p="lineage" hidden class="card">
+          <h3 style="font-family:var(--disp);font-weight:500;font-size:15px;margin-bottom:5px">R-110 · “NBRx↓ TRx→ + PA rejects↑ → access erosion, not share loss”</h3>
+          <div style="margin:6px 0 14px"><span class="b act">ACTIVE</span> <span class="tag l3">access</span><span class="tag">payer</span> <span class="chip unval">⚠ unvalidated — Claude-drafted</span></div>
+          <ul class="feed">
+            <li><span class="dot" style="background:var(--ink3)"></span><div><b>Origin</b> — seeded from <i>commercial.yaml</i> (Claude-drafted, ATLAS run, 10 Jun) · no SME signature.</div></li>
+            <li><span class="dot" style="background:var(--info)"></span><div><b>DELTA-089</b> — anti-pattern added (“except during copay-card expiry season”) · proposed by R. Mehta (session) · approved by Priya K.</div></li>
+            <li><span class="dot" style="background:var(--jade)"></span><div><b>Shipped in</b> commercial_analytics 0.1.0 → 0.3.0 · exercised by 2 eval cases · fires on 4 / 22 gold accounts.</div></li>
+            <li><span class="dot" style="background:var(--molten)"></span><div><b>Open</b> — needs an SME signature plus one held-out eval to count toward the validated corpus.</div></li>
+          </ul>
+          <div class="note">Lineage answers the governance question — “where did this judgment come from and who stands behind it?” — for every object, in one tab.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PACKS ============ -->
+  <section id="s-packs" hidden>
+    <div class="head">
+      <div class="eyebrow"><span class="step">05 ·</span> Production line</div>
+      <h1>Packs &amp; Releases</h1>
+      <div class="lede">Compile · gate · version · publish · consume. The eval gate is <b>structural, not procedural</b> — a version that fails cannot ship.</div>
+    </div>
+    <div class="three">
+      <div class="card" style="grid-column:1/3">
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:14px">
+          <h2 style="font-family:var(--disp);font-weight:500;font-size:17px">commercial_analytics</h2>
+          <span class="tag">base pack</span><span class="tag">MCP + REST</span>
+          <button class="btn sm sec" style="margin-left:auto" onclick="toast('Pack composer: choose domains + layers + scope filters → live what-is-in / what-is-excluded view')">Compose new version</button>
+        </div>
+        <table>
+          <tr><th>Version</th><th>Artifacts</th><th>Eval cases</th><th>Gate</th><th>Agent lift</th><th></th></tr>
+          <tr>
+            <td style="font-family:var(--mono)"><b>0.4.0-rc</b> <span class="b draft">DRAFT</span></td><td>25</td><td>31</td>
+            <td><span class="b warn">… running</span></td><td>—</td>
+            <td><button class="btn sm" disabled title="Publish unlocks only when the gate passes">Publish 🔒</button></td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--mono)"><b>0.3.0</b> <span class="b act">SERVED</span></td><td>24</td><td style="color:var(--ember);font-family:var(--mono)">0</td>
+            <td><span class="b fail">✕ FAILED</span></td><td style="color:var(--ink3)">unmeasured</td>
+            <td><button class="btn sm sec" onclick="toast('Re-running 31-case suite against 0.3.0…',true)">Re-run gate</button></td>
+          </tr>
+          <tr>
+            <td style="font-family:var(--mono)"><b>0.1.0</b></td><td>24</td><td>26</td>
+            <td><span class="b pass">✓ PASSED</span></td><td><b style="color:var(--jade);font-family:var(--mono)">+0.308</b> <span class="note">26/26 vs 18/26 blind</span></td>
+            <td><button class="btn sm ghost" onclick="toast('Version diff: artifact-level added / changed / retired between any two versions')">Diff vs 0.3.0</button></td>
+          </tr>
+        </table>
+        <div class="callout red" style="margin-top:14px">✕ <b>The publish button is not there for an ungated pack.</b> A version that fails its eval gate cannot ship — structurally, not by policy. The lift receipt is the version's headline, and the count of SME-authored held-out cases sits beside it (currently 0 — the honesty metric again).</div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="kicker">Consume <span class="line"></span></div>
+          <div class="note" style="margin-bottom:8px">MCP endpoint</div>
+          <div class="diff" style="margin:0 0 11px"><span class="ctx">tools: context/get · pack/list · pack/query</span><span class="add">mcp://ontowiz.zs.internal/commercial_analytics</span></div>
+          <div class="note" style="margin-bottom:8px">Function slices <span style="color:var(--ink3)">· token footprint per slice</span></div>
+          <div style="font-size:12.5px;line-height:2"><span class="tag">brand_diagnosis · ~3.1k tok</span><br><span class="tag">access_triage · ~2.4k tok</span><br><span class="tag">forecast_review · ~1.8k tok</span></div>
+          <button class="btn sm sec" style="margin-top:12px" onclick="toast('Try-it console: runs context/get live against the served pack')">▶ Try it</button>
+        </div>
+        <div class="card" style="margin-top:16px">
+          <div class="kicker">Overlays <span class="line"></span></div>
+          <div class="note">No client overlays yet. An overlay extends / overrides / suppresses base artifacts and is diffed in the Mapping Workbench (Base ↔ overlay).</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  </main>
+</div>
+
+<!-- ============ DRAWER ============ -->
+<div id="drawer">
+  <div class="dh">
+    <b>DELTA-147</b><span class="b prop">PROPOSED</span><span class="tag l3">L3 · Rules</span>
+    <span class="chip"><span class="av rm">RM</span>R. Mehta</span>
+    <button class="x" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="db">
+    <h3 class="mini">Proposed change — human-readable diff (raw YAML behind a tab)</h3>
+    <div class="diff">
+      <span class="ctx">rule R-090 · safety-signal triage</span>
+      <span class="del">− priority: 90   (below supply check at 95)</span>
+      <span class="add">+ priority: 85   (safety triage now precedes supply &amp; competitive)</span>
+      <span class="add">+ anti_pattern: “unless inquiry volume tracks a media event — check share of voice first”</span>
+    </div>
+    <h3 class="mini">Context — the artifact this changes</h3>
+    <div class="card" style="background:#0b171c">
+      <b>R-090</b> · Volume drop + clinical inquiry spike → safety signal, not competitive
+      <div style="margin-top:6px"><span class="b act">ACTIVE</span> <span class="tag l3">safety</span><span class="tag">triage</span> · shipped 0.1.0 → 0.3.0 · <a style="color:var(--cyan);cursor:pointer" onclick="closeDrawer();go('ontology')">open in Ontology →</a></div>
+    </div>
+    <div class="callout">⚠ <b>Potential conflict:</b> R-095 (supply check, priority 95) shares the <span class="tag">triage</span> tag — approving reorders the triage cascade for 4 gold accounts. Review both.</div>
+    <h3 class="mini">Evidence</h3>
+    <div class="quote">“Safety always outranks a competitive read. I've seen teams burn three weeks on a share story while a signal sat in the inquiry queue.” — R. Mehta, session 12 · step 6</div>
+    <div style="display:flex;gap:11px;align-items:center;margin-top:11px">
+      <button class="btn sm sec" onclick="toast('Dry-run: safety triage now fires first on 6/22 gold accounts (was 4/22) — no eval regressions')">▶ Dry-run on gold set</button>
+      <span class="note">linked evals: COMP-SAF-02, COMP-SAF-09</span>
+    </div>
+  </div>
+  <div class="df">
+    <button class="btn" onclick="approve()">✓ Approve</button>
+    <button class="btn sec" onclick="toast('Structured editor opens — curator amendment tracked as dual attribution on the SME proposal')">✎ Edit &amp; resubmit</button>
+    <button class="btn ghost" onclick="toast('Escalates to domain owner')">Escalate</button>
+    <button class="btn danger" onclick="toast('Reject requires a reason — it becomes feedback to the SME and a training signal for mining')">✕ Reject</button>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+const sections=['home','intake','forge','queue','ontology','packs','capture','studio'];
+
+/* ---------- nav ---------- */
+function go(s){
+  sections.forEach(id=>{const el=document.getElementById('s-'+id);if(el)el.hidden=(id!==s);});
+  document.querySelectorAll('#nav a[data-s]').forEach(a=>a.classList.toggle('on',a.dataset.s===s));
+  document.querySelectorAll('#spine .node').forEach(a=>a.classList.toggle('on',a.dataset.s===s));
+  document.getElementById('main').scrollTop=0; closeDrawer();
+}
+document.querySelectorAll('#nav a[data-s]').forEach(a=>a.onclick=()=>go(a.dataset.s));
+document.querySelectorAll('#spine .node').forEach(a=>a.onclick=()=>go(a.dataset.s));
+
+/* ---------- role ---------- */
+function setRole(r){
+  document.getElementById('roleC').classList.toggle('on',r==='curator');
+  document.getElementById('roleS').classList.toggle('on',r==='sme');
+  document.getElementById('roleLbl').textContent=r==='curator'?'Curator':'SME';
+  const cur=r==='curator';
+  ['intake','queue','packs'].forEach(s=>{document.querySelector('#nav a[data-s='+s+']').style.display=cur?'flex':'none';});
+  toast(cur?'Curator view — full governance and intake surface':'SME view — Forge, Capture, Overview and read-only Ontology');
+  go(cur?'home':'forge');
+}
+
+/* ---------- tabs / workspace ---------- */
+function wsTab(t){
+  const g=document.getElementById('wsTabs');
+  g.querySelectorAll('button[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  g.parentElement.querySelectorAll('[data-p]').forEach(p=>p.hidden=(p.dataset.p!==t));
+}
+function scopeNode(el,name){
+  el.closest('.tree').querySelectorAll('.lay').forEach(l=>l.classList.remove('on'));
+  el.classList.add('on');
+  const bar=document.getElementById('scopeBar');
+  if(bar) bar.innerHTML='Scope: <b>Commercial › '+name+'</b> — local objects + <span class="tag">↓ inherited</span> from Commercial.';
+  wsTab('layers');
+  toast('Scoped to <b>'+name+'</b> — layer browser, graph, mappings and coverage narrow to this node.',false,4200);
+}
+
+/* ---------- coverage board ---------- */
+const domains=[
+  ['▾ Commercial Analytics',[95,90,100,85,70]],
+  ['&nbsp;&nbsp;↳ Field Force',[40,30,20,25,10]],
+  ['&nbsp;&nbsp;↳ Payer / Access',[55,45,30,20,25]],
+  ['&nbsp;&nbsp;↳ Patient Services',[25,15,10,10,5]],
+  ['Market Access',[60,10,0,10,5]],
+  ['Oncology (TA)',[70,30,0,20,10]],
+  ['Clinical Development',[25,5,0,0,0]],
+  ['Regulatory',[25,5,0,0,0]],
+  ['Pharmacovigilance',[20,5,0,0,0]],
+];
+(function renderCov(){
+  const mk=v=>v.map(x=>`<td><span class="bar"><i style="width:${x}%"></i></span></td>`).join('');
+  document.getElementById('covBody').innerHTML=domains.map(([n,v],i)=>{
+    const sub=n.includes('↳');
+    return `<tr class="row" style="${sub?'opacity:.75':''}" onclick="go('ontology')"><td style="${sub?'font-size:12.5px;color:var(--ink2)':''}">${n}${i===0?' <span class="tag">Σ roll-up</span>':''}${(!sub&&i>3)?' <span class="tag">seed</span>':''}</td>${mk(v)}<td style="color:var(--ink3);font:11px var(--mono)">→</td></tr>`;
+  }).join('');
+})();
+
+/* ---------- drawer ---------- */
+function openDrawer(){document.getElementById('drawer').classList.add('open')}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open')}
+function approve(){
+  closeDrawer();
+  toast('<b>DELTA-147 approved</b> by Priya K. — recorded to the persistent audit trail',false,2600);
+  setTimeout(()=>toast('Recompiling <b>commercial_analytics 0.4.0-rc</b>…',true,2600),1400);
+  setTimeout(()=>toast('Running <b>31 eval cases</b> against 0.4.0-rc…',true,2800),3400);
+  setTimeout(()=>toast('✓ <b>Gate PASSED</b> — 31/31 · lift measurement queued · new version in Packs',false,5000),5800);
+}
+
+/* ---------- toasts ---------- */
+function toast(msg,spin=false,ms=3400){
+  const t=document.createElement('div');t.className='toast';
+  t.innerHTML=(spin?'<span class="spin"></span>':'')+msg;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(()=>t.remove(),ms);
+  return t;
+}
+
+/* ================= FORGE SHIFT ================= */
+const shiftTotal=5; const done=new Set();
+function markDone(id){
+  if(done.has(id))return; done.add(id);
+  const card=document.getElementById('st-'+id); if(card)card.classList.add('done');
+  const pct=Math.round(done.size/shiftTotal*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=done.size+' / '+shiftTotal+' forged';
+  if(done.size===shiftTotal){
+    setTimeout(()=>{document.getElementById('shiftComplete').hidden=false;
+      document.getElementById('shiftComplete').scrollIntoView({behavior:'smooth',block:'center'});
+      toast('🜂 <b>Shift complete</b> — 3 artifacts forged, 2 held-out evals authored',false,4600);},500);
+  }
+}
+function resetShift(){done.clear();document.getElementById('progFill').style.width='0';
+  document.getElementById('progTxt').textContent='0 / 5 forged';
+  ['assay','duel','cal','hunt','temper'].forEach(id=>document.getElementById('st-'+id).classList.remove('done'));
+  document.getElementById('shiftComplete').hidden=true;
+  document.getElementById('calResult').hidden=true;document.getElementById('huntResult').hidden=true;
+  document.querySelectorAll('#s-forge .pick').forEach(p=>p.classList.remove('sel'));
+  document.querySelectorAll('#huntTrace .tstep').forEach(s=>s.classList.remove('bad','good'));
+  document.getElementById('dependsBox').hidden=true;
+  toast('Demo reset — fresh shift');
+}
+
+/* Station 1 — Assay */
+function assay(btn,v){
+  if(v==='agree'){toast('✓ Endorsement recorded — 1 of 3 needed to ratify R-110. Rating credit follows correctness, not speed.',false,4200);markDone('assay');}
+}
+function assayDepends(mode){
+  document.getElementById('dependsBox').hidden=false;
+  document.getElementById('dependsInput').focus();
+}
+function assayConfirm(){
+  const v=document.getElementById('dependsInput').value||'not during copay-card expiry season';
+  toast('🤖 Structuring an anti-pattern on R-110 (“'+v.slice(0,46)+'…”) + eval COMP-ACC-15…',true,2600);
+  setTimeout(()=>toast('✓ <b>DELTA-149 proposed</b> — attributed to you · provenance: Forge assay → Curation Queue',false,4600),2700);
+  markDone('assay');
+}
+
+/* Station 2 — Duel */
+function duelPick(el){
+  el.closest('.three').querySelectorAll('.pick').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+  const stake=document.getElementById('duelStake').textContent;
+  toast('Recorded at '+stake+' confidence — your pick + boundary condition feed the priority cascade. Dissent is preserved, never averaged.',false,4400);
+  markDone('duel');
+}
+
+/* Station 3 — Calibrate */
+let calChoice=null;
+function calPick(el,kind){
+  document.getElementById('calPicks').querySelectorAll('.pick').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel'); calChoice=kind;
+}
+function calReveal(){
+  if(!calChoice){toast('Pick an outcome first, then lock your confidence.');return;}
+  const stake=document.getElementById('calStake').textContent;
+  const box=document.getElementById('calResult'); box.hidden=false;
+  if(calChoice==='good'){
+    box.innerHTML='<div class="callout jade" style="margin-top:12px">✓ <b>You agreed with the corpus</b> — R-112 raises patient abandonment for 2 cycles. Your wager at '+stake+' is now <b>held-out eval COMP-ACC-15</b>, authored by you. Calibration credit applied.</div>';
+  }else{
+    box.innerHTML='<div class="callout red" style="margin-top:12px">✕ <b>You diverged from the corpus</b> — the pack raises abandonment, not share loss. Your reasoning is captured as a challenge on R-112: if you\'re right, it becomes a correction; if not, a training signal. Either way it is a held-out eval.</div>';
+  }
+  toast('◎ Wager locked at '+stake+' — a held-out eval case is the honesty metric the dashboard tracks',false,4200);
+  markDone('cal');
+}
+
+/* Station 4 — Hunt */
+function huntPick(el,correct){
+  if(correct){
+    document.querySelectorAll('#huntTrace .tstep').forEach(s=>s.classList.remove('bad'));
+    el.classList.add('bad');
+    const box=document.getElementById('huntResult'); box.hidden=false;
+    box.innerHTML='<div class="callout jade" style="margin-top:10px">⌖ <b>Caught it.</b> Step 03 ranks competitive response above safety-signal triage — a priority inversion. Claude drafts <b>correction DELTA-149</b> plus a regression eval so this can never re-fire silently. <b>+40 rating.</b></div>';
+    toast('⌖ <b>Flaw caught</b> — correction delta + regression eval drafted, attributed to you',false,4400);
+    markDone('hunt');
+  }else{
+    el.classList.add('good');setTimeout(()=>el.classList.remove('good'),700);
+    toast('Not the flaw — that step is sound. Look at where two rules compete on priority.');
+  }
+}
+
+/* Station 5 — Temper */
+function temper(btn){
+  toast('🜂 Consolidating 3 boundary conditions into a single governed ExceptionRule set on R-110…',true,2600);
+  setTimeout(()=>toast('✓ <b>Tempered</b> — R-110 now carries one clean, ordered ExceptionRule set. Craft credit to you; each contributor keeps attribution.',false,4600),2700);
+  markDone('temper');
+}
+
+/* ================= STUDIO ================= */
+const studioSteps=[
+  {turns:['sm-t2'],canvas:['n-acc','e-acc','e-acc-l','n-aband','r-acc'],stage:['sg-l1','sg-l2','sg-l3','sg-l4']},
+  {turns:['sm-t3','sm-t4'],canvas:['b-anti','n-eval'],stage:['sg-anti','sg-eval']},
+  {turns:['sm-t5'],canvas:[],stage:[]}
+];
+let studioPtr=0;
+function studioReveal(step){
+  step.turns.forEach(id=>{const e=document.getElementById(id);if(e)e.hidden=false;});
+  step.canvas.forEach(id=>{const e=document.getElementById(id);if(e)e.classList.add('on');});
+  step.stage.forEach(id=>{const e=document.getElementById(id);if(e)e.classList.add('on');});
+  const h=document.getElementById('studioHint');if(h)h.style.display='none';
+  const sc=document.getElementById('chatScroll');if(sc)sc.scrollTop=sc.scrollHeight;
+  updateCommitCount();
+}
+function studioStep(){
+  if(studioPtr>=studioSteps.length)return;
+  studioReveal(studioSteps[studioPtr]); studioPtr++;
+  if(studioPtr>=studioSteps.length)document.getElementById('btnCommit').disabled=false;
+}
+function studioPlay(){
+  if(studioPtr>=studioSteps.length)return;
+  studioStep();
+  if(studioPtr<studioSteps.length)setTimeout(studioPlay,1500);
+}
+function updateCommitCount(){
+  const n=document.querySelectorAll('#stageTray .strow.on').length;
+  const c=document.getElementById('stageCount');if(c)c.textContent=n;
+  const b=document.getElementById('btnCommit');if(b)b.textContent='Commit '+n+' proposal'+(n===1?'':'s')+' to Curation Queue';
+}
+function discardStage(el){el.closest('.strow').classList.remove('on');updateCommitCount();}
+function commitStudio(){
+  const n=document.querySelectorAll('#stageTray .strow.on').length;
+  if(!n){toast('Nothing staged yet — press ▶ Play to elicit proposals first');return;}
+  toast('Committing '+n+' proposals — attributed to you, provenance: Studio conversation…',true,2600);
+  setTimeout(()=>toast('✓ <b>'+n+' PROPOSED deltas</b> created → Curation Queue · conversation stored as a managed source',false,4600),2700);
+  const b=document.getElementById('btnCommit');b.disabled=true;b.textContent='Committed to queue ✓';
+}
+function studioResetC(){
+  studioPtr=0;
+  ['sm-t2','sm-t3','sm-t4','sm-t5'].forEach(id=>{const e=document.getElementById(id);if(e)e.hidden=true;});
+  document.querySelectorAll('#studioCanvas .prop').forEach(e=>e.classList.remove('on'));
+  document.querySelectorAll('#stageTray .strow').forEach(e=>e.classList.remove('on'));
+  const h=document.getElementById('studioHint');if(h)h.style.display='block';
+  const b=document.getElementById('btnCommit');b.disabled=true;
+  updateCommitCount();
+}
+
+/* ================= INTAKE ================= */
+const sheetTitles={
+  transcript:'Extraction sheet — Field Force QBR · 11 candidates across 5 layers · 2 flagged low-confidence',
+  deck:'Extraction sheet — Q2 Brand Review · 7 candidates across 3 layers · 1 flagged low-confidence',
+  sop:'Extraction sheet — Access Triage SOP v3 · 5 candidates across 2 layers'
+};
+function intakeShow(src,row){
+  document.querySelectorAll('#srcList .srcrow').forEach(r=>r.classList.remove('on'));
+  if(row)row.classList.add('on');
+  document.querySelectorAll('.sheet[data-sheet]').forEach(s=>s.hidden=(s.dataset.sheet!==src));
+  document.getElementById('sheetTitle').innerHTML=sheetTitles[src]+' <span class="line"></span>';
+}
+function intakeAdd(){
+  const t=toast('Uploading & parsing <b>Payer Strategy Offsite.vtt</b>…',true,2600);
+  setTimeout(()=>toast('🤖 Extracting candidates by layer — reading 38 min of transcript…',true,2800),2600);
+  setTimeout(()=>{
+    toast('✓ <b>9 candidates</b> extracted — L1·3 · L2·1 · L3·3 · L5·2 · all provenance-stamped',false,4600);
+    const list=document.getElementById('srcList');
+    const row=document.createElement('div');
+    row.className='srcrow';
+    row.innerHTML='<div class="ico">🎙</div><div><div class="nm">Payer Strategy Offsite.vtt</div><div class="mt">transcript · 38 min · just now</div></div><div><span class="chip"><span class="av">PK</span>Priya K.</span></div><div class="yield"><span class="yb">L1·3</span><span class="yb">L2·1</span><span class="yb">L3·3</span><span class="yb">L5·2</span></div><div style="font-family:var(--mono);font-size:12px;color:var(--ink2)">0 / 9</div><div style="color:var(--ink3)">→</div>';
+    row.onclick=()=>toast('Prototype: the transcript sheet shows the full layer-classified extraction');
+    list.insertBefore(row,list.firstChild);
+  },5400);
+}
+function triage(btn,verdict){
+  const card=btn.closest('.cand');
+  card.style.opacity=.4;card.querySelectorAll('button').forEach(b=>b.disabled=true);
+  const msg={promoted:'✓ Promoted to PROPOSED — attributed to you, provenance stamped → Curation Queue',
+             fixed:'✎ Structured editor would open — your fix recorded as an amendment',
+             rejected:'✕ Rejected — reason captured as a mining training signal'}[verdict];
+  toast(msg);
+}
+function sendToForge(btn){
+  const card=btn.closest('.cand');
+  card.style.opacity=.55;card.querySelectorAll('button').forEach(b=>b.disabled=true);
+  toast('⚒ <b>Queued into the Forge</b> as an Assay task — SMEs will ratify or adjudicate before it can ship',false,4200);
+}
+</script>
+</body>
+</html>

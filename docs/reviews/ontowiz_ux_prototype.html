@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onto_Wiz — Domain Knowledge Factory (UX Prototype)</title>
+<style>
+  :root{
+    --bg:#0f172a; --panel:#1e293b; --panel2:#243449; --line:#334155; --line2:#42526b;
+    --ink:#e2e8f0; --ink2:#94a3b8; --ink3:#64748b;
+    --accent:#f97316; --accent-soft:rgba(249,115,22,.14);
+    --good:#34d399; --warn:#fbbf24; --bad:#f87171; --info:#60a5fa;
+    --seq:#38bdf8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:14px/1.5 "Segoe UI",system-ui,sans-serif;height:100vh;display:flex;overflow:hidden}
+  /* ---------- sidebar ---------- */
+  #side{width:228px;min-width:228px;background:#0b1222;border-right:1px solid var(--line);display:flex;flex-direction:column;padding:14px 10px}
+  .logo{font-weight:700;font-size:15px;padding:6px 10px 2px;letter-spacing:.2px}
+  .logo span{color:var(--accent)}
+  .sub{font-size:11px;color:var(--ink3);padding:0 10px 14px}
+  .nav{display:flex;flex-direction:column;gap:2px}
+  .nav a{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;color:var(--ink2);cursor:pointer;text-decoration:none;font-size:13.5px}
+  .nav a:hover{background:var(--panel)}
+  .nav a.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+  .nav a.dis{opacity:.38;cursor:not-allowed}
+  .nav .ic{width:17px;text-align:center}
+  .pill{margin-left:auto;background:var(--accent);color:#0b1222;font-size:10.5px;font-weight:700;border-radius:9px;padding:0 6px}
+  .roleBox{margin-top:auto;border-top:1px solid var(--line);padding-top:12px}
+  .roleBox label{font-size:11px;color:var(--ink3);display:block;padding:0 10px 6px}
+  .seg{display:flex;background:var(--panel);border-radius:8px;padding:3px;margin:0 6px}
+  .seg button{flex:1;border:0;background:transparent;color:var(--ink2);padding:5px 0;border-radius:6px;cursor:pointer;font-size:12px}
+  .seg button.on{background:var(--panel2);color:var(--ink);font-weight:600}
+  .me{display:flex;gap:8px;align-items:center;padding:12px 10px 2px;font-size:12px;color:var(--ink2)}
+  .av{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#0b1222;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center}
+  /* ---------- main ---------- */
+  #main{flex:1;overflow-y:auto;padding:22px 26px 60px}
+  h1{font-size:19px;margin-bottom:2px}
+  .crumb{font-size:12px;color:var(--ink3);margin-bottom:18px}
+  .grid{display:grid;gap:14px}
+  .tiles{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .tile .k{font-size:11.5px;color:var(--ink2);margin-bottom:6px}
+  .tile .v{font-size:24px;font-weight:700}
+  .tile .d{font-size:11.5px;color:var(--ink3);margin-top:4px}
+  .sec{margin-top:22px}
+  .sec h2{font-size:13px;color:var(--ink2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;color:var(--ink3);font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding:6px 10px;border-bottom:1px solid var(--line)}
+  td{padding:8px 10px;border-bottom:1px solid #26334a;vertical-align:middle}
+  tr.row:hover{background:var(--panel2);cursor:pointer}
+  .bar{height:6px;border-radius:3px;background:#1a2942;position:relative;width:64px;display:inline-block;vertical-align:middle}
+  .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--seq)}
+  .mini{display:flex;gap:6px;align-items:center}
+  .mini .lbl{font-size:10px;color:var(--ink3);width:14px}
+  /* badges & chips */
+  .b{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;border-radius:6px;padding:2px 7px;letter-spacing:.3px}
+  .b.draft{background:#3341551f;color:var(--ink3);border:1px solid var(--line)}
+  .b.prop{background:rgba(96,165,250,.12);color:var(--info);border:1px solid rgba(96,165,250,.3)}
+  .b.appr{background:rgba(45,212,191,.1);color:#2dd4bf;border:1px solid rgba(45,212,191,.3)}
+  .b.act{background:rgba(52,211,153,.1);color:var(--good);border:1px solid rgba(52,211,153,.3)}
+  .b.dep{background:#33415522;color:var(--ink3);border:1px solid var(--line);text-decoration:line-through}
+  .b.gate-pass{background:rgba(52,211,153,.12);color:var(--good);border:1px solid rgba(52,211,153,.35)}
+  .b.gate-fail{background:rgba(248,113,113,.12);color:var(--bad);border:1px solid rgba(248,113,113,.35)}
+  .b.gate-warn{background:rgba(251,191,36,.1);color:var(--warn);border:1px solid rgba(251,191,36,.3)}
+  .chip{display:inline-flex;align-items:center;gap:5px;background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:1px 9px 1px 3px;font-size:11px;color:var(--ink2)}
+  .chip .av{width:16px;height:16px;font-size:8.5px}
+  .chip.src{padding:1px 9px;border-radius:6px}
+  .chip.unval{border-color:rgba(251,191,36,.4);color:var(--warn)}
+  .tag{display:inline-block;background:#16233b;border:1px solid var(--line);color:var(--ink2);border-radius:5px;font-size:10.5px;padding:1px 6px;margin-right:4px}
+  .btn{background:var(--accent);border:0;color:#0b1222;font-weight:700;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px}
+  .btn.sec2{background:var(--panel2);color:var(--ink);border:1px solid var(--line2)}
+  .btn.ghost{background:transparent;color:var(--ink2);border:1px solid var(--line)}
+  .btn.danger{background:transparent;color:var(--bad);border:1px solid rgba(248,113,113,.4)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn.sm{padding:5px 10px;font-size:12px}
+  /* feed */
+  .feed li{list-style:none;padding:8px 4px;border-bottom:1px solid #26334a;font-size:13px;display:flex;gap:9px;align-items:flex-start}
+  .feed .dot{margin-top:6px;width:7px;height:7px;border-radius:50%;flex:none}
+  .two{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  /* drawer */
+  #drawer{position:fixed;top:0;right:-620px;width:600px;height:100vh;background:#141f33;border-left:1px solid var(--line2);box-shadow:-18px 0 40px rgba(0,0,0,.45);transition:right .25s ease;z-index:50;display:flex;flex-direction:column}
+  #drawer.open{right:0}
+  #drawer .head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+  #drawer .body{flex:1;overflow-y:auto;padding:18px 20px}
+  #drawer .foot{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:10px}
+  .x{margin-left:auto;background:none;border:0;color:var(--ink3);font-size:18px;cursor:pointer}
+  .diff{background:#0d1626;border:1px solid var(--line);border-radius:8px;font-family:Consolas,monospace;font-size:12px;padding:10px 12px;margin:8px 0}
+  .diff .del{color:var(--bad);display:block}
+  .diff .add{color:var(--good);display:block}
+  .diff .ctx{color:var(--ink3);display:block}
+  .callout{border:1px solid rgba(251,191,36,.35);background:rgba(251,191,36,.06);border-radius:8px;padding:10px 12px;font-size:12.5px;margin:10px 0}
+  .callout.blue{border-color:rgba(96,165,250,.35);background:rgba(96,165,250,.06)}
+  .callout.red{border-color:rgba(248,113,113,.35);background:rgba(248,113,113,.06)}
+  .quote{background:#0d1626;border-left:3px solid var(--accent);padding:8px 12px;font-size:12.5px;color:var(--ink2);border-radius:0 6px 6px 0;margin:8px 0;font-style:italic}
+  h3.mini{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px}
+  /* tabs */
+  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:16px}
+  .tabs button{background:none;border:0;color:var(--ink2);padding:8px 14px;cursor:pointer;font-size:13px;border-bottom:2px solid transparent}
+  .tabs button.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+  /* toast */
+  #toasts{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:99;display:flex;flex-direction:column;gap:8px;align-items:center}
+  .toast{background:#1c2a44;border:1px solid var(--line2);border-radius:10px;padding:10px 18px;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.5);display:flex;gap:9px;align-items:center;animation:up .25s ease}
+  @keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+  .spin{width:13px;height:13px;border:2px solid var(--line2);border-top-color:var(--accent);border-radius:50%;animation:rot .8s linear infinite;flex:none}
+  @keyframes rot{to{transform:rotate(360deg)}}
+  /* capture */
+  .doors{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .door{border:1px solid var(--line);border-radius:12px;padding:18px;background:var(--panel);cursor:pointer;transition:border-color .15s}
+  .door:hover{border-color:var(--accent)}
+  .door .big{font-size:22px;margin-bottom:8px}
+  .door h3{font-size:14.5px;margin-bottom:6px}
+  .door p{font-size:12.5px;color:var(--ink2)}
+  .qform label{display:block;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;margin:14px 0 5px}
+  .qform input,.qform textarea,.qform select{width:100%;background:#0d1626;border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:9px 11px;font-size:13.5px;font-family:inherit}
+  .qform input:focus,.qform textarea:focus{outline:none;border-color:var(--accent)}
+  .cand{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--panel);margin-bottom:12px}
+  .cand .acts{display:flex;gap:8px;margin-top:12px}
+  /* workspace */
+  .ws{display:grid;grid-template-columns:210px 1fr;gap:16px}
+  .tree{font-size:13px}
+  .tree .dom{padding:6px 8px;border-radius:7px;color:var(--ink2);cursor:pointer}
+  .tree .dom.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+  .tree .layers{margin:8px 0 0 6px;border-left:1px solid var(--line);padding-left:10px}
+  .tree .lay{padding:4px 8px;border-radius:6px;cursor:pointer;color:var(--ink2);font-size:12.5px;display:flex;gap:6px}
+  .tree .lay.on{background:var(--panel2);color:var(--ink)}
+  .tree .lay .n{margin-left:auto;color:var(--ink3);font-size:11px}
+  /* mapping */
+  .mapwrap{display:grid;grid-template-columns:1fr 130px 1fr;gap:0;align-items:stretch}
+  .mapcol{background:#0d1626;border:1px solid var(--line);border-radius:10px;padding:10px}
+  .mapcol h4{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.4px;padding:4px 6px 8px}
+  .mapitem{padding:7px 9px;border-radius:7px;font-size:12.5px;border:1px solid transparent;margin-bottom:4px}
+  .mapitem.hl{border-color:var(--accent);background:var(--accent-soft)}
+  .maplink{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;font-size:10.5px;color:var(--ink3);text-align:center}
+  .maplink .rel{background:var(--panel2);border:1px solid var(--line2);border-radius:6px;padding:2px 8px;color:var(--ink2);font-size:10.5px}
+  svg text{font-family:inherit}
+  .legend{display:flex;gap:16px;font-size:11.5px;color:var(--ink2);margin-top:10px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .note{font-size:11.5px;color:var(--ink3);margin-top:8px}
+  .search{background:#0d1626;border:1px solid var(--line);border-radius:8px;color:var(--ink3);padding:7px 12px;font-size:12.5px;width:260px;margin-bottom:14px}
+  .flowline{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2);background:#0d1626;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin-top:10px}
+</style>
+</head>
+<body data-palette="#38bdf8">
+<!-- ============ SIDEBAR ============ -->
+<nav id="side">
+  <div class="logo">Onto<span>_Wiz</span></div>
+  <div class="sub">Domain Knowledge Factory</div>
+  <div class="nav" id="nav">
+    <a data-s="home" class="on"><span class="ic">◧</span>Domain Dashboard</a>
+    <a data-s="capture"><span class="ic">✎</span>Capture</a>
+    <a data-s="forge"><span class="ic">⚔</span>The Forge <span class="pill" style="background:var(--info)">5</span></a>
+    <a data-s="queue"><span class="ic">☰</span>Curation Queue <span class="pill">12</span></a>
+    <a data-s="workspace"><span class="ic">⬡</span>Ontology Workspace</a>
+    <a data-s="packs"><span class="ic">▣</span>Packs &amp; Releases</a>
+    <a class="dis"><span class="ic">⚙</span>Admin <span style="margin-left:auto;font-size:10px;color:var(--ink3)">Phase 4</span></a>
+  </div>
+  <div class="roleBox">
+    <label>Viewing as</label>
+    <div class="seg">
+      <button id="roleC" class="on" onclick="setRole('curator')">Curator</button>
+      <button id="roleS" onclick="setRole('sme')">SME</button>
+    </div>
+    <div class="me"><div class="av">PK</div><div>Priya K. · <span id="roleLbl">Curator</span><br><span style="color:var(--ink3);font-size:11px">Commercial Analytics</span></div></div>
+  </div>
+</nav>
+
+<!-- ============ MAIN ============ -->
+<main id="main">
+
+<!-- ============ HOME ============ -->
+<section id="s-home">
+  <h1>Domain Dashboard</h1>
+  <div class="crumb">The state of the corpus · pharma · 11 domains · updated 2 min ago</div>
+  <div class="grid tiles">
+    <div class="card tile"><div class="k">Active artifacts</div><div class="v">24</div><div class="d">across 3 domains with rules</div></div>
+    <div class="card tile"><div class="k">SME-validated</div><div class="v" style="color:var(--warn)">8%</div><div class="d">⚠ 22 of 24 artifacts are Claude-drafted, unvalidated</div></div>
+    <div class="card tile"><div class="k">Pending deltas</div><div class="v">12</div><div class="d">median age 3.2 days</div></div>
+    <div class="card tile"><div class="k">Shipping pack gate</div><div class="v"><span class="b gate-fail" style="font-size:13px;padding:4px 10px">✕ FAILED</span></div><div class="d">commercial_analytics 0.3.0 · lift unmeasured</div></div>
+  </div>
+
+  <div class="sec two">
+    <div class="card">
+      <h2 style="font-size:13px;color:var(--ink2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Domain coverage — depth per layer</h2>
+      <table>
+        <tr><th>Domain</th><th>Entities</th><th>Relations</th><th>Rules</th><th>Metrics</th><th>Evals</th><th></th></tr>
+        <tbody id="covBody"></tbody>
+      </table>
+      <div class="note">Bars: relative depth per layer (single-hue scale). Rules + evals are where value lives — 8 of 11 domains are taxonomy stubs.</div>
+    </div>
+    <div>
+      <div class="card">
+        <h2 style="font-size:13px;color:var(--ink2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Needs attention</h2>
+        <ul class="feed">
+          <li><span class="dot" style="background:var(--bad)"></span><div><b>Pack 0.3.0 fails its gate</b> — 0 eval cases attached. Re-run suite or roll back to 0.1.0. <a style="color:var(--accent);cursor:pointer" onclick="go('packs')">Open release gate →</a></div></li>
+          <li><span class="dot" style="background:var(--warn)"></span><div><b>7 rules have zero linked eval cases</b> — unfalsifiable judgment can’t ship.</div></li>
+          <li><span class="dot" style="background:var(--warn)"></span><div><b>Gold set: 4 German accounts carry US payer mechanics</b> (340B, copay accumulator) — fix before SME demo.</div></li>
+          <li><span class="dot" style="background:var(--info)"></span><div><b>3 deltas stuck in PROPOSED &gt; 7 days</b> — oldest from R. Mehta’s session.</div></li>
+        </ul>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h2 style="font-size:13px;color:var(--ink2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Recent activity</h2>
+        <ul class="feed">
+          <li><span class="dot" style="background:var(--good)"></span><div><span class="chip"><span class="av">PK</span>Priya K.</span> approved <b>DELTA-142</b> → recompile queued</div></li>
+          <li><span class="dot" style="background:var(--info)"></span><div><span class="chip"><span class="av" style="background:var(--info)">RM</span>R. Mehta</span> proposed 3 deltas via guided session</div></li>
+          <li><span class="dot" style="background:var(--info)"></span><div>Document intake proposed <b>5 candidates</b> from <i>Q2_Brand_Review.pptx</i></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CAPTURE ============ -->
+<section id="s-capture" hidden>
+  <h1>Capture</h1>
+  <div class="crumb">Codify your judgment — everything lands as a governed proposal, nothing publishes itself</div>
+  <div class="doors">
+    <div class="door" onclick="toast('Guided session would launch the 9-step Situation Room flow (existing, rewired)')">
+      <div class="big">🎯</div><h3>Guided session</h3>
+      <p>Work a realistic scenario end-to-end. ~15 min. Best for deep triage judgment — hypothesis ordering, disconfirming evidence, common mistakes.</p>
+    </div>
+    <div class="door" onclick="showTab('capTabs','intake')">
+      <div class="big">📄</div><h3>Document intake</h3>
+      <p>Drop decks, transcripts or SOPs. Claude proposes candidate rules + eval cases; you triage. The machine proposes — only you promote.</p>
+    </div>
+    <div class="door" onclick="showTab('capTabs','quick')">
+      <div class="big">⚡</div><h3>Quick capture</h3>
+      <p>One judgment in 60 seconds. A structured sentence — no forms about forms, never YAML.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="tabs" id="capTabs">
+      <button data-t="quick" class="on" onclick="showTab('capTabs','quick')">Quick capture</button>
+      <button data-t="intake" onclick="showTab('capTabs','intake')">Candidate tray <span class="pill" style="background:var(--info)">3</span></button>
+    </div>
+
+    <div data-p="quick" class="card" style="max-width:720px">
+      <div class="qform">
+        <label>Where does this judgment live? <span style="text-transform:none;color:var(--ink3)">(pre-filled from your profile — curators can re-scope in review)</span></label>
+        <select>
+          <optgroup label="Commercial"><option>Commercial › Payer / Access interface</option><option>Commercial › Field Force</option><option>Commercial › Marketing &amp; Omnichannel</option><option>Commercial › Patient Services</option><option>Commercial › Analytics &amp; Insights</option><option>Commercial (domain-wide)</option></optgroup>
+          <optgroup label="Other domains"><option>Market Access</option><option>Forecasting</option><option>Oncology (TA)</option></optgroup>
+        </select>
+        <label>When … <span style="text-transform:none;color:var(--ink3)">(the situation / signals)</span></label>
+        <input placeholder="e.g. NBRx falls while TRx holds and PA rejection rate rises in the same geography">
+        <label>Then … <span style="text-transform:none;color:var(--ink3)">(your judgment / what to conclude or do first)</span></label>
+        <input placeholder="e.g. investigate payer access before any competitive response — this pattern is access erosion, not share loss">
+        <label>Because … <span style="text-transform:none;color:var(--ink3)">(the rationale a colleague would need)</span></label>
+        <textarea rows="2" placeholder="e.g. new-to-brand scripts are the first casualty of a formulary change; TRx lags by 6–8 weeks"></textarea>
+        <label>Watch out for … <span style="text-transform:none;color:var(--ink3)">(anti-pattern — when this rule does NOT apply)</span></label>
+        <input placeholder="e.g. does not apply during co-pay card expiry season — check patient-services data first">
+        <div style="margin-top:18px;display:flex;gap:10px;align-items:center">
+          <button class="btn" onclick="submitQuick()">Propose judgment</button>
+          <span class="note">Creates a PROPOSED delta attributed to you → Curation Queue</span>
+        </div>
+      </div>
+    </div>
+
+    <div data-p="intake" hidden>
+      <div class="flowline">📄 <b>Q2_Brand_Review.pptx</b> · parsed 46 slides · Claude proposed 5 candidates (2 triaged, 3 remaining) <span style="margin-left:auto;color:var(--ink3)">provenance stamped on every candidate</span></div>
+      <div style="margin-top:14px">
+        <div class="cand">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><span class="b prop">CANDIDATE</span><span class="tag">access</span><span class="tag">payer</span><span class="chip src">📄 slide 23</span></div>
+          <b>Copay accumulator adoption precedes abandonment spike by ~2 cycles</b>
+          <div class="quote">“…plans adopting accumulator programmes showed abandonment +14pts within two refill cycles, before any TRx signal…” — slide 23</div>
+          <div style="font-size:12.5px;color:var(--ink2)">Proposed rule: when a covered plan adopts an accumulator, raise patient-abandonment hypothesis above share-loss for 2 cycles. <b>+ 1 paired eval case</b> auto-drafted.</div>
+          <div class="acts">
+            <button class="btn sm" onclick="triage(this,'endorsed')">✓ Looks right</button>
+            <button class="btn sm sec2" onclick="triage(this,'edited')">✎ Fix it</button>
+            <button class="btn sm danger" onclick="triage(this,'rejected')">✕ Wrong</button>
+          </div>
+        </div>
+        <div class="cand">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><span class="b prop">CANDIDATE</span><span class="tag">supply</span><span class="chip src">📄 slide 31</span></div>
+          <b>Specialty pharmacy stockouts masquerade as demand decline</b>
+          <div class="quote">“…3PL transition caused 11 days of intermittent stockouts; field reported it as softening demand…” — slide 31</div>
+          <div style="font-size:12.5px;color:var(--ink2)">Proposed rule: volume drop + normal leading indicators → check distribution before demand hypotheses. <b>+ 1 paired eval case</b>.</div>
+          <div class="acts">
+            <button class="btn sm" onclick="triage(this,'endorsed')">✓ Looks right</button>
+            <button class="btn sm sec2" onclick="triage(this,'edited')">✎ Fix it</button>
+            <button class="btn sm danger" onclick="triage(this,'rejected')">✕ Wrong</button>
+          </div>
+        </div>
+        <div class="cand">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><span class="b prop">CANDIDATE</span><span class="tag">competitive</span><span class="chip src">📄 slide 38 · low confidence</span></div>
+          <b>Rep-reported competitor sampling predicts NBRx erosion</b>
+          <div class="quote">“…anecdotal — three districts flagged heavy competitor sampling…” — slide 38</div>
+          <div style="font-size:12.5px;color:var(--ink2)">Proposed rule: weight rep-reported sampling as a leading NBRx signal. <i style="color:var(--warn)">Claude flags weak evidence in source.</i></div>
+          <div class="acts">
+            <button class="btn sm" onclick="triage(this,'endorsed')">✓ Looks right</button>
+            <button class="btn sm sec2" onclick="triage(this,'edited')">✎ Fix it</button>
+            <button class="btn sm danger" onclick="triage(this,'rejected')">✕ Wrong</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FORGE ============ -->
+<section id="s-forge" hidden>
+  <h1>The Forge</h1>
+  <div class="crumb">Daily queue · 5 questions · ~3 min · <b style="color:var(--accent)">Field Force week</b> — every answer ships a governed artifact + eval, or it doesn't count</div>
+  <div class="two">
+    <div>
+      <!-- RATIFY CARD -->
+      <div class="card" id="fCard1" style="border-color:var(--line2)">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+          <span class="b prop" style="background:var(--accent-soft);color:var(--accent);border-color:rgba(249,115,22,.35)">⚔ RATIFY · 1 of 5</span>
+          <span class="tag">Payer / Access</span><span class="chip unval">⚠ Claude-drafted — never SME-checked</span>
+        </div>
+        <div style="font-size:15px;font-weight:600;margin:6px 0 4px">“NBRx↓ while TRx holds + PA rejects↑ → treat as access erosion, not share loss.”</div>
+        <div class="quote" style="font-style:normal">Example it currently fires on: <b>Account #14 (Midwest IDN)</b> — NBRx −18%, TRx flat, PA rejections +11pts.</div>
+        <div style="display:flex;gap:10px;margin-top:14px">
+          <button class="btn sm" onclick="forgeAnswer(this,'agree')">✓ Agree</button>
+          <button class="btn sm sec2" onclick="forgeDepends(this)">〜 It depends…</button>
+          <button class="btn sm danger" onclick="forgeAnswer(this,'disagree')">✕ Disagree</button>
+        </div>
+        <div id="dependsBox" hidden style="margin-top:12px">
+          <input class="search" style="width:100%" placeholder="When does it NOT hold? One line — e.g. ‘not during copay-card expiry season’" id="dependsInput">
+          <div class="flowline" style="margin-top:8px">🤖 I’ll structure this into an <b>anti-pattern</b> on R-110 + a paired eval case — you confirm before it ships. <button class="btn sm" style="margin-left:auto" onclick="forgeConfirm()">Confirm &amp; ship to review</button></div>
+        </div>
+      </div>
+      <!-- DUEL CARD -->
+      <div class="card" style="margin-top:14px">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+          <span class="b prop">⚔ ADJUDICATE · 2 of 5</span><span class="tag">conflict · 2 SMEs split</span>
+        </div>
+        <div style="font-size:13px;color:var(--ink2);margin-bottom:10px">Scenario: hospital account, volume −22%, formulary unchanged, clinical inquiries +40%. <b>Which judgment wins?</b></div>
+        <div class="three" style="grid-template-columns:1fr 1fr">
+          <div class="card" style="background:#0d1626;cursor:pointer" onclick="toast('Recorded. Your pick + boundary condition feed the priority cascade — dissent is preserved, never averaged away')"><b>A · Safety first</b><div style="font-size:12px;color:var(--ink2);margin-top:4px">“Inquiry spike outranks everything — triage safety before any commercial read.” <span class="chip" style="margin-top:6px"><span class="av" style="background:var(--info)">RM</span>R. Mehta · conf 0.9</span></div></div>
+          <div class="card" style="background:#0d1626;cursor:pointer" onclick="toast('Recorded — you sided with the minority. If the room stays split, both positions become a governed ExceptionRule (“it depends” is knowledge)')"><b>B · Budget crisis</b><div style="font-size:12px;color:var(--ink2);margin-top:4px">“Hospital + across-the-board drop = budget freeze pattern; inquiries are noise.” <span class="chip" style="margin-top:6px"><span class="av" style="background:#a78bfa">AS</span>A. Shah · conf 0.7</span></div></div>
+        </div>
+        <div class="note" style="margin-top:10px">What would flip your answer? Your boundary condition is the real prize — it becomes the rule’s condition.</div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h2 style="font-size:13px;color:var(--ink2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Your impact</h2>
+        <div style="display:flex;gap:14px;margin-bottom:10px">
+          <div><div style="font-size:20px;font-weight:700">1,284</div><div class="note">ForgeRating · dissent-weighted, never volume</div></div>
+          <div><div style="font-size:20px;font-weight:700">9</div><div class="note">artifacts ratified by you</div></div>
+        </div>
+        <ul class="feed">
+          <li><span class="dot" style="background:var(--good)"></span><div style="font-size:12.5px">Your caveat on <b>R-090</b> shipped in <b>pack 0.4.0-rc</b> and now guards eval COMP-SAF-09 →</div></li>
+          <li><span class="dot" style="background:var(--good)"></span><div style="font-size:12.5px">Your duel answer settled the <b>supply-vs-demand</b> conflict (3/3 consensus)</div></li>
+        </ul>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h2 style="font-size:13px;color:var(--ink2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Ratification ladder — corpus</h2>
+        <div style="font-size:12.5px;line-height:2.1">
+          <span class="chip unval">⚠ unvalidated</span> 22 → <span class="b prop">endorsed</span> 7 → <span class="b act">✓ ratified</span> 2<br>
+          <span class="b gate-warn">⚔ contested</span> 3 → adjudication in play
+        </div>
+        <div class="note" style="margin-top:8px">Every ratification moves the dashboard’s “SME-validated %”. The game <i>is</i> the validation engine.</div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <div class="note">Curator view adds: conflict heatmap over the hierarchy, question console (set k, seed gold probes), escalation inbox for persistent splits — with dissent preserved verbatim.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUEUE ============ -->
+<section id="s-queue" hidden>
+  <h1>Curation Queue</h1>
+  <div class="crumb">12 pending · one pipe: every change from every surface passes through here</div>
+  <input class="search" placeholder="Filter: domain, layer, source, SME…">
+  <div class="card" style="padding:0">
+    <table>
+      <tr><th>Delta</th><th>Change</th><th>Layer</th><th>Source</th><th>Proposed by</th><th>Age</th><th>Status</th></tr>
+      <tr class="row" onclick="openDrawer()">
+        <td><b>DELTA-147</b></td>
+        <td>Raise priority: safety-signal triage above competitive</td>
+        <td><span class="tag">L3 · Rules</span></td>
+        <td><span class="chip src">🎯 session</span></td>
+        <td><span class="chip"><span class="av" style="background:var(--info)">RM</span>R. Mehta</span></td>
+        <td>2d</td><td><span class="b prop">PROPOSED</span></td>
+      </tr>
+      <tr class="row" onclick="toast('Prototype: DELTA-147 shows the full drawer')">
+        <td><b>DELTA-146</b></td>
+        <td>New rule: accumulator adoption → abandonment hypothesis</td>
+        <td><span class="tag">L3 · Rules</span></td>
+        <td><span class="chip src">📄 mined</span></td>
+        <td><span class="chip"><span class="av" style="background:var(--info)">RM</span>R. Mehta ✓</span></td>
+        <td>4h</td><td><span class="b prop">PROPOSED</span></td>
+      </tr>
+      <tr class="row" onclick="toast('Prototype: DELTA-147 shows the full drawer')">
+        <td><b>DELTA-145</b></td>
+        <td>Synonym bind: “PA rejects” → prior_auth_rejection_rate</td>
+        <td><span class="tag">L1 · Entities</span></td>
+        <td><span class="chip src">✎ manual</span></td>
+        <td><span class="chip"><span class="av">PK</span>Priya K.</span></td>
+        <td>1d</td><td><span class="b prop">PROPOSED</span></td>
+      </tr>
+      <tr class="row" onclick="toast('Prototype: DELTA-147 shows the full drawer')">
+        <td><b>DELTA-141</b></td>
+        <td>Map: commercial.payer ↔ market_access.payer_archetype</td>
+        <td><span class="tag">Mapping</span></td>
+        <td><span class="chip src">⬡ workbench</span></td>
+        <td><span class="chip"><span class="av">PK</span>Priya K.</span></td>
+        <td>8d ⚠</td><td><span class="b prop">PROPOSED</span></td>
+      </tr>
+      <tr class="row" style="opacity:.55" onclick="toast('Approved deltas stay browsable in the audit trail')">
+        <td><b>DELTA-142</b></td>
+        <td>Add anti-pattern to LOE-erosion forecast rule</td>
+        <td><span class="tag">L3 · Rules</span></td>
+        <td><span class="chip src">🎯 session</span></td>
+        <td><span class="chip"><span class="av" style="background:#a78bfa">AS</span>A. Shah</span></td>
+        <td>—</td><td><span class="b appr">APPROVED</span></td>
+      </tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ WORKSPACE ============ -->
+<section id="s-workspace" hidden>
+  <h1>Ontology Workspace</h1>
+  <div class="crumb">Browse, edit and map the layers · commercial analytics</div>
+  <div class="ws">
+    <div class="card" style="padding:12px 10px">
+      <div class="tree">
+        <div class="dom on">▾ Commercial <span style="float:right;color:var(--ink3);font-size:11px">Σ 20</span></div>
+        <div class="subs" style="margin:2px 0 4px 8px;border-left:1px solid var(--line);padding-left:8px">
+          <div class="lay on" onclick="toast('Scopes everything to the parent node — counts roll up from subdomains')">All commercial <span class="n">roll-up</span></div>
+          <div class="lay" onclick="scopeNode(this,'Field Force')">Field Force <span class="n">4</span></div>
+          <div class="lay" onclick="scopeNode(this,'Marketing & Omnichannel')">Marketing &amp; Omni. <span class="n">3</span></div>
+          <div class="lay" onclick="scopeNode(this,'Payer / Access interface')">Payer / Access <span class="n">6</span></div>
+          <div class="lay" onclick="scopeNode(this,'Patient Services')">Patient Services <span class="n">2</span></div>
+          <div class="lay" onclick="scopeNode(this,'Analytics & Insights')">Analytics &amp; Insights <span class="n">5</span></div>
+        </div>
+        <div class="layers">
+          <div class="lay" onclick="wsTab('layers')">L1 Entities <span class="n">15</span></div>
+          <div class="lay" onclick="wsTab('layers')">L2 Relations <span class="n">15</span></div>
+          <div class="lay on" onclick="wsTab('layers')">L3 Rules <span class="n">20</span></div>
+          <div class="lay" onclick="wsTab('layers')">L4 Metrics <span class="n">16</span></div>
+          <div class="lay" onclick="wsTab('layers')">L5 Scenarios <span class="n">22</span></div>
+        </div>
+        <div class="dom" style="margin-top:10px" onclick="toast('Domain switch — content-driven, no frontend release needed')">▸ Market Access</div>
+        <div class="dom" onclick="toast('Domain switch')">▸ Forecasting</div>
+        <div class="dom" onclick="toast('Domain switch')">▸ Oncology (TA)</div>
+        <div class="dom" style="color:var(--ink3)" onclick="toast('Seed-status domain: taxonomy stub, no rules yet — visible honesty')">+ 7 seed domains…</div>
+        <button class="btn sm ghost" style="width:100%;margin-top:12px" onclick="toast('✎ Manage hierarchy: add / rename / move / merge subdomains and reparent objects — every change is a governed delta, because moving a node changes what compiles into which pack','',5200)">✎ Manage hierarchy</button>
+      </div>
+    </div>
+    <div>
+      <div class="tabs" id="wsTabs">
+        <button data-t="layers" class="on" onclick="wsTab('layers')">Layer browser</button>
+        <button data-t="graph" onclick="wsTab('graph')">Graph</button>
+        <button data-t="map" onclick="wsTab('map')">Mapping Workbench</button>
+        <button data-t="lineage" onclick="wsTab('lineage')">Lineage</button>
+      </div>
+
+      <!-- layers -->
+      <div data-p="layers" class="card" style="padding:0">
+        <div id="scopeBar" style="padding:9px 14px;border-bottom:1px solid var(--line);font-size:12px;color:var(--ink2)">Scope: <b>Commercial</b> (roll-up of 5 subdomains) — select a subdomain in the tree to narrow</div>
+        <table>
+          <tr><th>P</th><th>Rule (L3 · priority-ordered)</th><th>Node</th><th>Tags</th><th>Anti-patterns</th><th>Evals</th><th>Validation</th><th>Lifecycle</th></tr>
+          <tr class="row" onclick="toast('Opens the structured rule editor — form fields mirroring the spec schema, never YAML-first')">
+            <td><b>90</b></td><td>Volume drop + clinical inquiry spike → safety signal, not competitive</td>
+            <td><span class="tag">Commercial</span><span class="tag" style="color:var(--ink3)">↓ inherited by 5</span></td>
+            <td><span class="tag">safety</span><span class="tag">triage</span></td><td>2</td>
+            <td><span class="b gate-pass">✓ 4</span></td>
+            <td><span class="chip unval">⚠ unvalidated</span></td>
+            <td><span class="b act">ACTIVE</span></td>
+          </tr>
+          <tr class="row" onclick="toast('Structured rule editor')">
+            <td><b>95</b></td><td>Volume drop + normal leading indicators → check supply/distribution first</td>
+            <td><span class="tag">Commercial</span></td>
+            <td><span class="tag">supply</span></td><td>1</td>
+            <td><span class="b gate-pass">✓ 3</span></td>
+            <td><span class="chip"><span class="av" style="background:var(--info)">RM</span>R. Mehta ✓</span></td>
+            <td><span class="b act">ACTIVE</span></td>
+          </tr>
+          <tr class="row" onclick="toast('Structured rule editor')">
+            <td><b>100</b></td><td>Hospital budget crisis pattern → engage account before rep push</td>
+            <td><span class="tag">Payer / Access</span></td>
+            <td><span class="tag">access</span><span class="tag">account</span></td><td>1</td>
+            <td><span class="b gate-warn">⚠ 0</span></td>
+            <td><span class="chip unval">⚠ unvalidated</span></td>
+            <td><span class="b act">ACTIVE</span></td>
+          </tr>
+          <tr class="row" onclick="toast('Structured rule editor')">
+            <td><b>110</b></td><td>NBRx↓ TRx→ + PA rejects↑ → access erosion, not share loss</td>
+            <td><span class="tag">Payer / Access</span></td>
+            <td><span class="tag">access</span><span class="tag">payer</span></td><td>1</td>
+            <td><span class="b gate-pass">✓ 2</span></td>
+            <td><span class="chip unval">⚠ unvalidated</span></td>
+            <td><span class="b act">ACTIVE</span></td>
+          </tr>
+          <tr class="row" onclick="toast('PROPOSED objects are browsable in place — governance ambient, not a separate module')">
+            <td><b>112</b></td><td>Accumulator adoption → abandonment hypothesis for 2 cycles</td>
+            <td><span class="tag">Patient Services</span></td>
+            <td><span class="tag">access</span><span class="tag">patient</span></td><td>0</td>
+            <td><span class="b gate-warn">⚠ 1 draft</span></td>
+            <td><span class="chip"><span class="av" style="background:var(--info)">RM</span>R. Mehta ✓</span></td>
+            <td><span class="b prop">PROPOSED</span></td>
+          </tr>
+        </table>
+        <div class="note" style="padding:10px 14px">Editing as a curator still creates a delta through the one pipe — no back doors, including hierarchy moves: reparenting a rule to a subdomain is a delta too. “⚠ unvalidated” = Claude-drafted, no SME signature yet: the dashboard’s 8% is this column.</div>
+      </div>
+
+      <!-- graph -->
+      <div data-p="graph" hidden class="card">
+        <svg viewBox="0 0 760 340" style="width:100%;max-width:860px">
+          <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6" fill="none" stroke="#64748b"/></marker></defs>
+          <line x1="150" y1="90" x2="330" y2="90" stroke="#64748b" stroke-width="1.5" marker-end="url(#ar)"/>
+          <line x1="150" y1="90" x2="330" y2="210" stroke="#64748b" stroke-width="1.5" marker-end="url(#ar)"/>
+          <line x1="390" y1="90" x2="560" y2="90" stroke="#64748b" stroke-width="1.5" marker-end="url(#ar)"/>
+          <line x1="390" y1="210" x2="560" y2="110" stroke="#64748b" stroke-width="1.5" marker-end="url(#ar)"/>
+          <line x1="390" y1="210" x2="560" y2="250" stroke="#f97316" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+          <text x="230" y="78" fill="#94a3b8" font-size="11">prescribed_by</text>
+          <text x="205" y="165" fill="#94a3b8" font-size="11">covered_by</text>
+          <text x="455" y="78" fill="#94a3b8" font-size="11">influences</text>
+          <text x="440" y="168" fill="#94a3b8" font-size="11">gates</text>
+          <text x="430" y="248" fill="#f97316" font-size="11">cross-domain ↗</text>
+          <g><rect x="70" y="68" width="80" height="44" rx="9" fill="#1e293b" stroke="#38bdf8"/><text x="110" y="88" fill="#e2e8f0" font-size="12" text-anchor="middle">Brand</text><text x="110" y="103" fill="#64748b" font-size="9.5" text-anchor="middle">L1 entity</text></g>
+          <g><rect x="330" y="68" width="80" height="44" rx="9" fill="#1e293b" stroke="#38bdf8"/><text x="370" y="88" fill="#e2e8f0" font-size="12" text-anchor="middle">HCP</text><text x="370" y="103" fill="#64748b" font-size="9.5" text-anchor="middle">L1 entity</text></g>
+          <g><rect x="560" y="68" width="90" height="44" rx="9" fill="#1e293b" stroke="#38bdf8"/><text x="605" y="88" fill="#e2e8f0" font-size="12" text-anchor="middle">NBRx</text><text x="605" y="103" fill="#64748b" font-size="9.5" text-anchor="middle">L4 metric</text></g>
+          <g><rect x="330" y="188" width="80" height="44" rx="9" fill="#1e293b" stroke="#38bdf8"/><text x="370" y="208" fill="#e2e8f0" font-size="12" text-anchor="middle">Payer</text><text x="370" y="223" fill="#64748b" font-size="9.5" text-anchor="middle">L1 entity</text></g>
+          <g><rect x="560" y="228" width="128" height="44" rx="9" fill="#1e293b" stroke="#f97316"/><text x="624" y="248" fill="#e2e8f0" font-size="11.5" text-anchor="middle">Payer archetype</text><text x="624" y="263" fill="#64748b" font-size="9.5" text-anchor="middle">market_access · L1</text></g>
+          <g><rect x="548" y="120" width="115" height="30" rx="15" fill="rgba(52,211,153,.12)" stroke="#34d399"/><text x="605" y="139" fill="#34d399" font-size="10.5" text-anchor="middle">⚖ R-110 access rule</text></g>
+        </svg>
+        <div class="legend"><span><i style="background:#38bdf8"></i>Entity / metric (this domain)</span><span><i style="background:#f97316"></i>Cross-domain mapping</span><span><i style="background:#34d399"></i>Rule attached to edge</span></div>
+        <div class="note">Read-first comprehension surface (reactflow). Phase 3: drawing an edge creates a PROPOSED relationship delta. Tables remain the fast editor.</div>
+      </div>
+
+      <!-- mapping -->
+      <div data-p="map" hidden>
+        <div class="tabs" style="margin-top:-6px">
+          <button class="on" onclick="toast('Prototype shows cross-domain mapping')">Cross-domain</button>
+          <button onclick="toast('Synonym & merge — dedupe entities, bind synonyms')">Synonyms &amp; merge</button>
+          <button onclick="toast('Standards — bind to SNOMED / MedDRA / ATC / CDISC glossary already in ARCHITECTURE.yaml')">Standards</button>
+          <button onclick="toast('Base ↔ overlay — three-column diff of client overrides')">Base ↔ overlay</button>
+        </div>
+        <div class="mapwrap">
+          <div class="mapcol">
+            <h4>Commercial Analytics</h4>
+            <div class="mapitem hl">Payer <span class="tag" style="margin-left:6px">L1</span></div>
+            <div class="mapitem">Prior-auth rejection rate <span class="tag" style="margin-left:6px">L4</span></div>
+            <div class="mapitem">Formulary position <span class="tag" style="margin-left:6px">L1</span></div>
+            <div class="mapitem">Copay programme <span class="tag" style="margin-left:6px">L1</span></div>
+          </div>
+          <div class="maplink">
+            <div class="rel">same_as · 0.95</div>
+            <svg width="110" height="14"><line x1="0" y1="7" x2="110" y2="7" stroke="#f97316" stroke-width="1.5"/><circle cx="55" cy="7" r="3" fill="#f97316"/></svg>
+            <div>governed as<br>DELTA-141 <span class="b prop" style="font-size:9px">PROPOSED</span></div>
+          </div>
+          <div class="mapcol">
+            <h4>Market Access</h4>
+            <div class="mapitem hl">Payer archetype <span class="tag" style="margin-left:6px">L1</span></div>
+            <div class="mapitem">Utilisation management <span class="tag" style="margin-left:6px">L1</span></div>
+            <div class="mapitem">Benefit design <span class="tag" style="margin-left:6px">L1</span></div>
+            <div class="mapitem">Gross-to-net driver <span class="tag" style="margin-left:6px">L4</span></div>
+          </div>
+        </div>
+        <div class="note" style="margin-top:12px">Every mapping is a governed artifact: typed link + confidence + rationale, approved through the queue like everything else. Cross-domain maps are what turn 11 silos into an <i>organisation</i> ontology — and what agent traversal follows at runtime.</div>
+      </div>
+
+      <!-- lineage -->
+      <div data-p="lineage" hidden class="card">
+        <h3 style="font-size:14px;margin-bottom:4px">R-110 · “NBRx↓ TRx→ + PA rejects↑ → access erosion, not share loss”</h3>
+        <div style="margin:6px 0 14px"><span class="b act">ACTIVE</span> <span class="tag">access</span><span class="tag">payer</span> <span class="chip unval">⚠ unvalidated — Claude-drafted</span></div>
+        <ul class="feed">
+          <li><span class="dot" style="background:var(--ink3)"></span><div><b>Origin</b> — seeded from <i>commercial.yaml</i> (Claude-drafted, ATLAS run, 10 Jun) · no SME signature</div></li>
+          <li><span class="dot" style="background:var(--info)"></span><div><b>DELTA-089</b> — anti-pattern added (“except during copay-card expiry season”) · proposed by R. Mehta (session) · approved by Priya K.</div></li>
+          <li><span class="dot" style="background:var(--good)"></span><div><b>Shipped in</b> commercial_analytics 0.1.0 → 0.3.0 · exercised by <b>2 eval cases</b> (COMP-ACC-07, COMP-ACC-14) · fires on 4/22 gold accounts</div></li>
+          <li><span class="dot" style="background:var(--warn)"></span><div><b>Open</b> — needs SME validation + 1 held-out eval authored by an SME to count toward the validated corpus</div></li>
+        </ul>
+        <div class="note">Lineage answers the agentic-AI governance question — “where did this judgment come from and who stands behind it?” — for every object, in one tab.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PACKS ============ -->
+<section id="s-packs" hidden>
+  <h1>Packs &amp; Releases</h1>
+  <div class="crumb">Compile · gate · version · publish · consume — the eval gate is structural, not procedural</div>
+  <div class="three">
+    <div class="card" style="grid-column:1/3">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <h2 style="font-size:15px;text-transform:none;letter-spacing:0;color:var(--ink)">commercial_analytics</h2>
+        <span class="tag">base pack</span><span class="tag">MCP + REST</span>
+        <button class="btn sm sec2" style="margin-left:auto" onclick="toast('Pack composer: choose domains + layers + scope filters → live what’s-in / what’s-excluded view')">Compose new version</button>
+      </div>
+      <table>
+        <tr><th>Version</th><th>Artifacts</th><th>Eval cases</th><th>Gate</th><th>Agent lift</th><th></th></tr>
+        <tr>
+          <td><b>0.4.0-rc</b> <span class="b draft">DRAFT</span></td><td>25</td><td>31</td>
+          <td><span class="b gate-warn">… running</span></td><td>—</td>
+          <td><button class="btn sm" disabled title="Publish unlocks only when the gate passes">Publish 🔒</button></td>
+        </tr>
+        <tr>
+          <td><b>0.3.0</b> <span class="b act">SERVED</span></td><td>24</td><td style="color:var(--bad)">0</td>
+          <td><span class="b gate-fail">✕ FAILED</span></td><td style="color:var(--ink3)">unmeasured</td>
+          <td><button class="btn sm sec2" onclick="toast('Re-running 31-case suite against 0.3.0…')">Re-run gate</button></td>
+        </tr>
+        <tr>
+          <td><b>0.1.0</b></td><td>24</td><td>26</td>
+          <td><span class="b gate-pass">✓ PASSED</span></td><td><b style="color:var(--good)">+0.308</b> <span class="note">26/26 vs 18/26 blind</span></td>
+          <td><button class="btn sm ghost" onclick="toast('Version diff: artifact-level added / changed / retired between any two versions')">Diff vs 0.3.0</button></td>
+        </tr>
+      </table>
+      <div class="callout red" style="margin-top:14px">✕ <b>The publish button is not there for an ungated pack.</b> A version that fails its eval gate cannot ship — structurally, not by policy. The lift receipt is the version’s headline, and the count of SME-authored held-out cases is shown beside it (currently 0 — the honesty metric again).</div>
+    </div>
+    <div>
+      <div class="card">
+        <h2 style="font-size:13px;color:var(--ink2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Consume</h2>
+        <div style="font-size:12.5px;color:var(--ink2);margin-bottom:8px">MCP endpoint</div>
+        <div class="diff" style="margin:0 0 10px"><span class="ctx">tools: context/get · pack/list · pack/query</span><span class="add">mcp://ontowiz.zs.internal/commercial_analytics</span></div>
+        <div style="font-size:12.5px;color:var(--ink2);margin-bottom:8px">Function slices <span class="note">token footprint per slice</span></div>
+        <div style="font-size:12.5px;line-height:2"><span class="tag">brand_diagnosis · ~3.1k tok</span><br><span class="tag">access_triage · ~2.4k tok</span><br><span class="tag">forecast_review · ~1.8k tok</span></div>
+        <button class="btn sm sec2" style="margin-top:12px" onclick="toast('Try-it console: runs context/get live against the served pack')">▶ Try it</button>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h2 style="font-size:13px;color:var(--ink2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Overlays</h2>
+        <div style="font-size:12.5px;color:var(--ink2)">No client overlays yet. An overlay extends / overrides / suppresses base artifacts and is diffed in the Mapping Workbench (Base ↔ overlay).</div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ============ DRAWER (DELTA-147) ============ -->
+<div id="drawer">
+  <div class="head">
+    <b>DELTA-147</b><span class="b prop">PROPOSED</span><span class="tag">L3 · Rules</span>
+    <span class="chip"><span class="av" style="background:var(--info)">RM</span>R. Mehta</span>
+    <button class="x" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="body">
+    <h3 class="mini">Proposed change — human-readable diff (raw YAML behind a tab)</h3>
+    <div class="diff">
+      <span class="ctx">rule R-090 · safety-signal triage</span>
+      <span class="del">− priority: 90   (below supply check at 95)</span>
+      <span class="add">+ priority: 85   (safety triage now precedes supply &amp; competitive)</span>
+      <span class="add">+ anti_pattern: “unless inquiry volume tracks a media event — check share of voice first”</span>
+    </div>
+    <h3 class="mini">Context — the artifact this changes</h3>
+    <div class="card" style="background:#0d1626">
+      <b>R-090</b> · Volume drop + clinical inquiry spike → safety signal, not competitive
+      <div style="margin-top:6px"><span class="b act">ACTIVE</span> <span class="tag">safety</span><span class="tag">triage</span> · shipped in 0.1.0 → 0.3.0 · <a style="color:var(--accent);cursor:pointer" onclick="closeDrawer();go('workspace')">open in Workspace →</a></div>
+    </div>
+    <div class="callout">⚠ <b>Potential conflict:</b> R-095 (supply check, priority 95) shares tags <span class="tag">triage</span> — approving reorders the triage cascade for 4 gold-set accounts. Review both.</div>
+    <h3 class="mini">Evidence</h3>
+    <div class="quote">“Safety always outranks a competitive read. I’ve seen teams burn three weeks on a share story while a signal sat in the inquiry queue.” — R. Mehta, session 12 · step 6 (common mistakes)</div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
+      <button class="btn sm sec2" onclick="toast('Dry-run: with this change, safety triage fires first on 6/22 gold accounts (was 4/22) — no eval regressions')">▶ Dry-run on gold set</button>
+      <span class="note">linked evals: COMP-SAF-02, COMP-SAF-09</span>
+    </div>
+  </div>
+  <div class="foot">
+    <button class="btn" onclick="approve()">✓ Approve</button>
+    <button class="btn sec2" onclick="toast('Structured editor opens — curator amendment tracked as dual attribution on the SME’s proposal')">✎ Edit &amp; resubmit</button>
+    <button class="btn ghost" onclick="toast('Escalates to domain owner')">Escalate</button>
+    <button class="btn danger" onclick="toast('Reject requires a reason — it becomes feedback to the SME and training signal for mining')">✕ Reject</button>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+/* ---------- nav ---------- */
+const sections=['home','capture','forge','queue','workspace','packs'];
+
+/* ---------- forge ---------- */
+function forgeAnswer(btn,verdict){
+  const card=btn.closest('.card');
+  if(verdict==='agree'){card.style.opacity=.5;toast('✓ Endorsement recorded (1 of 3 needed to ratify) — rating credit follows correctness, not speed',false,4200);}
+  else{toast('✕ One line on why — the AI structures it into a correction delta you confirm before it ships',false,4200);}
+}
+function forgeDepends(btn){document.getElementById('dependsBox').hidden=false;}
+function forgeConfirm(){
+  const v=document.getElementById('dependsInput').value||'seasonal copay-card expiry';
+  document.getElementById('fCard1').style.opacity=.5;
+  toast('🤖 Drafted: anti-pattern on R-110 (“'+v.slice(0,50)+'…”) + eval case COMP-ACC-15',true,2600);
+  setTimeout(()=>toast('✓ <b>DELTA-149 PROPOSED</b> — attributed to you, provenance: Forge ratify mission → Curation Queue',false,4600),2800);
+}
+function go(s){
+  sections.forEach(id=>document.getElementById('s-'+id).hidden=(id!==s));
+  document.querySelectorAll('#nav a[data-s]').forEach(a=>a.classList.toggle('on',a.dataset.s===s));
+  document.getElementById('main').scrollTop=0; closeDrawer();
+}
+document.querySelectorAll('#nav a[data-s]').forEach(a=>a.onclick=()=>go(a.dataset.s));
+
+/* ---------- role toggle ---------- */
+function setRole(r){
+  document.getElementById('roleC').classList.toggle('on',r==='curator');
+  document.getElementById('roleS').classList.toggle('on',r==='sme');
+  document.getElementById('roleLbl').textContent=r==='curator'?'Curator':'SME';
+  const cur=r==='curator';
+  document.querySelector('#nav a[data-s=queue]').style.display=cur?'flex':'none';
+  document.querySelector('#nav a[data-s=workspace]').style.display=cur?'flex':'none';
+  toast(cur?'Curator view: full governance surface':'SME view: Capture + Forge + Dashboard — nav is role-shaped');
+  go(cur?'home':'forge');
+}
+
+/* ---------- tabs ---------- */
+function showTab(groupId,t){
+  const g=document.getElementById(groupId);
+  g.querySelectorAll('button[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  let el=g.parentElement.querySelectorAll('[data-p]');
+  el.forEach(p=>p.hidden=(p.dataset.p!==t));
+}
+function wsTab(t){
+  const g=document.getElementById('wsTabs');
+  g.querySelectorAll('button[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  g.parentElement.querySelectorAll('[data-p]').forEach(p=>p.hidden=(p.dataset.p!==t));
+}
+
+/* ---------- workspace scope ---------- */
+function scopeNode(el,name){
+  el.closest('.subs').querySelectorAll('.lay').forEach(l=>l.classList.remove('on'));
+  el.classList.add('on');
+  const bar=document.getElementById('scopeBar');
+  if(bar) bar.innerHTML='Scope: <b>Commercial › '+name+'</b> — showing local objects + <span class="tag">↓ inherited</span> from Commercial';
+  wsTab('layers');
+  toast('Scoped to <b>'+name+'</b> — layer browser, graph, mappings and coverage all narrow to this node; inherited objects stay visible with provenance chips',false,4600);
+}
+
+/* ---------- coverage board ---------- */
+const subdomains=[
+  ['&nbsp;&nbsp;&nbsp;↳ Field Force',[40,30,20,25,10]],
+  ['&nbsp;&nbsp;&nbsp;↳ Marketing &amp; Omnichannel',[35,25,15,30,10]],
+  ['&nbsp;&nbsp;&nbsp;↳ Payer / Access interface',[55,45,30,20,25]],
+  ['&nbsp;&nbsp;&nbsp;↳ Patient Services',[25,15,10,10,5]],
+  ['&nbsp;&nbsp;&nbsp;↳ Analytics &amp; Insights',[50,40,25,45,20]],
+];
+const domains=[
+  ['▾ Commercial Analytics',[95,90,100,85,70],'deep'],
+  ['Forecasting',[30,20,25,15,20],''],
+  ['Market Access',[60,10,0,10,5],''],
+  ['Oncology (TA)',[70,30,0,20,10],''],
+  ['Clinical Development',[25,5,0,0,0],'stub'],
+  ['Regulatory',[25,5,0,0,0],'stub'],
+  ['Manufacturing',[25,5,10,0,0],'stub'],
+  ['Medical Affairs',[20,5,0,0,0],'stub'],
+  ['Pharmacovigilance',[20,5,0,0,0],'stub'],
+  ['HEOR',[20,5,0,0,0],'stub'],
+  ['Patient Services',[20,5,0,0,0],'stub'],
+];
+let covSubsOpen=true;
+function renderCov(){
+  const mkBars=v=>v.map(x=>`<td><span class="bar"><i style="width:${x}%"></i></span></td>`).join('');
+  let html='';
+  domains.forEach(([n,v,tag],i)=>{
+    const isC=i===0;
+    html+=`<tr class="row" onclick="${isC?'toggleCovSubs(event)':'go(\'workspace\')'}"><td>${isC?(covSubsOpen?'▾':'▸')+n.slice(1):n}${tag==='stub'?' <span class="tag">seed</span>':''}${isC?' <span class="tag">Σ roll-up</span>':''}</td>${mkBars(v)}<td style="color:var(--ink3);font-size:11px">→</td></tr>`;
+    if(isC&&covSubsOpen) subdomains.forEach(([sn,sv])=>{
+      html+=`<tr class="row" style="opacity:.75" onclick="go('workspace')"><td style="font-size:12px;color:var(--ink2)">${sn}</td>${mkBars(sv)}<td style="color:var(--ink3);font-size:11px">→</td></tr>`;
+    });
+  });
+  document.getElementById('covBody').innerHTML=html;
+}
+function toggleCovSubs(e){e.stopPropagation();covSubsOpen=!covSubsOpen;renderCov();}
+renderCov();
+
+/* ---------- drawer ---------- */
+function openDrawer(){document.getElementById('drawer').classList.add('open')}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open')}
+
+/* ---------- toasts ---------- */
+function toast(msg,spin=false,ms=3400){
+  const t=document.createElement('div');t.className='toast';
+  t.innerHTML=(spin?'<span class="spin"></span>':'')+msg;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(()=>t.remove(),ms);
+  return t;
+}
+
+/* ---------- flywheel: approve ---------- */
+function approve(){
+  closeDrawer();
+  const t1=toast('<b>DELTA-147 approved</b> by Priya K. — recorded to persistent audit trail',false,2600);
+  setTimeout(()=>toast('Recompiling <b>commercial_analytics 0.4.0-rc</b>…',true,2600),1400);
+  setTimeout(()=>toast('Running <b>31 eval cases</b> against 0.4.0-rc…',true,2800),3400);
+  setTimeout(()=>toast('✓ <b>Gate PASSED</b> — 31/31 · lift measurement queued · new version in Packs &amp; Releases',false,5000),5800);
+}
+
+/* ---------- quick capture ---------- */
+function submitQuick(){
+  toast('✓ <b>DELTA-148 proposed</b> — attributed to you, provenance: quick capture → Curation Queue',false,4200);
+}
+
+/* ---------- candidate triage ---------- */
+function triage(btn,verdict){
+  const card=btn.closest('.cand');
+  card.style.opacity=.45;card.querySelectorAll('button').forEach(b=>b.disabled=true);
+  const msg={endorsed:'✓ Promoted to PROPOSED with your endorsement + paired eval case',
+             edited:'✎ Structured editor would open — your fix recorded as amendment',
+             rejected:'✕ Rejected — reason captured as mining training signal'}[verdict];
+  toast(msg);
+}
+</script>
+</body>
+</html>
