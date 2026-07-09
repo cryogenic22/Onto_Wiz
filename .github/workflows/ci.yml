@@ -65,16 +65,19 @@ jobs:
         run: pytest tests/ -v --tb=short --cov=src --cov-report=term-missing --cov-fail-under=70
 
       - name: Quality Gate
+        # Advisory (R3 / F0.1): removed from the blocking path — reported, not gating.
+        # Pre-commit hook still runs it locally on staged files.
+        continue-on-error: true
         run: python quality-gate/quality_gate.py --root .
 
       - name: Slop Checker
-        # Non-blocking until baseline violations are cleaned up (SEN-002)
-        # Pre-commit hook still blocks new slop on staged files
+        # Advisory (R3 / F0.1, was SEN-002): reported, not gating.
+        # Pre-commit hook still blocks new slop on staged files.
         continue-on-error: true
         run: python quality/slop_checker.py --config quality/config.yaml --root .
 
   frontend-build:
-    name: Frontend Build
+    name: Frontend Build + Test (Vitest gate — R3)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -91,6 +94,11 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Test (Vitest — BLOCKING, R3 gate / ADR-017)
+        # The frontend Vitest suite is part of the R3 blocking path. test:cov
+        # enforces the ADR-017 >=85% coverage thresholds on the catalog code.
+        run: npm run test:cov
 
       - name: Build
         run: npm run build

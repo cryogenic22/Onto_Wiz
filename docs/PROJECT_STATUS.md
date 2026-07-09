@@ -5,7 +5,8 @@
 > `scripts/verify-audit.sh`. "Written" / "committed" ≠ "done" (see ADR-015,
 > adopted from Content_medical_hub ADR-0001).
 
-_Last audit (2026-06-15, after the **catalog frontend port + DB + RBAC** — Loops F-DB1..3, F-RB1..2, F-FE0..5: SQLite store engine behind a `Database` wrapper, JWT/bcrypt RBAC bound to a real Bearer principal, and the Domain Intelligence Catalog ported into the Next.js `frontend/` app): 209 package + 308 src tests green; coverage 98.38%; ruff/mypy(Tier A)/boundary clean; CK new-code clean (6 tracked legacy-debt findings). `bash scripts/verify-audit.sh` → PASS. Frontend gate (new, ADR-017): 25 Vitest tests, 96%+ coverage on catalog code, `tsc`/`eslint`/`next build` clean._
+_Last audit (2026-07-09, after **F0.1 — CI gate set = R3** (Foundry build, Loop 0, backend lane): frontend Vitest wired into CI as a **blocking** step (`npm run test:cov`), quality-gate + slop_checker demoted to advisory, and the `.env`/API-key hygiene **verified** (never committed → history purge is a no-op). New governance test `tests/test_ci_gate_set.py` machine-checks the blocking/advisory split. 209 package + **312** src/gov tests green; coverage 98.38%; `bash scripts/verify-audit.sh` → PASS. Frontend gate: 20 Vitest tests, 96.1% stmts (≥85%)._
+_Prior audit (2026-06-15, after the **catalog frontend port + DB + RBAC** — Loops F-DB1..3, F-RB1..2, F-FE0..5: SQLite store engine behind a `Database` wrapper, JWT/bcrypt RBAC bound to a real Bearer principal, and the Domain Intelligence Catalog ported into the Next.js `frontend/` app): 209 package + 308 src tests green; coverage 98.38%; ruff/mypy(Tier A)/boundary clean; CK new-code clean (6 tracked legacy-debt findings). `bash scripts/verify-audit.sh` → PASS. Frontend gate (new, ADR-017): 25 Vitest tests, 96%+ coverage on catalog code, `tsc`/`eslint`/`next build` clean._
 _Prior audit (2026-06-14, after the **served Domain Intelligence Catalog** — Loops C1–C10: catalog index/search, function-slice + artifact surfaces, a live-served catalog page, comments, RBAC-lite, version diff, telemetry, + a forecasting eval suite): 191 package + 308 src tests green; coverage 98.2%; ruff/mypy(Tier A)/boundary clean; CK new-code clean (6 tracked legacy-debt findings). `bash scripts/verify-audit.sh` → PASS._
 _Prior audit (2026-06-13, after **functionalizing the commercial pack** — L1–L5: per-function tags, multi-module seed, tag-sliced serving, a new forecasting module): 163 package + 308 src tests; the one licensable `commercial_analytics` pack is sub-divided by `TagDimension.FUNCTION` and serves any function slice in isolation; recompiled to `0.3.0` (24 artifacts, sealed)._
 _Prior audit (2026-06-13, after the **end-to-end living-loop MVP** — consume→signal→mission→evolve→serve): 151 package + 308 src tests green; coverage ~98%. Pack: `agent_lift 0.308`, with-pack 26/26; living loop produces `commercial_analytics@0.2.0` from a usage gap._
@@ -212,6 +213,29 @@ no signup/reset/refresh-token/SSO; JWT has no rotation. The frontend gate is
 self-contained page (`GET /`) remains as a zero-dependency fallback alongside the new
 Next.js route. `verify-audit.sh` stays Python-only — the FE gate is run and recorded
 beside it, not folded in.
+
+## Foundry build — Loop 0 (2026-07-09) — backend lane
+
+The July 2026 Foundry build program (`docs/specs/DELIVERY_LOOPS_BACKLOG_2026-07.md`
++ `docs/specs/BUILD_INSTRUCTION_SET_2026-07.md`) opens with Loop 0. Backend lane,
+one unit at a time under the R2 loop; mini-specs in `docs/specs/`.
+
+| Unit | What shipped | Evidence |
+|---|---|---|
+| **F0.1** — CI gate set = R3 | Frontend Vitest wired into CI as a **blocking** step (`npm run test:cov` added to the existing `frontend-build` job — no new job/toolchain); quality-gate + slop_checker demoted to **advisory** (`continue-on-error: true`). New governance test `tests/test_ci_gate_set.py` (4 tests) parses `ci.yml` and asserts the blocking/advisory split, so the gate set is machine-checked, not eyeballed. Spec: `docs/specs/F0-1_CI_GATE_SET.md`. | `verify-audit` → PASS (209 pkg + **312** src/gov tests, 98.38% cov); FE gate green (20 Vitest tests, 96.1% stmts ≥85%). |
+
+**Security hygiene verified (F0.1), not assumed:** the `ANTHROPIC_API_KEY` was
+**never committed** — exact-path `git log -- .env` is empty; the only `.env*` blob
+in history is the intended `.env.example`; `.env` is git-ignored (working-tree only,
+126 bytes). So the backlog's "purge `.env` from history" is a **no-op** (no destructive
+rewrite performed), and "rotate the *committed* key" is inaccurate — the key never
+leaked via git. Rotation remains available as user-side Anthropic-console hygiene.
+
+**Honest boundary (R3 gap, deferred to its own unit):** the retained ctx core
+(`ontowiz-ctx`) has substantial source but only a smoke test and is **not yet under
+the ≥85% coverage gate** (verify-audit covers spec/runtime/factory/serve/core.bridge).
+R3 says "no exemptions"; closing it is a dedicated follow-up unit, **not** folded into
+F0.1. Tracked here so it is not lost.
 
 ## Known debt (tracked, not hidden)
 
