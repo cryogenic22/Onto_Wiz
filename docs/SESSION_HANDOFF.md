@@ -3,7 +3,40 @@
 > **Authoritative status is `docs/PROJECT_STATUS.md`** (single source of truth) and
 > the visual companion `docs/LOOP_DASHBOARD.html`. This file is just the resume
 > pointer + open threads, so context can be cleared and work picked up cleanly.
-> Last updated: 2026-06-15.
+> Last updated: 2026-07-09.
+
+## ▶ RESUME HERE (2026-07-09) — Foundry build, backend team
+
+I am now operating as the **backend (BE) team** for the July-2026 Foundry build.
+Plan of record: `docs/TEAM_START_HERE.md` → `docs/specs/DELIVERY_LOOPS_BACKLOG_2026-07.md`
+(BE/FE lanes, loops 0–8) + `docs/specs/BUILD_INSTRUCTION_SET_2026-07.md` (rules R1–R6,
+epics F0–E5, API/DDL masters). UI source of truth: `docs/reviews/ontowiz_nextgen_prototype_9.html`.
+
+**Branch:** `foundry-build` (off `main`). Baseline committed clean, `verify-audit` PASS:
+- `8f1b4f0` catalog frontend port + SQLite DB seam + JWT/RBAC (the prior unit)
+- `57f17c3` Foundry program docs + Prototype 9 → `docs/reviews/`
+- (+ CtxPack onboarding commit)
+
+**Harness decisions this session:**
+- **CtxPack onboarded** (hooks + MCP + a CLAUDE.md conventions block). It **activates only after a
+  Claude Code restart** — approve the hooks/`ctxpack` MCP server when prompted. Now-in-force
+  conventions (see the `ctxpack:session-memory` block in `CLAUDE.md`): sentence-leading
+  `Decision:` / `Constraint:` / `Supersedes:` / `ctx-incident:` markers in turn-final messages.
+- **kp_sdlc:** the user is doing the module comparison and will upgrade as needed. Until then this
+  repo's `verify-audit.sh` gate set stays authoritative (Build Instruction Set R3); do not rewire it.
+- **market_zero** conventions already absorbed (db.py + auth.py ported; provenance in `8f1b4f0`).
+
+**NEXT UNIT → Loop 0 BE, in sequence, one unit at a time (R2: mini-spec → failing test → build →
+`verify-audit` green → PROJECT_STATUS evidence):**
+1. **F0.1** — confirm the frontend Vitest suite is a *blocking* CI job; demote slop_checker/
+   quality-gate to advisory. (Key rotation is the USER's Anthropic-console action; `.env` is already
+   gitignored and never committed — "purge from history" is a no-op here.)
+2. **F0.2** — governance persistence: move Delta/approval/audit/contribution stores off in-memory
+   dicts onto the `db.py` SQLite seam (`deltas, delta_events, approvals, audit_log, contributions`);
+   restart-survival test. Builds on the `Database` wrapper landed in `8f1b4f0`.
+3. **F0.4** — one `parse(source)→Chunk[]` interface + pptx/vtt/xlsx/eml parsers (golden files) in
+   ontowiz-factory.
+4. **Contract tooling** — OpenAPI → generated TS client → mock server (the FE↔BE handshake seam).
 
 ## Where things stand (verified)
 
