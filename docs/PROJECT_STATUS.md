@@ -5,7 +5,8 @@
 > `scripts/verify-audit.sh`. "Written" / "committed" ≠ "done" (see ADR-015,
 > adopted from Content_medical_hub ADR-0001).
 
-_Last audit (2026-06-14, after the **served Domain Intelligence Catalog** — Loops C1–C10: catalog index/search, function-slice + artifact surfaces, a live-served catalog page, comments, RBAC-lite, version diff, telemetry, + a forecasting eval suite): 191 package + 308 src tests green; coverage 98.2%; ruff/mypy(Tier A)/boundary clean; CK new-code clean (6 tracked legacy-debt findings). `bash scripts/verify-audit.sh` → PASS._
+_Last audit (2026-06-15, after the **catalog frontend port + DB + RBAC** — Loops F-DB1..3, F-RB1..2, F-FE0..5: SQLite store engine behind a `Database` wrapper, JWT/bcrypt RBAC bound to a real Bearer principal, and the Domain Intelligence Catalog ported into the Next.js `frontend/` app): 209 package + 308 src tests green; coverage 98.38%; ruff/mypy(Tier A)/boundary clean; CK new-code clean (6 tracked legacy-debt findings). `bash scripts/verify-audit.sh` → PASS. Frontend gate (new, ADR-017): 25 Vitest tests, 96%+ coverage on catalog code, `tsc`/`eslint`/`next build` clean._
+_Prior audit (2026-06-14, after the **served Domain Intelligence Catalog** — Loops C1–C10: catalog index/search, function-slice + artifact surfaces, a live-served catalog page, comments, RBAC-lite, version diff, telemetry, + a forecasting eval suite): 191 package + 308 src tests green; coverage 98.2%; ruff/mypy(Tier A)/boundary clean; CK new-code clean (6 tracked legacy-debt findings). `bash scripts/verify-audit.sh` → PASS._
 _Prior audit (2026-06-13, after **functionalizing the commercial pack** — L1–L5: per-function tags, multi-module seed, tag-sliced serving, a new forecasting module): 163 package + 308 src tests; the one licensable `commercial_analytics` pack is sub-divided by `TagDimension.FUNCTION` and serves any function slice in isolation; recompiled to `0.3.0` (24 artifacts, sealed)._
 _Prior audit (2026-06-13, after the **end-to-end living-loop MVP** — consume→signal→mission→evolve→serve): 151 package + 308 src tests green; coverage ~98%. Pack: `agent_lift 0.308`, with-pack 26/26; living loop produces `commercial_analytics@0.2.0` from a usage gap._
 
@@ -176,6 +177,41 @@ it gates capabilities, not principals. C8 proves the forecasting eval cases are
 unmeasured** (a separate step). The served page is a real client over the API but is
 not the production Next.js app in `frontend/` — porting these routes into that app is
 the natural follow-up.
+
+## Catalog frontend port + DB + RBAC (2026-06-15) — Loops F-DB/F-RB/F-FE
+
+The catalog's four open follow-ups (SESSION_HANDOFF thread 00) were taken as one
+coordinated unit, by the user's explicit call, adopting architecture/decisions from
+the sister repo `market_zero`. Spec: `docs/specs/CATALOG_FRONTEND_PORT.md`. Two
+SETTLED decisions were knowingly amended and recorded first: **ADR-016** (SQLite for
+dev/test, Postgres for prod via DSN — amends ADR-013 in part) and **ADR-017** (dep
+approval for pyjwt/bcrypt + the Vitest stack, per ADR-006; logged in `Lead2Dev.md`).
+
+| Loop | What shipped | Evidence |
+|---|---|---|
+| F-DB1 | `ontowiz_runtime.Database` — thin SQLite wrapper (execute/fetch_one/fetch_all/transaction), DSN/path-driven, ported from market_zero `db.py`. Thread-safe (lock + `check_same_thread=False`) for the serve threadpool. | `test_db.py` (6 tests) |
+| F-DB2 | `CommentStore` re-backed on `Database` (`<root>/catalog.db`); same `CommentStore(root)` + `add`/`list` contract. | `test_comments.py` (4; existing 3 stay green + a SQLite-backing assertion) |
+| F-DB3 | `UsageStore` re-backed on `Database` (shared `catalog.db`); same contract + `catalog_stats`. | `test_telemetry.py` (3) |
+| F-RB1 | `ontowiz_serve.auth` — bcrypt `hash/verify_password` + pyjwt HS256 `issue/decode_token` (`ONTOWIZ_JWT_SECRET`); ported from market_zero `services/auth.py`. | `test_auth.py` (5) |
+| F-RB2 | RBAC bound to a real principal: `get`/resolve from a Bearer JWT; `require_capability` derives the role from the **token**, not the `X-OntoWiz-Role` header (header now a dev fallback only). `POST /v1/auth/login` + `GET /v1/auth/me` over a seeded SQLite `UserStore`. | `test_rbac.py` (5) — incl. **a header cannot escalate an authenticated principal**; existing `test_api.py` (18) stay green |
+| F-FE0 | Frontend test gate (ADR-017): Vitest + RTL + jsdom; `vitest.config.ts` (coverage scoped to catalog code, ≥85% thresholds), `npm test`/`test:cov`/`typecheck`. | smoke test green |
+| F-FE1 | `src/types/catalog.ts` (mirrors the runtime dataclasses) + `src/services/catalog.ts` client (catalog/search/functions/detail/artifact/comments/diff/stats/roles/login/me) against `NEXT_PUBLIC_CATALOG_API_URL`. | `catalog.test.ts` (mocked fetch) |
+| F-FE2..5 | `/catalog` route in the Next.js app: grid + search → pack detail (function slices w/ token-leanness note + artifact list) → artifact drawer (verdict, anti-patterns, governance trail, YAML) → comments + Bearer-authed posting + curator/manager review; `LoginBar` + `useCatalogAuth` (JWT in localStorage). | `catalog.test.tsx` (component RTL) |
+
+Net: **+18 package tests (191→209)**, coverage 98.38%; ruff/mypy(Tier A)/boundary
+clean; CK new-code 0; 308 src tests green; `verify-audit` → PASS. **Frontend gate:**
+25 Vitest tests, **96%+ coverage on the catalog code**, `tsc --noEmit` clean,
+`eslint` clean, `next build` clean (`/catalog` prerendered).
+
+**Honest boundaries (deferred, not hidden):** SQLite is the dev/test engine —
+**Postgres is the production target** (ADR-016) but is **not yet exercised by an
+automated test** (no local PG credential; docker daemon down). The `UserStore` is
+**seeded** (one demo user per role, password `ONTOWIZ_SEED_PASSWORD`/`ontowiz-demo`);
+no signup/reset/refresh-token/SSO; JWT has no rotation. The frontend gate is
+**Vitest component/client tests**, not full e2e against a live backend; the served
+self-contained page (`GET /`) remains as a zero-dependency fallback alongside the new
+Next.js route. `verify-audit.sh` stays Python-only — the FE gate is run and recorded
+beside it, not folded in.
 
 ## Known debt (tracked, not hidden)
 

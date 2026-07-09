@@ -1,18 +1,21 @@
 """Annotation / comment store (Tier A) — governed discussion on an artifact.
 
-A lightweight, JSON-on-disk store of role-attributed comments keyed by
-(pack, version, artifact_id). This is the collaboration layer of the catalog:
-SMEs annotate, curators record decisions, builders note usage. MVP persistence
-(a single JSON file, not a database) — honest and self-contained; swappable for a
-real store later without changing the call sites.
+Role-attributed comments keyed by (pack, version, artifact_id): SMEs annotate,
+curators record decisions, builders note usage. Backed by the shared catalog
+database (``<root>/catalog.db``) through the ``Database`` wrapper — SQLite for
+dev/test, Postgres for production (ADR-016). The call-site contract
+(``CommentStore(root)`` + ``add`` / ``list``) is unchanged from the JSON MVP.
 """
 
 from __future__ import annotations
 
-import json
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+
+from .db import Database
+
+_COLUMNS = "pack, version, artifact_id, author, role, text, created_at"
 
 
 @dataclass
@@ -33,22 +36,18 @@ def _now() -> str:
 
 
 class CommentStore:
-    """Append-only comments keyed by (pack, version, artifact_id), JSON-backed."""
+    """Append-only comments keyed by (pack, version, artifact_id), DB-backed."""
 
     def __init__(self, root: str | Path) -> None:
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
-        self._file = self.root / "comments.json"
-
-    def _load(self) -> dict[str, list[dict]]:
-        if not self._file.is_file():
-            return {}
-        data = json.loads(self._file.read_text(encoding="utf-8"))
-        return data if isinstance(data, dict) else {}
-
-    @staticmethod
-    def _key(pack: str, version: str, artifact_id: str) -> str:
-        return f"{pack}\x1f{version}\x1f{artifact_id}"
+        self._db = Database(self.root / "catalog.db")
+        self._db.execute(
+            "CREATE TABLE IF NOT EXISTS comments ("
+            "pack TEXT NOT NULL, version TEXT NOT NULL, artifact_id TEXT NOT NULL, "
+            "author TEXT NOT NULL, role TEXT NOT NULL, text TEXT NOT NULL, "
+            "created_at TEXT NOT NULL)"
+        )
 
     def add(
         self, pack: str, version: str, artifact_id: str,
@@ -59,12 +58,17 @@ class CommentStore:
             pack=pack, version=version, artifact_id=artifact_id,
             author=author, role=role, text=text, created_at=at or _now(),
         )
-        data = self._load()
-        data.setdefault(self._key(pack, version, artifact_id), []).append(asdict(comment))
-        self._file.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        self._db.execute(
+            f"INSERT INTO comments ({_COLUMNS}) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (pack, version, artifact_id, author, role, text, comment.created_at),
+        )
         return comment
 
     def list(self, pack: str, version: str, artifact_id: str) -> list[Comment]:
         """All comments on an artifact, in the order they were added."""
-        rows = self._load().get(self._key(pack, version, artifact_id), [])
+        rows = self._db.fetch_all(
+            f"SELECT {_COLUMNS} FROM comments "
+            "WHERE pack = ? AND version = ? AND artifact_id = ? ORDER BY rowid",
+            (pack, version, artifact_id),
+        )
         return [Comment(**row) for row in rows]

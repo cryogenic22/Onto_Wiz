@@ -18,6 +18,18 @@
 
 ---
 
+## Dependency Approvals (ADR-006)
+
+> ADR-006 requires Lead approval here before any new pip/npm package is used.
+
+| Date | Package | Ecosystem | Scope | Decision |
+|------|---------|-----------|-------|----------|
+| 2026-02-01 | anthropic/openai, pdfplumber, pyarrow | pip | EPIC-007/008 | APPROVED (DEC-012) |
+| 2026-06-15 | pyjwt, bcrypt | pip | `ontowiz-serve` RBAC principal binding | APPROVED (DEC-017 / ADR-017) |
+| 2026-06-15 | vitest, @vitejs/plugin-react, vite-tsconfig-paths, @testing-library/react, @testing-library/jest-dom, jsdom | npm (dev) | `frontend/` TDD gate | APPROVED (DEC-017 / ADR-017) |
+
+---
+
 ## Dependencies
 
 | Ticket | Blocked By | Status |

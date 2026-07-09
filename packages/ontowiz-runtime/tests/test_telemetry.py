@@ -25,3 +25,10 @@ def test_usage_persists_across_instances(tmp_path):
     again.record("p", "0.1.0", hit=False)
     stats = {p.pack: p for p in catalog_stats(again)}
     assert stats["p"].consults == 2  # the first instance's event survived
+
+
+def test_usage_is_backed_by_sqlite_catalog_db(tmp_path):
+    # ADR-016: DB-backed, not JSON; shares the catalog.db with CommentStore
+    UsageStore(tmp_path).record("p", "0.1.0", hit=True)
+    assert (tmp_path / "catalog.db").is_file()
+    assert not (tmp_path / "usage.json").exists()

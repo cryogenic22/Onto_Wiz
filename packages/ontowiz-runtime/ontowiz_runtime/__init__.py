@@ -32,6 +32,7 @@ from .context import (
     gate,
     get_context,
 )
+from .db import Database
 from .diff import DiffResult, pack_diff
 from .lineage import LineageEntry, explain_concept
 from .registry import LoadedPack, PackRegistry, load_pack
@@ -55,6 +56,7 @@ __all__ = [
     "ArtifactView",
     "CommentStore",
     "Comment",
+    "Database",
     "pack_diff",
     "DiffResult",
     "UsageStore",

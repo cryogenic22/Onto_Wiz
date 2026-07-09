@@ -11,6 +11,8 @@ dependencies = [
     "ontowiz-runtime",
     "fastapi>=0.110",
     "uvicorn>=0.27",
+    "pyjwt>=2.8",      # RBAC tokens (ADR-017 / DEC-017)
+    "bcrypt>=4.1",     # password hashing (ADR-017 / DEC-017)
 ]
 
 [project.optional-dependencies]

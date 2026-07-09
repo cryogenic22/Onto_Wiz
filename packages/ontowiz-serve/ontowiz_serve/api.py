@@ -37,8 +37,10 @@ from ontowiz_runtime import (
 from ontowiz_spec import Tag, TagDimension
 from pydantic import BaseModel, Field
 
+from .auth import AuthError, decode_token, issue_token
 from .catalog_page import catalog_html
 from .roles import ROLE_CAPABILITIES, require_capability, require_role
+from .users import UserStore
 
 
 class TagIn(BaseModel):
@@ -54,6 +56,11 @@ class CommentIn(BaseModel):
 class ReviewIn(BaseModel):
     decision: str = Field(max_length=40)  # approve | request_changes | reject
     note: str = Field(default="", max_length=4000)
+
+
+class LoginIn(BaseModel):
+    email: str = Field(max_length=200)
+    password: str = Field(max_length=200)
 
 
 class UsageIn(BaseModel):
@@ -131,6 +138,31 @@ def _require_artifact(load: Loader, name: str, version: str, artifact_id: str) -
         artifact_view(load(name, version), artifact_id)
     except KeyError as e:
         raise HTTPException(status_code=404, detail=f"artifact not found: {artifact_id}") from e
+
+
+def _claims_from_bearer(authorization: str | None) -> dict | None:
+    """Decode a ``Authorization: Bearer <jwt>`` header. None if no bearer present.
+
+    A *present but invalid/expired* token is a 401 — it is not silently ignored.
+    """
+    if not authorization or not authorization.lower().startswith("bearer "):
+        return None
+    try:
+        return decode_token(authorization.split(" ", 1)[1])
+    except AuthError as e:
+        raise HTTPException(status_code=401, detail="invalid or expired token") from e
+
+
+def _resolve_principal(authorization: str | None, x_ontowiz_role: str) -> tuple[str, str]:
+    """Return ``(role, who)``. An authenticated Bearer principal wins; the
+    ``X-OntoWiz-Role`` header is honoured only as a dev fallback when no token is
+    presented — so a header cannot escalate an authenticated caller's role.
+    """
+    claims = _claims_from_bearer(authorization)
+    if claims is not None:
+        role = require_role(claims.get("role", ""))
+        return role, claims.get("email") or claims.get("sub") or role
+    return require_role(x_ontowiz_role), ""
 
 
 def _register_pages(app: FastAPI) -> None:
@@ -212,24 +244,47 @@ def _register_collaboration(app: FastAPI, load: Loader, comments: CommentStore) 
     @app.post("/v1/packs/{name}/{version}/artifacts/{artifact_id}/comments")
     def add_comment(
         name: str, version: str, artifact_id: str, body: CommentIn,
+        authorization: str | None = Header(default=None),
         x_ontowiz_role: str = Header(default="sme"),
     ) -> dict:
         _require_artifact(load, name, version, artifact_id)
-        role = require_role(x_ontowiz_role)
+        role, _who = _resolve_principal(authorization, x_ontowiz_role)
         return asdict(comments.add(name, version, artifact_id,
                                    author=body.author, role=role, text=body.text))
 
     @app.post("/v1/packs/{name}/{version}/artifacts/{artifact_id}/review")
     def review_artifact(
         name: str, version: str, artifact_id: str, body: ReviewIn,
+        authorization: str | None = Header(default=None),
         x_ontowiz_role: str = Header(default="sme"),
     ) -> dict:
-        # governance action — only roles with the 'review' capability may decide
-        require_capability(x_ontowiz_role, "review")
+        # governance action — only an authenticated role with 'review' may decide;
+        # the X-OntoWiz-Role header cannot escalate a Bearer principal.
+        role, who = _resolve_principal(authorization, x_ontowiz_role)
+        require_capability(role, "review")
         _require_artifact(load, name, version, artifact_id)
-        comments.add(name, version, artifact_id, author=x_ontowiz_role, role=x_ontowiz_role,
+        comments.add(name, version, artifact_id, author=who or role, role=role,
                      text=f"[review:{body.decision}] {body.note}".strip())
-        return {"artifact_id": artifact_id, "decision": body.decision, "by": x_ontowiz_role}
+        return {"artifact_id": artifact_id, "decision": body.decision, "by": who or role}
+
+
+def _register_auth(app: FastAPI, users: UserStore) -> None:
+    @app.post("/v1/auth/login")
+    def login(body: LoginIn) -> dict:
+        user = users.authenticate(body.email, body.password)
+        if user is None:
+            raise HTTPException(status_code=401, detail="invalid credentials")
+        token = issue_token(user.id, user.role, email=user.email)
+        return {"access_token": token, "token_type": "bearer",
+                "role": user.role, "email": user.email}
+
+    @app.get("/v1/auth/me")
+    def me(authorization: str | None = Header(default=None)) -> dict:
+        claims = _claims_from_bearer(authorization)
+        if claims is None:
+            raise HTTPException(status_code=401, detail="authentication required")
+        return {"sub": claims.get("sub", ""), "role": claims.get("role", ""),
+                "email": claims.get("email", "")}
 
 
 def create_app(packs_root: str | Path = "packs", *, allow_dev_context: bool = False) -> FastAPI:
@@ -243,12 +298,15 @@ def create_app(packs_root: str | Path = "packs", *, allow_dev_context: bool = Fa
     registry = PackRegistry(packs_root)
     catalog_dir = Path(packs_root) / ".catalog"
     comments, usage = CommentStore(catalog_dir), UsageStore(catalog_dir)
+    users = UserStore(catalog_dir)
+    users.seed_default()
     load = _make_loader(registry)
 
     _register_pages(app)
     _register_catalog(app, registry, usage)
     _register_pack_views(app, load)
     _register_collaboration(app, load, comments)
+    _register_auth(app, users)
 
     @app.post("/v1/context")
     def get_context_route(req: ContextRequest) -> dict:

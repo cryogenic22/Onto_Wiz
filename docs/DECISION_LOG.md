@@ -137,4 +137,24 @@
 
 ---
 
+## DEC-016: SQLite for dev/test, Postgres for production
+
+**Date:** 2026-06-15
+**Decision:** Persistence engine is DSN-selected behind one thin `Database` wrapper (ported from market_zero `db.py`). Dev/test/`verify-audit` run **SQLite** (hermetic, `<packs_root>/.catalog/catalog.db`); **production stays Postgres** via `ONTOWIZ_DB_DSN`. Amends DEC-013/ADR-013 *in part*.
+**Context:** Productionising the catalog `CommentStore`/`UsageStore` off their JSON MVP. Docker daemon down; native PG on `:5434` reachable but no working credential; `verify-audit` must stay offline (ADR-015).
+**Rationale:** The founder's "Postgres, not SQLite" call (DEC-013) is about the shipped production machine; the inner loop needs a hermetic, zero-service engine. The wrapper makes the engine a one-config swap, so prod Postgres is preserved, not foreclosed.
+**Status:** SETTLED — approved by Human (Founder) on 2026-06-15. See ADR-016.
+
+---
+
+## DEC-017: Dependency approval — RBAC (pyjwt+bcrypt) + frontend test gate
+
+**Date:** 2026-06-15
+**Decision:** Approve, as an ADR-006 exemption for the catalog-frontend-port unit: **Python** `pyjwt`, `bcrypt` (RBAC principal binding in `ontowiz-serve`); **npm (dev-only)** `vitest`, `@vitejs/plugin-react`, `vite-tsconfig-paths`, `@testing-library/react`, `@testing-library/jest-dom`, `jsdom` (frontend TDD gate). Matches market_zero's stack.
+**Context:** Binding RBAC to a real principal needs token + hashing; the approved frontend stack has no test runner but ADR-015 mandates TDD-red. No stdlib equivalent for React component testing.
+**Rationale:** Minimal, targeted additions; all dev/server-side, none ship in a Domain Pack. Heavyweight frameworks remain rejected (DEC-012 spirit). A stdlib-only RBAC path was available but the founder chose market_zero parity.
+**Status:** SETTLED — approved by Human (Founder, acting Lead) on 2026-06-15. See ADR-017 + `docs/Lead2Dev.md` (Dependency Approvals).
+
+---
+
 _End of Decision Log — append new entries below this line_

@@ -3,13 +3,22 @@
 > **Authoritative status is `docs/PROJECT_STATUS.md`** (single source of truth) and
 > the visual companion `docs/LOOP_DASHBOARD.html`. This file is just the resume
 > pointer + open threads, so context can be cleared and work picked up cleanly.
-> Last updated: 2026-06-14.
+> Last updated: 2026-06-15.
 
 ## Where things stand (verified)
 
 - **`bash scripts/verify-audit.sh` → PASS** — all 6 owned gates green:
-  **191 package tests + 308 src tests; coverage 98.2%**; ruff/mypy(Tier A)/boundary
+  **209 package tests + 308 src tests; coverage 98.38%**; ruff/mypy(Tier A)/boundary
   clean; CK new-code clean (6 tracked legacy-debt findings).
+- **Catalog frontend port + DB + RBAC (2026-06-15, Loops F-DB/F-RB/F-FE):** the
+  catalog is ported into the Next.js `frontend/` app (`/catalog` route); the
+  Comment/Usage stores moved off JSON onto **SQLite** behind a `Database` wrapper
+  (Postgres stays the prod target via DSN — ADR-016); RBAC now binds to a real
+  **JWT Bearer principal** (login/me + seeded `UserStore`), and a header can no
+  longer escalate an authenticated caller (ADR-017 added pyjwt/bcrypt + a Vitest
+  gate). New **frontend gate**: 25 Vitest tests, 96%+ catalog coverage,
+  `tsc`/`eslint`/`next build` clean. Spec: `docs/specs/CATALOG_FRONTEND_PORT.md`;
+  evidence in `PROJECT_STATUS.md` → "Catalog frontend port + DB + RBAC".
 - **Served Domain Intelligence Catalog (2026-06-14, Loops C1–C10):** the catalog is
   real and served from the live registry — `catalog_index`/`catalog_search`,
   `pack_functions`, `artifact_view`, `pack_diff`, `CommentStore`, `UsageStore`+`catalog_stats`
@@ -77,9 +86,15 @@
     `docs/specs/CATALOG_LOOPS.md`. New Tier-A runtime surfaces (`catalog_index`, `catalog_search`,
     `pack_functions`, `artifact_view`, `pack_diff`, `CommentStore`, `UsageStore`+`catalog_stats`)
     + REST doors + a served page at `GET /` + RBAC-lite. 191 pkg tests, verify-audit PASS.
-    Open follow-ups: port these routes into the Next.js `frontend/` app; swap the JSON
-    comment/usage MVP stores for a DB; live-benchmark the forecasting slice (0.3.0 `agent_lift`
-    still unmeasured); bind RBAC to a real auth principal.
+    **✅ Three of the four follow-ups DONE (2026-06-15)** — see "Catalog frontend port +
+    DB + RBAC" in `PROJECT_STATUS.md`: routes ported into the Next.js `frontend/` app
+    (`/catalog`); JSON comment/usage stores → SQLite behind a `Database` wrapper (ADR-016;
+    Postgres still the prod target via DSN); RBAC bound to a real JWT principal (ADR-017).
+    **Remaining open follow-ups:** (a) **live-benchmark the forecasting slice** (0.3.0
+    `agent_lift` still unmeasured — the last untouched item); (b) **exercise the Postgres
+    engine** with an automated contract test once a local PG cred/docker is available
+    (today only SQLite is tested); (c) harden auth — real identity provisioning
+    (signup/reset/SSO), JWT rotation/refresh (today the `UserStore` is seeded).
 
 0. **✅ DONE (2026-06-13) — functionalized the commercial pack (L1–L5 all green).**
    See "Functionalized domain packs" in `PROJECT_STATUS.md` for the evidence. The

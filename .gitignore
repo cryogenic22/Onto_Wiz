@@ -47,6 +47,16 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# ─── Local databases (SQLite dev/test seam — ADR-016) ───────────
+# db.py writes catalog.db (and future per-epic tables) locally; the DB is a
+# build artifact, never source. Postgres is the prod target (ONTOWIZ_DB_DSN).
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+
 # ─── Tooling reports / generated ────────────────────────────────
 .quality-reports/
 quality-reports/

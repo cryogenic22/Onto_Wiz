@@ -1,18 +1,21 @@
 """Catalog telemetry (Tier A) — persist consult events, aggregate usage stats.
 
-The serving-side counterpart to the factory's in-process UsageEvent: a JSON-backed
-store of consult records (which pack/version/function was served, and whether it
-was a hit) plus a per-pack aggregation for the catalog's Manager lens — where is
-the catalog being used, and where is it missing? MVP persistence (a JSON file,
-not a database) — honest and self-contained.
+The serving-side counterpart to the factory's in-process UsageEvent: a store of
+consult records (which pack/version/function was served, and whether it was a hit)
+plus a per-pack aggregation for the catalog's Manager lens — where is the catalog
+being used, and where is it missing? Backed by the shared catalog database
+(``<root>/catalog.db``) through the ``Database`` wrapper — SQLite for dev/test,
+Postgres for production (ADR-016). The ``UsageStore(root)`` + ``record`` / ``all``
+contract is unchanged from the JSON MVP.
 """
 
 from __future__ import annotations
 
-import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
+
+from .db import Database
 
 
 @dataclass
@@ -42,18 +45,17 @@ def _now() -> str:
 
 
 class UsageStore:
-    """Append-only consult records, JSON-backed under ``root``."""
+    """Append-only consult records, DB-backed under ``root``."""
 
     def __init__(self, root: str | Path) -> None:
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
-        self._file = self.root / "usage.json"
-
-    def _load(self) -> list[dict]:
-        if not self._file.is_file():
-            return []
-        data = json.loads(self._file.read_text(encoding="utf-8"))
-        return data if isinstance(data, list) else []
+        self._db = Database(self.root / "catalog.db")
+        self._db.execute(
+            "CREATE TABLE IF NOT EXISTS usage ("
+            "pack TEXT NOT NULL, version TEXT NOT NULL, function TEXT, "
+            "hit INTEGER NOT NULL, at TEXT NOT NULL)"
+        )
 
     def record(
         self, pack: str, version: str, *,
@@ -61,13 +63,23 @@ class UsageStore:
     ) -> UsageRecord:
         """Append a consult record and persist it."""
         rec = UsageRecord(pack=pack, version=version, function=function, hit=hit, at=at or _now())
-        rows = self._load()
-        rows.append(asdict(rec))
-        self._file.write_text(json.dumps(rows, indent=2), encoding="utf-8")
+        self._db.execute(
+            "INSERT INTO usage (pack, version, function, hit, at) VALUES (?, ?, ?, ?, ?)",
+            (rec.pack, rec.version, rec.function, int(rec.hit), rec.at),
+        )
         return rec
 
     def all(self) -> list[UsageRecord]:
-        return [UsageRecord(**row) for row in self._load()]
+        rows = self._db.fetch_all(
+            "SELECT pack, version, function, hit, at FROM usage ORDER BY rowid"
+        )
+        return [
+            UsageRecord(
+                pack=r["pack"], version=r["version"], function=r["function"],
+                hit=bool(r["hit"]), at=r["at"],
+            )
+            for r in rows
+        ]
 
 
 def catalog_stats(store: UsageStore) -> list[PackUsage]:

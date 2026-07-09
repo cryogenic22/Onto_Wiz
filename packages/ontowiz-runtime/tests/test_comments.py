@@ -30,3 +30,10 @@ def test_comments_persist_across_store_instances(tmp_path):
     CommentStore(tmp_path).add("p", "0.1.0", "a1", author="x", role="sme", text="durable")
     # a fresh store over the same root reads what the first persisted
     assert CommentStore(tmp_path).list("p", "0.1.0", "a1")[0].text == "durable"
+
+
+def test_comments_are_backed_by_sqlite_catalog_db(tmp_path):
+    # ADR-016: the store is DB-backed, not JSON — a catalog.db appears beside packs
+    CommentStore(tmp_path).add("p", "0.1.0", "a1", author="x", role="sme", text="hi")
+    assert (tmp_path / "catalog.db").is_file()
+    assert not (tmp_path / "comments.json").exists()

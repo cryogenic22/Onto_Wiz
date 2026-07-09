@@ -22,6 +22,12 @@
 | [ADR-009](ADR-009-agile-board.md) | Agile Board for Cross-Team Visibility | SETTLED | 2026-01-31 | DEC-009 |
 | [ADR-010](ADR-010-estimation-scale.md) | Ticket Estimation Scale (S/M/L/XL) | SETTLED | 2026-01-31 | DEC-010 |
 | [ADR-011](ADR-011-sentinel-reviews-read-only.md) | SENTINEL Reviews Are Read-Only | SETTLED | 2026-02-01 | DEC-011 |
+| [ADR-012](ADR-012-monorepo-two-tier-packaging.md) | Monorepo Two-Tier Packaging (A ships, B secret) | SETTLED | 2026-06-10 | — |
+| [ADR-013](ADR-013-persistence-postgres-and-yaml.md) | Persistence — Postgres for the machine, YAML for the product | SETTLED | 2026-06-10 | — |
+| [ADR-014](ADR-014-ctx-context-engine-and-headless.md) | CTX Context Engine + Headless Serve | SETTLED | 2026-06-10 | — |
+| [ADR-015](ADR-015-adopt-loop-driven-harness.md) | Adopt Loop-Driven + Anti-Overstatement Harness | SETTLED | 2026-06-10 | — |
+| [ADR-016](ADR-016-sqlite-dev-postgres-prod.md) | SQLite for dev/test, Postgres for production | SETTLED | 2026-06-15 | DEC-016 |
+| [ADR-017](ADR-017-dependency-approval-rbac-and-fe-tests.md) | Dependency Approval — RBAC + Frontend Test Gate | SETTLED | 2026-06-15 | DEC-017 |
 
 ---
 
