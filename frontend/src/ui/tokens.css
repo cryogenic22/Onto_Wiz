@@ -1,0 +1,47 @@
+/*
+ * Foundry design tokens → Tailwind 4 utilities.
+ * Mirrors src/ui/tokens.ts (the typed source of truth); the drift-guard test in
+ * tokens.test.ts fails if any colour here falls out of sync with tokens.ts.
+ * Lifted verbatim from Prototype 9 :root (docs/reviews/ontowiz_nextgen_prototype_9.html).
+ */
+@theme {
+  /* Surfaces */
+  --color-void: #0a1519;
+  --color-carbon: #0e1d22;
+  --color-slab: #15282e;
+  --color-slab2: #1c333a;
+  /* Borders */
+  --color-edge: #26414a;
+  --color-edge2: #365660;
+  /* Text */
+  --color-ink: #e8efec;
+  --color-ink2: #9fb4b2;
+  --color-ink3: #647c7b;
+  /* Accents */
+  --color-cyan: #4cc6d4;
+  --color-molten: #eda93c;
+  --color-molten-hot: #ffc44d;
+  --color-jade: #46c08a;
+  --color-ember: #ef6a50;
+  --color-info: #6ba8e8;
+  --color-iris: #9e8bee;
+
+  /* Soft accent fills (badges, chips, callouts) */
+  --color-cyan-soft: rgba(76, 198, 212, 0.12);
+  --color-molten-soft: rgba(237, 169, 60, 0.13);
+  --color-jade-soft: rgba(70, 192, 138, 0.12);
+  --color-ember-soft: rgba(239, 106, 80, 0.12);
+  --color-info-soft: rgba(107, 168, 232, 0.12);
+  --color-iris-soft: rgba(158, 139, 238, 0.13);
+
+  /* Type */
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 9px;
+  --radius-lg: 14px;
+  --radius-pill: 20px;
+}

@@ -19,6 +19,9 @@ export default defineConfig({
         'src/services/catalog.ts',
         'src/types/catalog.ts',
         'src/components/catalog/**',
+        // D0 design system (foundry tokens + gallery + ui/ primitives)
+        'src/ui/**/*.{ts,tsx}',
+        'src/app/ui/**/*.tsx',
       ],
       thresholds: { lines: 85, functions: 85, statements: 85 },
     },

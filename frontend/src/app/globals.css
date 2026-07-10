@@ -1,12 +1,13 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@import '../ui/tokens.css';
 
+/* Foundry surface defaults (Prototype 9). Persona density vars below stay until the
+ * primitives are rebased in D0.4. */
 :root {
-  --background: #0f172a;
-  --foreground: #f8fafc;
+  --background: var(--color-void);
+  --foreground: var(--color-ink);
 
-  /* Persona: SME (warm) */
+  /* Persona: SME (warm) — legacy, retired in D0.4 */
   --persona-spacing-sm: 0.75rem;
   --persona-spacing-md: 1.25rem;
   --persona-spacing-lg: 2rem;
@@ -31,5 +32,5 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
 }
