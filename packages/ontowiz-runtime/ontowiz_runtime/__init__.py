@@ -34,6 +34,14 @@ from .context import (
 )
 from .db import Database
 from .diff import DiffResult, pack_diff
+from .governance import (
+    ApprovalRecord,
+    AuditRecord,
+    ContributionRecord,
+    DeltaEvent,
+    DeltaRecord,
+    GovernanceStore,
+)
 from .lineage import LineageEntry, explain_concept
 from .registry import LoadedPack, PackRegistry, load_pack
 from .registry_view import ArtifactRow, PackDetail, pack_detail
@@ -63,6 +71,12 @@ __all__ = [
     "UsageRecord",
     "PackUsage",
     "catalog_stats",
+    "GovernanceStore",
+    "DeltaRecord",
+    "DeltaEvent",
+    "ApprovalRecord",
+    "AuditRecord",
+    "ContributionRecord",
     "gate",
     "ContextResult",
     "TrustEnvelope",

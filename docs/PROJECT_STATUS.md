@@ -5,7 +5,8 @@
 > `scripts/verify-audit.sh`. "Written" / "committed" ≠ "done" (see ADR-015,
 > adopted from Content_medical_hub ADR-0001).
 
-_Last audit (2026-07-09, after **F0.1 — CI gate set = R3** (Foundry build, Loop 0, backend lane): frontend Vitest wired into CI as a **blocking** step (`npm run test:cov`), quality-gate + slop_checker demoted to advisory, and the `.env`/API-key hygiene **verified** (never committed → history purge is a no-op). New governance test `tests/test_ci_gate_set.py` machine-checks the blocking/advisory split. 209 package + **312** src/gov tests green; coverage 98.38%; `bash scripts/verify-audit.sh` → PASS. Frontend gate: 20 Vitest tests, 96.1% stmts (≥85%)._
+_Last audit (2026-07-10, after **F0.2 — Governance persistence** (Foundry build, Loop 0, backend lane): the delta lifecycle — proposed deltas, approvals, audit trail, SME contributions — now persists on the `db.py` SQLite seam via a new **Tier A** `GovernanceStore` (tables `deltas`/`delta_events`/`approvals`/`audit_log`/`contributions`), mirroring the `CommentStore` pattern (no new persistence machinery). **Restart-survival proven**: approve a delta → fresh store instance on the same DB → approval + audit survive. Tier A holds (no Tier B import); R1's one pipe untouched. 218 package + 312 src/gov tests green; coverage 98.49%; `bash scripts/verify-audit.sh` → PASS._
+_Prior audit (2026-07-09, after **F0.1 — CI gate set = R3** (Foundry build, Loop 0, backend lane): frontend Vitest wired into CI as a **blocking** step (`npm run test:cov`), quality-gate + slop_checker demoted to advisory, and the `.env`/API-key hygiene **verified** (never committed → history purge is a no-op). New governance test `tests/test_ci_gate_set.py` machine-checks the blocking/advisory split. 209 package + **312** src/gov tests green; coverage 98.38%; `bash scripts/verify-audit.sh` → PASS. Frontend gate: 20 Vitest tests, 96.1% stmts (≥85%)._
 _Prior audit (2026-06-15, after the **catalog frontend port + DB + RBAC** — Loops F-DB1..3, F-RB1..2, F-FE0..5: SQLite store engine behind a `Database` wrapper, JWT/bcrypt RBAC bound to a real Bearer principal, and the Domain Intelligence Catalog ported into the Next.js `frontend/` app): 209 package + 308 src tests green; coverage 98.38%; ruff/mypy(Tier A)/boundary clean; CK new-code clean (6 tracked legacy-debt findings). `bash scripts/verify-audit.sh` → PASS. Frontend gate (new, ADR-017): 25 Vitest tests, 96%+ coverage on catalog code, `tsc`/`eslint`/`next build` clean._
 _Prior audit (2026-06-14, after the **served Domain Intelligence Catalog** — Loops C1–C10: catalog index/search, function-slice + artifact surfaces, a live-served catalog page, comments, RBAC-lite, version diff, telemetry, + a forecasting eval suite): 191 package + 308 src tests green; coverage 98.2%; ruff/mypy(Tier A)/boundary clean; CK new-code clean (6 tracked legacy-debt findings). `bash scripts/verify-audit.sh` → PASS._
 _Prior audit (2026-06-13, after **functionalizing the commercial pack** — L1–L5: per-function tags, multi-module seed, tag-sliced serving, a new forecasting module): 163 package + 308 src tests; the one licensable `commercial_analytics` pack is sub-divided by `TagDimension.FUNCTION` and serves any function slice in isolation; recompiled to `0.3.0` (24 artifacts, sealed)._
@@ -214,7 +215,7 @@ self-contained page (`GET /`) remains as a zero-dependency fallback alongside th
 Next.js route. `verify-audit.sh` stays Python-only — the FE gate is run and recorded
 beside it, not folded in.
 
-## Foundry build — Loop 0 (2026-07-09) — backend lane
+## Foundry build — Loop 0 (2026-07-09 → 07-10) — backend lane
 
 The July 2026 Foundry build program (`docs/specs/DELIVERY_LOOPS_BACKLOG_2026-07.md`
 + `docs/specs/BUILD_INSTRUCTION_SET_2026-07.md`) opens with Loop 0. Backend lane,
@@ -223,6 +224,7 @@ one unit at a time under the R2 loop; mini-specs in `docs/specs/`.
 | Unit | What shipped | Evidence |
 |---|---|---|
 | **F0.1** — CI gate set = R3 | Frontend Vitest wired into CI as a **blocking** step (`npm run test:cov` added to the existing `frontend-build` job — no new job/toolchain); quality-gate + slop_checker demoted to **advisory** (`continue-on-error: true`). New governance test `tests/test_ci_gate_set.py` (4 tests) parses `ci.yml` and asserts the blocking/advisory split, so the gate set is machine-checked, not eyeballed. Spec: `docs/specs/F0-1_CI_GATE_SET.md`. | `verify-audit` → PASS (209 pkg + **312** src/gov tests, 98.38% cov); FE gate green (20 Vitest tests, 96.1% stmts ≥85%). |
+| **F0.2** — Governance persistence | New **Tier A** `ontowiz_runtime.GovernanceStore` on the `db.py` SQLite seam — the durable delta lifecycle (5 DDL §9 tables: `deltas`/`delta_events`/`approvals`/`audit_log`/`contributions`). Flat hand-rolled rows (no Tier B import, no ORM), mirroring `CommentStore`/`UsageStore`. `propose`/`approve`/`reject`/`escalate`/`record_contribution` each append a delta-event **and** an audit row atomically. Records the lifecycle only — does **not** promote to ACTIVE (R1's `bridge.py` pipe untouched). Endpoint wiring is F0.3. Spec: `docs/specs/F0-2_GOVERNANCE_PERSISTENCE.md`. | `verify-audit` → PASS (**218** pkg + 312 src/gov tests, **98.49%** cov); **restart-survival test green** (`test_approval_and_audit_survive_restart`); boundary clean (no Tier A→B). |
 
 **Security hygiene verified (F0.1), not assumed:** the `ANTHROPIC_API_KEY` was
 **never committed** — exact-path `git log -- .env` is empty; the only `.env*` blob
@@ -236,6 +238,14 @@ leaked via git. Rotation remains available as user-side Anthropic-console hygien
 the ≥85% coverage gate** (verify-audit covers spec/runtime/factory/serve/core.bridge).
 R3 says "no exemptions"; closing it is a dedicated follow-up unit, **not** folded into
 F0.1. Tracked here so it is not lost.
+
+**Honest boundary (F0.2):** the durable `GovernanceStore` is the system-of-record for
+the *deployed* process; the legacy **Tier B** in-memory `DeltaStore`/`ContributionStore`
+(`ontowiz-core/stores.py`) still back the offline factory composition flows and are
+slated for reduction (§2) — F0.2 did **not** rewrite that legacy-debt file. The store
+persists the delta lifecycle but is **not yet wired to any endpoint**; `/v1/deltas`
+(approve/reject/escalate over JWT principals) is **F0.3**, which will consume this store
+and route approval→ACTIVE promotion through `bridge.py` (R1).
 
 ## Known debt (tracked, not hidden)
 
