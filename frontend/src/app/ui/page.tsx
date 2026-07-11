@@ -1,4 +1,5 @@
 import { FOUNDRY_COLORS, FOUNDRY_FONTS, FOUNDRY_RADII } from '@/ui/tokens';
+import { LifecycleBadge, type LifecycleState } from '@/ui/LifecycleBadge';
 
 /**
  * /ui — the in-app design-system gallery (the D0 exit demo surface).
@@ -104,6 +105,27 @@ export default function UIGalleryPage() {
             </div>
           ))}
         </div>
+      </GallerySection>
+
+      <GallerySection title="Lifecycle & Gate">
+        {(
+          [
+            ['Artifact lifecycle', ['draft', 'review', 'verified', 'active', 'deprecated', 'archived']],
+            ['Delta status', ['proposed', 'approved', 'rejected', 'merged']],
+            ['Gate outcome', ['pass', 'fail', 'warn']],
+          ] as [string, LifecycleState[]][]
+        ).map(([group, states]) => (
+          <div key={group} className="mb-5">
+            <div className="mb-2 font-mono text-[10px] uppercase tracking-[1px] text-ink3">
+              {group}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {states.map((state) => (
+                <LifecycleBadge key={state} state={state} />
+              ))}
+            </div>
+          </div>
+        ))}
       </GallerySection>
     </main>
   );

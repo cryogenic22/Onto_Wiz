@@ -1,4 +1,8 @@
-@import 'tailwindcss';
+/* Scope Tailwind's content scanning to the frontend source only. Without this, v4's
+ * automatic detection walks up to the git root and crawls the whole monorepo
+ * (docs/, packages/, the Prototype 9 HTML), which both wastes work and can crash the
+ * build on non-source tokens. */
+@import 'tailwindcss' source('../');
 @import '../ui/tokens.css';
 
 /* Foundry surface defaults (Prototype 9). Persona density vars below stay until the
