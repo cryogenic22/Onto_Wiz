@@ -1,5 +1,25 @@
 import { FOUNDRY_COLORS, FOUNDRY_FONTS, FOUNDRY_RADII } from '@/ui/tokens';
 import { LifecycleBadge, type LifecycleState } from '@/ui/LifecycleBadge';
+import {
+  AttributionChip,
+  LayerChip,
+  ONTOLOGY_LAYERS,
+  PROVENANCE_SOURCES,
+  ProvenanceChip,
+  type ProvenanceSource,
+} from '@/ui/chips';
+
+/** Realistic locators (icon supplied by the component, not the string). */
+const PROVENANCE_DEMO: Record<ProvenanceSource, string> = {
+  transcript: '00:12:31 · R. Mehta',
+  deck: 'slide 23',
+  doc: '§3.2',
+  session: 'session',
+  forge: 'forge · hunt',
+  studio: 'studio',
+  intake: 'intake · mined',
+  eval: 'scenario → eval',
+};
 
 /**
  * /ui — the in-app design-system gallery (the D0 exit demo surface).
@@ -126,6 +146,48 @@ export default function UIGalleryPage() {
             </div>
           </div>
         ))}
+      </GallerySection>
+
+      <GallerySection title="Attribution · Provenance · Layer">
+        <div className="mb-2 font-mono text-[10px] uppercase tracking-[1px] text-ink3">
+          Attribution
+        </div>
+        <div
+          data-testid="gallery-attribution"
+          className="mb-5 flex flex-wrap items-center gap-2"
+        >
+          <AttributionChip name="Priya K." tone="cyan" />
+          <AttributionChip name="R. Mehta" tone="info" validated calibration={0.9} />
+          <AttributionChip name="A. Shah" tone="iris" href="#a-shah" />
+          <AttributionChip name="K. Bose" tone="jade" calibration={0.79} />
+        </div>
+
+        <div className="mb-2 font-mono text-[10px] uppercase tracking-[1px] text-ink3">
+          Provenance
+        </div>
+        <div
+          data-testid="gallery-provenance"
+          className="mb-5 flex flex-wrap items-center gap-2"
+        >
+          {PROVENANCE_SOURCES.map((source) => (
+            <ProvenanceChip key={source} source={source} locator={PROVENANCE_DEMO[source]} />
+          ))}
+          <ProvenanceChip source="deck" locator="slide 23" href="#deck-23" />
+          <ProvenanceChip
+            source="doc"
+            locator="Claude-drafted — never SME-checked"
+            unvalidated
+          />
+        </div>
+
+        <div className="mb-2 font-mono text-[10px] uppercase tracking-[1px] text-ink3">
+          Ontology layer
+        </div>
+        <div data-testid="gallery-layer" className="flex flex-wrap items-center gap-2">
+          {ONTOLOGY_LAYERS.map((layer) => (
+            <LayerChip key={layer} layer={layer} />
+          ))}
+        </div>
       </GallerySection>
     </main>
   );

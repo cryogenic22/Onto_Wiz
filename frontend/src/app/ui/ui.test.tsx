@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { FOUNDRY_COLORS } from '@/ui/tokens';
 import { LIFECYCLE_STATES } from '@/ui/LifecycleBadge';
+import { ONTOLOGY_LAYERS, PROVENANCE_SOURCES } from '@/ui/chips';
 import UIGalleryPage from './page';
 
 describe('/ui gallery', () => {
@@ -22,6 +23,20 @@ describe('/ui gallery', () => {
     ).toBeInTheDocument();
     for (const state of LIFECYCLE_STATES) {
       expect(screen.getByTestId(`lifecycle-badge-${state}`)).toBeInTheDocument();
+    }
+  });
+
+  it('renders an Attribution · Provenance · Layer section with each chip family', () => {
+    render(<UIGalleryPage />);
+    expect(
+      screen.getByRole('heading', { name: /attribution · provenance · layer/i }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByTestId('attribution-chip').length).toBeGreaterThan(0);
+    for (const source of PROVENANCE_SOURCES) {
+      expect(screen.getAllByTestId(`provenance-chip-${source}`).length).toBeGreaterThan(0);
+    }
+    for (const layer of ONTOLOGY_LAYERS) {
+      expect(screen.getByTestId(`layer-chip-${layer}`)).toBeInTheDocument();
     }
   });
 });
