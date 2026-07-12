@@ -13,6 +13,8 @@ A pack is the unit that crosses the Tier A / Tier B boundary. The compiler
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -36,8 +38,28 @@ class PackEvalSummary(BaseModel):
     gate_passed: bool = False
 
 
+class InventoryEntry(BaseModel):
+    """One input artifact, recorded exactly in the manifest (not a mere count)."""
+
+    id: str
+    kind: str
+    content_digest: str          # sha256 of the artifact's canonical JSON
+
+
+class OutputFile(BaseModel):
+    """One emitted PAYLOAD file — path, size, and digest. Control files excluded."""
+
+    path: str                    # pack-relative POSIX path, e.g. "artifacts/x.yaml"
+    byte_count: int
+    sha256: str
+
+
 class PackManifest(BaseModel):
     """Everything a runtime needs to load, trust, and version a pack."""
+
+    # S1.1 manifest v2: default 1 so an *unmarked* on-disk pack loads as v1
+    # (compat); the compiler sets 2 explicitly on every fresh candidate.
+    manifest_version: int = 1
 
     name: str
     version: str                         # semver, e.g. "1.3.0"
@@ -49,9 +71,18 @@ class PackManifest(BaseModel):
     layers: list[PackLayer] = Field(default_factory=list)
     depends_on: list[str] = Field(default_factory=list)  # "name@version" pins
 
-    # counts for the registry view
+    # counts for the registry view (derived convenience — not the source of truth)
     artifact_count: int = 0
     artifact_kinds: dict[str, int] = Field(default_factory=dict)
+
+    # S1.1 candidate identity + exact inventory (v2). candidate_digest is the
+    # reproducible content id; it is excluded only from the bytes hashed to
+    # compute itself, and is still stored here. Empty string == v1/compat.
+    candidate_digest: str = ""
+    input_inventory: list[InventoryEntry] = Field(default_factory=list)
+    output_inventory: list[OutputFile] = Field(default_factory=list)
+    releasable: bool = True                              # False for empty/diagnostic
+    candidate_status: Literal["candidate", "diagnostic"] = "candidate"
 
     # quality / freshness
     evals: PackEvalSummary = Field(default_factory=PackEvalSummary)

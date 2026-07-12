@@ -46,9 +46,10 @@ def test_login_bad_credentials_401(tmp_path):
 
 
 def test_me_requires_auth_401(tmp_path):
-    assert _client(tmp_path).get("/v1/auth/me").status_code == 401
-    # a malformed token is rejected, not ignored
-    assert _client(tmp_path).get(
+    c = _client(tmp_path)  # one pack: S1.1 write_pack refuses to overwrite a same-version
+    assert c.get("/v1/auth/me").status_code == 401          # candidate, and the re-seeded pack
+    # a malformed token is rejected, not ignored              differs by governance timestamps
+    assert c.get(
         "/v1/auth/me", headers={"Authorization": "Bearer garbage"}).status_code == 401
 
 

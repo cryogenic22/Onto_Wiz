@@ -45,8 +45,12 @@ def test_catalog_index_groups_versions_and_functions(tmp_path):
     assert set(e.versions) == {"0.1.0", "0.2.0"}
     assert e.artifact_count == 3
     assert e.functions == {"market_access": 2, "brand_performance": 1}
-    assert e.signed is True                          # write_pack seals
-    assert e.eval_cases == 3 and e.agent_lift == 0.31  # latest version's summary
+    assert e.signed is True                          # write_pack seals (fixed-deterministic)
+    # S1.1 amend-2: mutable eval metadata is stripped from the candidate so it
+    # cannot alter candidate bytes under a fixed digest. The catalog eval summary
+    # is re-supplied from the external eval receipt in S1.3; until then it reads
+    # the manifest default (see docs/specs/S1-1_DETERMINISTIC_COMPILE.md).
+    assert e.eval_cases == 0 and e.agent_lift is None
 
 
 def test_catalog_index_sorts_versions_descending(tmp_path):
