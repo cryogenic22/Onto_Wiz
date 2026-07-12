@@ -120,7 +120,10 @@ truths.
 | Platform step | Existing card / area | Status |
 |---|---|---|
 | Step 0 accept + commit baseline | *this doc + ADR-018* | **in progress (this commit)** |
-| Step 1 harden candidate/release | overlaps F0.6A; new small unit for the 2 verified gaps | glob (`registry.py:43,60`) + reseal (`benchmark.py:238`) OPEN; path-traversal/seal/gate-decouple DONE |
+| Step 1 harden candidate/release | **audit: all 8 items OPEN** → split into S1.1/S1.2/S1.3 (security items done in red-team rounds) | see below |
+| — S1.1 deterministic fresh compile + inventory | new (compiler.py, pack_manifest.py) | mini-spec drafted; closes #1/#2/#3/#7 |
+| — S1.2 manifest-driven load (no glob, verify-before-load) | new (registry.py, release_verifier.py) | PLANNED; closes #4/#5; depends S1.1 |
+| — S1.3 immutable eval receipt (PackEvalSummary derived, no reseal) | new (benchmark.py, eval_contracts.py) | PLANNED; closes #6/#8; depends S1.1 |
 | Step 2 schema-registry kernel | new, `ontowiz-spec` | PLANNED (build source/evidence + governance contracts first) |
 | Step 3 source/evidence boundary | **F0.4A** | mini-spec at `2a493d4`; #7 superseded by ADR-018 → v3 after Step 2 |
 | Step 4 persistent governance | **F0.2H** | mini-spec at `2a493d4`; store = Tier-A adapter; write-model → core at F0.3 |
