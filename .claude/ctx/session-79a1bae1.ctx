@@ -1,0 +1,386 @@
+§CTX v1.0 L2 DOMAIN:session-79a1bae1
+COMPRESSED:2026-07-11 SOURCE_TOKENS:~971 CTX_TOKENS:~1407 RATIO:~0.9x
+
+±ENTITY-USER-REQUEST-55B346F0
+REQUEST:resume and some context Done — you're safe to /clear
+TURN:1
+FACT-ID:ff9ad5a70b43da5d
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn1
+±ENTITY-CONSTRAINT-DC645B94
+RULE:- feedback_v2_builder_protocol.md — the v2 rule: never self-verify; per-unit → §12.1 mini-spec → TDD → gates → §6 bundle → immutable review SHA on a build/<unit-id> worktree → HOLD; only INT marks VERIFIED.
+STATED-TURN:1
+FACT-ID:25f54b308bc71ed5
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn1
+±ENTITY-LITERAL-56EE8452
+VALUE:.claude/ctx/session-295a4abf.ctx
+KIND:path
+TURN:1
+FACT-ID:8296b09668238474
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn1
+±ENTITY-LITERAL-0B8973CB
+VALUE:1985 BPE
+KIND:number_unit
+TURN:1
+FACT-ID:03bfd3635d2547e8
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn1
+±ENTITY-LITERAL-581C141D
+VALUE:docs/reviews/D0.1_REVIEW_BUNDLE.md
+KIND:path
+TURN:1
+FACT-ID:cda9a9cc09435a54
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn1
+±ENTITY-ERROR-3C31259A
+MESSAGE:Exit code 143 Command timed out after 2m 0s
+TURN:9
+FACT-ID:673fe14918fc664f
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn9
+±ENTITY-TOOL-BASH-0008
+RAN:Test bash shell responsiveness
+COMMAND:echo "bash-alive"; pwd
+TURN:24
+SRC:session:79a1bae1#turn24
+±ENTITY-TOOL-BASH-0009
+RAN:List D0 branches, recent log, status via bash
+COMMAND:git --no-pager branch --list 'build/D0*' 2>&1; echo "---LOG---"; git --no-pager log --oneline -6 2>&1; echo "---STATUS---"; git --no-pager status --short 2>&1
+TURN:27
+SRC:session:79a1bae1#turn27
+±ENTITY-TOOL-BASH-0025
+RAN:Verify candidate lucide icon names exist at pinned version
+COMMAND:cd /c/Users/kapil/Documents/Onto_Wiz/frontend && node -e "const L=require('lucide-react'); const want=['Mic','Presentation','FileText','Target','Hammer','Apertu
+TURN:71
+SRC:session:79a1bae1#turn71
+±ENTITY-LITERAL-8BB551DE
+VALUE:0.563.0
+KIND:version
+TURN:74
+FACT-ID:7989d137712146d0
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn74
+±ENTITY-TOOL-BASH-0026
+RAN:Inspect worktrees and the D0.1/D0.2 branch commit contents
+COMMAND:cd /c/Users/kapil/Documents/Onto_Wiz echo "=== worktrees ==="; git worktree list 2>&1 echo "=== D0.1 commit stat ==="; git --no-pager show --stat --oneline buil
+TURN:75
+SRC:session:79a1bae1#turn75
+±ENTITY-DECISION-464806DA
+DECISION:**Decision:** D0.3 ships three cohesive chip components in one module `frontend/src/ui/chips.tsx` — `AttributionChip` (person + decorative avatar + optional ✓/calibration), `ProvenanceChip` (`.chip.src` source-locator, optional deep-link), `LayerChip` (`.tag` L1–L5 ontology layer
+TURN:78
+FACT-ID:093e8b9356f9374f
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn78
+±ENTITY-DECISION-AA8E4124
+DECISION:**Decision:** provenance source-type icons use lucide-react (decorative, `aria-hidden`), not the prototype's emoji, to stay consistent with LifecycleBadge's established icon+label accessibility invariant and avoid emoji-rendering variance.
+TURN:78
+FACT-ID:607f8221faaaba5e
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn78
+±ENTITY-DECISION-4AAD65A7
+DECISION:**Decision:** layer tones stay faithful to Prototype 9 — L1 cyan, L3 molten, L2/L4/L5 neutral — rather than inventing five distinct accents; the text label ("L2 relation") always carries meaning so colour is never the sole signal (mirrors LifecycleBadge's NEUTRAL choice).
+TURN:78
+FACT-ID:cb887189a98e3e22
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn78
+±ENTITY-LITERAL-B1100F8E
+VALUE:5f2a4b5
+KIND:git_sha
+TURN:78
+FACT-ID:3c8add8bf1e8800b
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn78
+±ENTITY-LITERAL-A7CF1967
+VALUE:5af28b1
+KIND:git_sha
+TURN:78
+FACT-ID:63791032ecd4c65b
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn78
+±ENTITY-LITERAL-B73DD759
+VALUE:frontend/src/ui/chips.tsx
+KIND:path
+TURN:78
+FACT-ID:cdcf488a7ba74be3
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn78
+±ENTITY-TOOL-BASH-0029
+RAN:Run chips tests to confirm TDD red
+COMMAND:cd /c/Users/kapil/Documents/Onto_Wiz/frontend && npx vitest run src/ui/chips.test.tsx 2>&1 | tail -20
+TURN:86
+SRC:session:79a1bae1#turn86
+±ENTITY-TOOL-BASH-0031
+RAN:Run chips tests for green
+COMMAND:npx vitest run src/ui/chips.test.tsx 2>&1 | tail -30
+TURN:92
+SRC:session:79a1bae1#turn92
+±ENTITY-TOOL-BASH-0036
+RAN:Run full Vitest suite with coverage
+COMMAND:npx vitest run --coverage 2>&1 | tail -40
+TURN:107
+SRC:session:79a1bae1#turn107
+±ENTITY-LITERAL-395C606D
+VALUE:91.7%
+KIND:number_unit
+TURN:110
+FACT-ID:ac2cd70a8f9002e4
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn110
+±ENTITY-LITERAL-8BA1782B
+VALUE:93.5%
+KIND:number_unit
+TURN:110
+FACT-ID:8c632f922f2c081b
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn110
+±ENTITY-LITERAL-FAE31ECE
+VALUE:100%
+KIND:number_unit
+TURN:110
+FACT-ID:52cc95a1c0366f77
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn110
+±ENTITY-LITERAL-9A80B8E2
+VALUE:85%
+KIND:number_unit
+TURN:110
+FACT-ID:cb704082c5caf85a
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn110
+±ENTITY-TOOL-BASH-0039
+RAN:Run vitest+coverage, tsc, eslint
+COMMAND:echo "=== VITEST + COVERAGE ==="; npx vitest run --coverage 2>&1 | tail -16 echo "=== TSC ==="; npx tsc --noEmit 2>&1 | tail -15; echo "tsc exit: ${PIPESTATUS[0
+TURN:118
+SRC:session:79a1bae1#turn118
+±ENTITY-TOOL-BASH-0040
+RAN:Run next build with /ui prerender
+COMMAND:npx next build 2>&1 | tail -30; echo "next exit: ${PIPESTATUS[0]}"
+TURN:122
+SRC:session:79a1bae1#turn122
+±ENTITY-TOOL-BASH-0041
+RAN:Check if dev server serving /ui on :3000
+COMMAND:curl -s -o /dev/null -w "%{http_code}" --max-time 4 http://localhost:3000/ui 2>&1 || echo " (no server)"
+TURN:126
+SRC:session:79a1bae1#turn126
+±ENTITY-TOOL-BASH-0042
+RAN:Get exact test count and confirm D0.3 file set
+COMMAND:npx vitest run 2>&1 | grep -E "Test Files|Tests " echo "=== D0.3 new/changed FE files ===" cd /c/Users/kapil/Documents/Onto_Wiz && git --no-pager status --short
+TURN:130
+SRC:session:79a1bae1#turn130
+±ENTITY-TOOL-BASH-0044
+RAN:Create worktree off D0.2 SHA, copy D0.3 files, stage, verify D0.3-only diff
+COMMAND:set -e ROOT=/c/Users/kapil/Documents/Onto_Wiz WT="/c/Users/kapil/AppData/Local/Temp/claude/C--Users-kapil-Documents-Onto-Wiz/79a1bae1-ffdd-4e32-b634-692bef5f7bd
+TURN:138
+SRC:session:79a1bae1#turn138
+±ENTITY-TOOL-BASH-0045
+RAN:Commit D0.3 review SHA, print it, remove worktree
+COMMAND:set -e WT="/c/Users/kapil/AppData/Local/Temp/claude/C--Users-kapil-Documents-Onto-Wiz/79a1bae1-ffdd-4e32-b634-692bef5f7bd9/scratchpad/d03-wt" cd "$WT" git commi
+TURN:142
+SRC:session:79a1bae1#turn142
+±ENTITY-LITERAL-55030871
+VALUE:59029aa
+KIND:git_sha
+TURN:145
+FACT-ID:b61b986ab7f6142e
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn145
+±ENTITY-LITERAL-207CB660
+VALUE:8bc247e
+KIND:git_sha
+TURN:145
+FACT-ID:994d2c46bb5b08ea
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn145
+±ENTITY-TOOL-BASH-0046
+RAN:Check foundry-build move, FE-file safety, and D0.3 diff integrity
+COMMAND:cd /c/Users/kapil/Documents/Onto_Wiz echo "=== foundry-build recent ==="; git --no-pager log --oneline -4 foundry-build echo "=== did BE sweep up my FE files? (
+TURN:146
+SRC:session:79a1bae1#turn146
+±ENTITY-DECISION-C539D144
+DECISION:Decision: I will not edit the INT-owned §0A baseline table — it carries uncommitted INT edits and D0.2 was likewise left for INT; I signal `READY FOR REVIEW` via the branch + bundle + this report, exactly as D0.1/D0.2 were submitted.
+TURN:156
+FACT-ID:854c41300a38916f
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn156
+±ENTITY-INCIDENT-242B19E4
+TYPE:saved
+PARSE-OK:true
+RAW:ctx-incident: saved | fact="FE resume pointer + D0.1/D0.2 submitted SHAs" | evidence="session-start gist + project_ontowiz_foundry_fe.md matched live git state (build/D0.1 8263575, build/D0.2 5af28b1); resumed D0.3 with no rework"
+TURN:165
+FACT:FE resume pointer + D0.1/D0.2 submitted SHAs
+EVIDENCE:session-start gist + project_ontowiz_foundry_fe.md matched live git state (build/D0.1 8263575, build/D0.2 5af28b1); resumed D0.3 with no rework
+FACT-ID:fdc90b35d442ea33
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn165
+±ENTITY-DECISION-BFCF5DA3
+DECISION:Decision: built D0.3 as three cohesive chip components in one module `frontend/src/ui/chips.tsx`, with taxonomies (`ONTOLOGY_LAYERS`, `PROVENANCE_SOURCES`, avatar tones) sourced verbatim from Prototype 9 rather than invented.
+TURN:165
+FACT-ID:cc25a3600810fd96
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn165
+±ENTITY-DECISION-E139DCAA
+DECISION:Decision: provenance source-type icons use lucide-react (decorative, `aria-hidden`), not the prototype's emoji, for crispness and consistency with LifecycleBadge's icon+label accessibility invariant.
+TURN:165
+FACT-ID:983b2ac5f8185f1b
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn165
+±ENTITY-DECISION-8F444355
+DECISION:Decision: layer tones stay faithful to Prototype 9 — L1 cyan, L3 molten, L2/L4/L5 neutral — the text label always carries meaning so colour is never the sole signal.
+TURN:165
+FACT-ID:c89416bd0baf0ba7
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn165
+±ENTITY-DECISION-F1EA3DB6
+DECISION:Decision: submitted D0.3 as immutable review SHA `59029aa` on `build/D0.3-chips`, cut via a throwaway worktree off D0.2's `5af28b1` with gates run in the main working tree, because the branch tip reconstructs the identical D0.1+D0.2+D0.3 tree and the fresh worktree lacks node_mod
+TURN:165
+FACT-ID:4d3b42b1d94a96d9
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn165
+±ENTITY-DECISION-5E162DAA
+DECISION:Decision: did not edit the INT-owned §0A baseline table (it carries your uncommitted edits and D0.2 was likewise left for you) — signalled `READY FOR REVIEW` via the branch + bundle + this report.
+TURN:165
+FACT-ID:65f0086380f7c973
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn165
+±ENTITY-CONSTRAINT-0FEB01E2
+RULE:Constraint: 360/768/1440 live screenshots remain the carried outstanding shared-FE-DoD item (same as D0.1/D0.2) — responsive behavior is test-enforced (truncate + flex-wrap) and the local browser-capture path is documented-flaky here; the running dev server on :3000 is currently returning 500 (stale, pre-existing — production `next build` is clean).
+STATED-TURN:165
+FACT-ID:8c0f38fae761774e
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn165
+±ENTITY-LITERAL-EB5A9A81
+VALUE:97.54%
+KIND:number_unit
+TURN:165
+FACT-ID:a20a1c611843fad8
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn165
+±ENTITY-LITERAL-11821888
+VALUE:96.25%
+KIND:number_unit
+TURN:165
+FACT-ID:7dd4bb25327fc632
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn165
+±ENTITY-LITERAL-8854A66F
+VALUE:docs/reviews/D0.3_REVIEW_BUNDLE.md
+KIND:path
+TURN:165
+FACT-ID:f43b59610251a9b3
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn165
+±ENTITY-LITERAL-2819B411
+VALUE:docs/specs/D0.3_CHIPS.md
+KIND:path
+TURN:165
+FACT-ID:e4eb91437deacb87
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn165
+±ENTITY-LITERAL-187BF743
+VALUE:scripts/verify-audit.sh
+KIND:path
+TURN:165
+FACT-ID:5fc2bc99b469a855
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:79a1bae1#turn165
+±ENTITY-FILE-APIL-DOCUMENTS-ONTO-WIZ-MEMORY-PROJECT-ONTOWIZ-FOUNDRY-FE-MD
+PATH:C:\Users\kapil\.claude\projects\C--Users-kapil-Documents-Onto-Wiz\memory\project_ontowiz_foundry_fe.md
+EDITS:2
+LAST-TURN:162
+SRC:session:79a1bae1#turn162
+±ENTITY-FILE--KAPIL-DOCUMENTS-ONTO-WIZ-DOCS-REVIEWS-D0-3-REVIEW-BUNDLE-MD
+PATH:C:\Users\kapil\Documents\Onto_Wiz\docs\reviews\D0.3_REVIEW_BUNDLE.md
+EDITS:2
+LAST-TURN:157
+SRC:session:79a1bae1#turn157
+±ENTITY-FILE-C-USERS-KAPIL-DOCUMENTS-ONTO-WIZ-DOCS-SPECS-D0-3-CHIPS-MD
+PATH:C:\Users\kapil\Documents\Onto_Wiz\docs\specs\D0.3_CHIPS.md
+EDITS:1
+LAST-TURN:79
+SRC:session:79a1bae1#turn79
+±ENTITY-FILE--USERS-KAPIL-DOCUMENTS-ONTO-WIZ-FRONTEND-SRC-APP-UI-PAGE-TSX
+PATH:C:\Users\kapil\Documents\Onto_Wiz\frontend\src\app\ui\page.tsx
+EDITS:2
+LAST-TURN:98
+SRC:session:79a1bae1#turn98
+±ENTITY-FILE-ERS-KAPIL-DOCUMENTS-ONTO-WIZ-FRONTEND-SRC-APP-UI-UI-TEST-TSX
+PATH:C:\Users\kapil\Documents\Onto_Wiz\frontend\src\app\ui\ui.test.tsx
+EDITS:2
+LAST-TURN:103
+SRC:session:79a1bae1#turn103
+±ENTITY-FILE-SERS-KAPIL-DOCUMENTS-ONTO-WIZ-FRONTEND-SRC-UI-CHIPS-TEST-TSX
+PATH:C:\Users\kapil\Documents\Onto_Wiz\frontend\src\ui\chips.test.tsx
+EDITS:2
+LAST-TURN:115
+SRC:session:79a1bae1#turn115
+±ENTITY-FILE-C-USERS-KAPIL-DOCUMENTS-ONTO-WIZ-FRONTEND-SRC-UI-CHIPS-TSX
+PATH:C:\Users\kapil\Documents\Onto_Wiz\frontend\src\ui\chips.tsx
+EDITS:1
+LAST-TURN:90
+SRC:session:79a1bae1#turn90

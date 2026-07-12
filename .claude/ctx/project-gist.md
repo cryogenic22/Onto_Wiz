@@ -1,0 +1,26 @@
+# Project memory (2 earlier sessions, oldest first)
+
+Cross-session ledger rollup. Detail per session: `ctxpack session decisions --session <id>`.
+
+## Constraints (verbatim — do not violate)
+- - feedback_v2_builder_protocol.md — the v2 rule: never self-verify; per-unit → §12.1 mini-spec → TDD → gates → §6 bundle → immutable review SHA on a build/<unit-id> worktree → HOLD; only INT marks VERIFIED. (s:79a1bae1#turn1)
+- Constraint: 360/768/1440 live screenshots remain the carried outstanding shared-FE-DoD item (same as D0.1/D0.2) — responsive behavior is test-enforced (truncate + flex-wrap) and the local browser-capture path is documented-flaky here; the running dev server on :3000 is currently returning 500 (stale, pre-existing — production `next build` is clean). (s:79a1bae1#turn165)
+
+## Decisions
+- Decision: removed my premature D0.1 completion entry from `PROJECT_STATUS.md` and relocated the evidence to a §6 review bundle, because Backlog v2 §0A/R14 make `PROJECT_STATUS.md` a verified-outcomes-only, INT-owned record and bar builders from self-verifying. (s:295a4abf#turn304)
+- Decision: submitted D0.1 as immutable review SHA `8263575` on `build/D0.1-tokens-gallery` off baseline `5f2a4b5`, cut in an isolated worktree so the parallel BE session on `foundry-build` is undisturbed (full v2 §0B protocol, per your choice). (s:295a4abf#turn304)
+- Decision: D0.2–D0.9 will use the §12.1 eleven-section mini-spec plus the shared FE DoD (WCAG 2.2 AA; 360/768/1440 evidence; badges icon+label not colour-only); D1.1 blocks on BE F0.3A (contract-before-consumer, R11), while D0.2–D0.9 have no API dependency and proceed within Loop  (s:295a4abf#turn304)
+- Decision: stopped chasing the 360px screenshot after it proved environmentally unreliable, having verified desktop + 768px cleanly and recorded the layout as responsive-by-construction — a capture limitation, not a UI defect. (s:295a4abf#turn304)
+- Decision: modeled `LifecycleBadge` on the canonical enums (`ontowiz_spec.Lifecycle` + `ontowiz_core.DeltaStatus` + gate outcomes = 13 states) instead of inventing states, satisfying the §13 "all true states represented" DoD. (s:295a4abf#turn408)
+- Decision: enforced icon + label (never colour-only) as a test invariant across all 13 states for WCAG 2.2 AA, per the §13 D0.2 DoD. (s:295a4abf#turn408)
+- Decision: fixed a Tailwind v4 build crash by scoping content scanning to `frontend/src` via `@import 'tailwindcss' source('../')`, because v4 auto-detects from the git root and crawled the monorepo (docs, Prototype 9 HTML, v2 specs) into a `RangeError`; this also retroactively ha (s:295a4abf#turn408)
+- Decision: submitted D0.2 as immutable review SHA `5af28b1` on `build/D0.2-lifecycle-badge`, stacked on D0.1's `8263575` (merge order D0.1 → D0.2). (s:295a4abf#turn408)
+- **Decision:** D0.3 ships three cohesive chip components in one module `frontend/src/ui/chips.tsx` — `AttributionChip` (person + decorative avatar + optional ✓/calibration), `ProvenanceChip` (`.chip.src` source-locator, optional deep-link), `LayerChip` (`.tag` L1–L5 ontology layer (s:79a1bae1#turn78)
+- **Decision:** provenance source-type icons use lucide-react (decorative, `aria-hidden`), not the prototype's emoji, to stay consistent with LifecycleBadge's established icon+label accessibility invariant and avoid emoji-rendering variance. (s:79a1bae1#turn78)
+- **Decision:** layer tones stay faithful to Prototype 9 — L1 cyan, L3 molten, L2/L4/L5 neutral — rather than inventing five distinct accents; the text label ("L2 relation") always carries meaning so colour is never the sole signal (mirrors LifecycleBadge's NEUTRAL choice). (s:79a1bae1#turn78)
+- Decision: I will not edit the INT-owned §0A baseline table — it carries uncommitted INT edits and D0.2 was likewise left for INT; I signal `READY FOR REVIEW` via the branch + bundle + this report, exactly as D0.1/D0.2 were submitted. (s:79a1bae1#turn156)
+- Decision: built D0.3 as three cohesive chip components in one module `frontend/src/ui/chips.tsx`, with taxonomies (`ONTOLOGY_LAYERS`, `PROVENANCE_SOURCES`, avatar tones) sourced verbatim from Prototype 9 rather than invented. (s:79a1bae1#turn165)
+- Decision: provenance source-type icons use lucide-react (decorative, `aria-hidden`), not the prototype's emoji, for crispness and consistency with LifecycleBadge's icon+label accessibility invariant. (s:79a1bae1#turn165)
+- Decision: layer tones stay faithful to Prototype 9 — L1 cyan, L3 molten, L2/L4/L5 neutral — the text label always carries meaning so colour is never the sole signal. (s:79a1bae1#turn165)
+- Decision: submitted D0.3 as immutable review SHA `59029aa` on `build/D0.3-chips`, cut via a throwaway worktree off D0.2's `5af28b1` with gates run in the main working tree, because the branch tip reconstructs the identical D0.1+D0.2+D0.3 tree and the fresh worktree lacks node_mod (s:79a1bae1#turn165)
+- Decision: did not edit the INT-owned §0A baseline table (it carries your uncommitted edits and D0.2 was likewise left for you) — signalled `READY FOR REVIEW` via the branch + bundle + this report. (s:79a1bae1#turn165)
