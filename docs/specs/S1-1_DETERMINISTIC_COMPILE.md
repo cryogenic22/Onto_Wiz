@@ -70,7 +70,7 @@ keeps the `<name>/<version>/` layout but makes it fresh, reproducible, and confl
 InventoryEntry:  id: str; kind: str; content_digest: str      # one per input artifact
 OutputFile:      path: str; byte_count: int; sha256: str       # one per emitted PAYLOAD file
 PackManifest (v2 additions):
-  manifest_version: int   = 2
+  manifest_version: int   = 1             # model default 1: an unmarked pack loads as v1; compile_pack sets 2
   candidate_digest: str   = ""            # reproducible content id (see §5); "" only for v1 compat
   input_inventory:  list[InventoryEntry]  = []   # every input artifact, sorted by (kind, id)
   output_inventory: list[OutputFile]      = []   # every emitted PAYLOAD file, sorted by path
@@ -99,12 +99,20 @@ The candidate is the directory `<name>/<version>/`. It contains exactly two cate
   are **never** listed in `output_inventory` and are the *only* non-payload files permitted in
   the directory.
 
-**Constraint: no volatile value is written anywhere inside the candidate.** `compiled_at` is
-**not** written into the candidate `pack.yaml` (left `None`); build time is provenance of the
-*registration/release event*, recorded outside the candidate (S1.3/F0.6A). `freshness_days`,
-`coverage`, and `evals` are derived catalog views, not candidate identity, and do not enter the
-digest. Consequence: repeated builds of the same inputs produce a **byte-identical directory**,
-including `pack.yaml` and `pack.sig`.
+**Constraint: the candidate `pack.yaml` is serialized from an explicit allowlist — no other field
+reaches disk.** The candidate manifest serializes **exactly** the digest `core` fields (§5.2) plus
+the two deterministically-derived convenience counts `artifact_count`/`artifact_kinds` (both
+functions of `input_inventory`, so fixed per content). Every field excluded from `candidate_digest`
+is therefore **also omitted from the candidate `pack.yaml`**: the mutable catalog/eval fields
+(`evals`, `coverage`, `freshness_days`) and the provenance fields (`compiled_at`,
+`compiler_version`, `signed`, `encrypted`, `license_id`) live only in the in-memory model, the
+external catalog, or the registration/release event — never in candidate bytes. Because the
+serialized set is exactly {digest core} ∪ {deterministic derived counts}, **candidate bytes are a
+pure function of the digest**: any field a caller mutates (existing callers already mutate `evals`)
+is stripped on write and cannot produce different bytes under the same digest. Implemented as a
+pydantic serialization allowlist in `write_pack`, not an ad-hoc field drop. Consequence: repeated
+builds of the same inputs produce a **byte-identical directory**, including `pack.yaml` and
+`pack.sig`.
 
 ### 5.2 `candidate_digest` — reproducible content identity (no self-reference)
 
@@ -293,6 +301,8 @@ seal. No egress.
 | §8-3 | manifest lists every emitted payload file + bytes + sha256; excludes control files | `test_output_inventory_matches_disk_payload_only` |
 | §8-7 | empty compile → `releasable=False`, `candidate_status="diagnostic"` | `test_empty_candidate_not_releasable` |
 | compat | v1 pack still loads in compat mode (`candidate_digest=""`) | `test_v1_manifest_loads_in_compat_mode` |
+| compat/**amend-1** | a manifest with **no** `manifest_version` field loads as `== 1` (not 2) | `test_absent_manifest_version_loads_as_v1` |
+| **amend-2** | non-default `evals`/`coverage`/`freshness_days` on the manifest are stripped on write and cannot change candidate bytes (written `pack.yaml` == default-metadata build, byte-for-byte) | `test_mutable_metadata_stripped_bytes_unchanged` |
 | regression | existing write/load round-trip + `verify_pack` stay green | existing `test_compiler.py` suite |
 
 Coverage ≥85% on changed compiler/manifest code; branch + every negative path (each typed error,
