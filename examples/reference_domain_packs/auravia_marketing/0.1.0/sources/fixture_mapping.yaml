@@ -1,0 +1,19 @@
+schema_version: ontowiz.synthetic-fixture-mapping/v0alpha1
+mapping:
+  purpose: >
+    Resolve source instances in source_manifest.yaml to document keys in the
+    embedded synthetic source fixture. This sidecar is test-fixture data, not a
+    canonical semantic module.
+  bundle_path: sources/synthetic_source_fixture.yaml
+  source_instances:
+    source_synthetic_us_label_v1: synthetic_us_label_v1
+    source_synthetic_study_report_v1: synthetic_study_report_v1
+    source_synthetic_us_promo_policy_v1: synthetic_us_promo_policy_v1
+    source_synthetic_gb_policy_v1: synthetic_gb_policy_v1
+    source_synthetic_metric_spec_v1: synthetic_metric_spec_v1
+    source_synthetic_data_contract_v1: synthetic_data_contract_v1
+    source_synthetic_plan_snapshot_w26: synthetic_plan_snapshot_w26
+  digest_rule: >
+    The compiler canonicalizes and hashes each mapped document subtree. The
+    resulting digest populates its content object before candidate compilation.
+

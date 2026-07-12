@@ -1,0 +1,244 @@
+schema_version: ontowiz.agent-contract-module/v0alpha1
+module:
+  id: agent_contracts_auravia_v1
+  lifecycle: design_fixture
+  synthetic_reference: true
+  direct_storage_access_permitted: false
+  arbitrary_sql_permitted: false
+
+common_scope:
+  required:
+    - client_id
+    - brand_id
+    - market
+    - audience
+    - communication_purpose
+    - as_of
+  optional:
+    - channel
+    - indication
+    - campaign_id
+    - segment_snapshot_id
+  missing_required_behavior: FAIL_CLOSED
+
+trust_envelope:
+  required_fields:
+    - pack_id
+    - release_id
+    - artifact_ids_and_versions
+    - resolved_scope
+    - evidence_spans
+    - policy_versions
+    - label_versions
+    - effective_and_expiry_dates
+    - access_decision
+    - evaluation_receipt_id
+    - synthetic_reference
+    - production_eligible
+    - human_approval_requirement
+  numeric_response_additions:
+    - metric_ids_and_versions
+    - formula_and_grain
+    - filters_and_period
+    - source_snapshot
+    - plan_snapshot_if_used
+    - freshness_and_completeness
+    - suppression
+    - uncertainty_if_applicable
+    - query_receipt_id
+
+operations:
+  - name: resolve_concept
+    purpose: Resolve user terminology to stable concepts within declared scope.
+    input: [term, common_scope]
+    output: [resolved_concepts, preferred_terms, disambiguation, trust_envelope]
+    abstain_when: [ambiguous_without_safe_default, no_scope_eligible_concept]
+
+  - name: get_content_brief
+    purpose: Return the governed inputs for a scoped content task.
+    input: [task, common_scope, intended_format, objective]
+    output:
+      - brief_id
+      - eligible_claims
+      - eligible_claim_variants
+      - required_risk_bundles
+      - mandatory_statements
+      - prohibited_transformations
+      - allowed_ctas
+      - human_review_requirement
+      - trust_envelope
+    block_when: [wrong_market, wrong_audience, wrong_purpose, no_current_label]
+
+  - name: get_eligible_claims
+    purpose: Resolve semantic claims, not free text, for a declared intent and scope.
+    input: [intent, common_scope]
+    output: [claims, support_assertions, required_risk_bundles, trust_envelope]
+    block_when: [claim_not_current, evidence_inaccessible, applicability_mismatch]
+
+  - name: explain_claim_support
+    purpose: Explain why a claim is or is not supported.
+    input: [claim_id, common_scope]
+    output: [proposition, support_assertions, evidence_spans, limitations, review_state, trust_envelope]
+    model_confidence_can_replace_evidence_strength: false
+
+  - name: get_required_risk
+    purpose: Return the risk and limitation bundle coupled to a claim and channel.
+    input: [claim_id, channel, common_scope]
+    output: [risk_bundle, presentation_policy, unresolved_visual_checks, trust_envelope]
+
+  - name: get_channel_policy
+    purpose: Resolve current channel eligibility and constraints.
+    input: [channel, common_scope]
+    output: [policy, consent_requirements, suppression_rules, frequency_rules, trust_envelope]
+
+  - name: validate_draft
+    purpose: Produce an automated preflight, never an approval.
+    input:
+      - draft_text
+      - declared_claim_ids
+      - common_scope
+      - intended_format
+    output:
+      - decision
+      - findings
+      - governing_artifacts
+      - evidence_spans
+      - unresolved_items
+      - human_review_required
+      - trust_envelope
+    allowed_decisions: [NO_AUTOMATED_BLOCK_FOUND, BLOCK, ROUTE, ABSTAIN]
+    prohibited_decisions: [APPROVED, MLR_APPROVED, REGULATORY_APPROVED]
+
+  - name: explain_finding
+    purpose: Resolve a preflight finding to its rule, expected state, and evidence.
+    input: [finding_id, common_scope]
+    output: [finding, rule, evidence, remediation_boundary, trust_envelope]
+
+  - name: get_next_action_options
+    purpose: Return governed eligible and excluded action options with a decision receipt.
+    input:
+      - opaque_subject_reference
+      - common_scope
+      - consent_snapshot_id
+      - suppression_snapshot_id
+      - segment_snapshot_id
+      - journey_state_observations
+    output:
+      - eligible_actions
+      - excluded_actions_with_reasons
+      - proposed_action
+      - decision_receipt
+      - trust_envelope
+    block_when: [consent_authority_unavailable, suppression_authority_unavailable]
+    generated_draft_can_be_selected_as_released_asset: false
+
+  - name: get_kpi_tree
+    purpose: Return the typed KPI hierarchy and edge semantics for a declared scope.
+    input: [common_scope, root_kpi_id, as_of]
+    output: [nodes, typed_edges, metric_versions, caveats, trust_envelope]
+    causal_relationship_inferred_from_tree_position: false
+
+  - name: get_campaign_performance
+    purpose: Return governed reach, engagement, spend, content exposure, and outcome observations for a campaign.
+    input: [campaign_id, common_scope, period, source_snapshot]
+    output: [observations, metric_definitions, data_quality, query_receipts, causal_status, trust_envelope]
+    default_causal_status: NOT_ESTABLISHED
+
+  - name: get_join_path
+    purpose: Resolve an approved table path and analysis grain for a semantic query.
+    input: [metric_ids, requested_dimensions, common_scope]
+    output: [join_contracts, required_preaggregation, fanout_policy, access_decision, trust_envelope]
+    undeclared_path_behavior: REJECT
+
+  - name: get_attribution_result
+    purpose: Return descriptive allocation results with explicit non-causal limits.
+    input: [analysis_id, common_scope]
+    output: [method, allocated_credit, identity_coverage, unattributed_share, limitations, trust_envelope]
+    can_support_incrementality: false
+
+  - name: get_metric_definition
+    purpose: Resolve exact metric semantics and interpretation limits.
+    input: [metric_id, version, common_scope]
+    output: [definition, formula, grain, dimensions, valid_uses, prohibited_interpretations, lineage, trust_envelope]
+
+  - name: query_metric
+    purpose: Execute a typed governed semantic request against an authorized query service.
+    input:
+      - metric_id
+      - metric_version
+      - common_scope
+      - period
+      - dimensions
+      - filters
+      - source_snapshot
+    output: [result, unit, quality_status, query_receipt, trust_envelope]
+    arbitrary_sql: false
+    undeclared_join_behavior: REJECT
+    row_level_result_behavior: REJECT_UNLESS_SEPARATELY_AUTHORIZED
+
+  - name: compare_metric
+    purpose: Compare a metric with an explicit governed baseline.
+    input: [metric_id, common_scope, period, baseline_type, baseline_version]
+    output: [actual, baseline, variance, query_receipts, caveats, trust_envelope]
+
+  - name: decompose_variance
+    purpose: Produce an arithmetic or diagnostic decomposition without implying causality.
+    input: [metric_id, common_scope, period, baseline, dimensions]
+    output: [components, residual, relation_types, quality_status, query_receipts, trust_envelope]
+
+  - name: trace_metric_lineage
+    purpose: Return metric, table, column, join, and source lineage.
+    input: [metric_id, metric_version, common_scope]
+    output: [metric_contract, table_contracts, join_contracts, source_instances, trust_envelope]
+
+  - name: get_dataset_health
+    purpose: Return freshness, completeness, revisions, and blocking quality failures.
+    input: [dataset_id, snapshot_id, common_scope]
+    output: [quality_results, interpretation_eligibility, trust_envelope]
+
+  - name: diagnose_brand_variance
+    purpose: Separate facts, hypotheses, confounders, causal findings, and next analyses.
+    input: [metric_id, common_scope, period, baseline, requested_driver_question]
+    output:
+      - performance_brief
+      - observations
+      - hypotheses
+      - supporting_and_contradicting_evidence
+      - confounders
+      - causal_findings
+      - unresolved_questions
+      - next_analyses
+      - permissible_action_candidates
+      - query_receipts
+      - trust_envelope
+    unresolved_is_valid: true
+
+  - name: get_experiment_result
+    purpose: Return an eligible governed causal analysis or explicitly state that none exists.
+    input: [experiment_id_or_scope, outcome_metric, common_scope]
+    output: [design, analysis_status, estimate, uncertainty, assumptions, limitations, review_state, trust_envelope]
+    observational_attribution_can_satisfy: false
+
+  - name: submit_feedback
+    purpose: Create a proposed feedback Delta linked to the served decision or answer.
+    input: [served_receipt_id, feedback_type, observation, proposed_correction, evidence]
+    output: [delta_id, lifecycle, routing, trust_envelope]
+    directly_mutates_released_pack: false
+
+response_policies:
+  - id: policy_always_surface_synthetic_status
+    condition: pack.synthetic_reference_equals_true
+    requirement: Every response states that the result is synthetic and non-production.
+  - id: policy_numeric_receipt_required
+    condition: response_contains_number
+    requirement: Every number resolves to a query or evidence receipt.
+  - id: policy_no_invented_artifact
+    condition: requested_metric_table_claim_or_rule_not_resolved
+    requirement: Return NOT_FOUND or ABSTAIN; do not synthesize an authority.
+  - id: policy_no_approval_language
+    condition: operation_equals_validate_draft
+    requirement: Never use approved or equivalent status language.
+  - id: policy_no_causal_language_without_artifact
+    condition: response_uses_causal_or_incremental_language
+    requirement: Resolve an eligible reviewed causal-analysis artifact or block the statement.
+

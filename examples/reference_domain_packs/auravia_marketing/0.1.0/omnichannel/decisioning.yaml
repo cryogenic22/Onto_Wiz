@@ -1,0 +1,214 @@
+schema_version: ontowiz.omnichannel-module/v0alpha1
+module:
+  id: omnichannel_auravia_v1
+  lifecycle: design_fixture
+  synthetic_reference: true
+  identity_and_consent_authority: external_client_system
+  stores_person_level_identity: false
+
+segment_definitions:
+  - id: segment_dermatologist_evaluation_v1
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    description: >
+      Synthetic segment of eligible US dermatologists with evidence of active
+      evaluation needs and a permitted commercial contact state.
+    rule:
+      all:
+        - specialty_equals: DERMATOLOGY
+        - market_equals: US
+        - eligibility_service_returns: ELIGIBLE
+        - consent_service_returns: PERMITTED_FOR_CHANNEL
+        - suppression_service_returns: NOT_SUPPRESSED
+    prohibited_inputs:
+      - protected_health_information
+      - inferred_sensitive_health_status_of_hcp
+      - unsupported_personality_profile
+    snapshot_required: true
+    owner: synthetic_commercial_operations
+
+journey_states:
+  - id: journey_state_evaluation
+    lifecycle: RATIFIED
+    synthetic: true
+    definition: >
+      A time-bound inference that the governed audience is evaluating the
+      fictional brand for eligible use. This is not a permanent person trait.
+    required_observations:
+      minimum_count: 1
+      maximum_age_days: 30
+      allowed_types:
+        - eligible_content_request
+        - synthetic_field_need_observation
+        - approved_site_topic_engagement
+    confidence_policy:
+      minimum_for_automated_selection: 0.75
+      below_threshold: ABSTAIN_OR_HUMAN_REVIEW
+    expiry_days: 30
+
+channels:
+  - id: channel_policy_hcp_email_v1
+    channel_ref: channel_hcp_email
+    lifecycle: RATIFIED
+    audience_types: [HCP]
+    identity_service_required: true
+    consent_service_required: true
+    monitoring_required: true
+    inbound_response_route: CLIENT_APPROVED_INBOUND_PROCESS
+  - id: channel_policy_field_detail_v1
+    channel_ref: channel_field_detail
+    lifecycle: RATIFIED
+    audience_types: [HCP]
+    field_eligibility_service_required: true
+    representative_review_required: true
+  - id: channel_policy_approved_web_v1
+    channel_ref: channel_approved_web
+    lifecycle: RATIFIED
+    audience_types: [HCP]
+    authentication_required: true
+    approved_asset_only: true
+
+contact_policies:
+  - id: contact_policy_us_hcp_email_v1
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    market: US
+    audience: audience_us_hcp_dermatologist
+    channel: channel_hcp_email
+    eligibility_checks:
+      - current_external_consent
+      - no_active_global_suppression
+      - no_active_channel_suppression
+      - recipient_identity_resolved
+      - asset_is_released_and_unexpired
+      - asset_scope_matches_market_audience_purpose
+    frequency_rule:
+      maximum_valid_deliveries: 2
+      rolling_window_days: 14
+      attempted_or_bounced_delivery_counts: false
+    cooldown_after_unsubscribe:
+      decision: BLOCK
+      duration: INDEFINITE_UNTIL_EXTERNAL_AUTHORITY_CHANGES
+    missing_authority_response: FAIL_CLOSED
+
+suppression_rules:
+  - id: suppress_active_medical_information_case
+    lifecycle: RATIFIED
+    synthetic: true
+    condition: external_case_service_returns_active_medical_information_case
+    applies_to: [channel_hcp_email]
+    decision: BLOCK_AUTOMATED_PROMOTIONAL_CONTACT
+  - id: suppress_recent_adverse_event_route
+    lifecycle: RATIFIED
+    synthetic: true
+    condition: validated_safety_routing_service_returns_contact_hold
+    applies_to: [channel_hcp_email, channel_field_detail]
+    decision: BLOCK
+  - id: suppress_frequency_limit
+    lifecycle: RATIFIED
+    synthetic: true
+    condition: contact_policy_us_hcp_email_v1.frequency_rule_exceeded
+    applies_to: [channel_hcp_email]
+    decision: BLOCK_CHANNEL_ONLY
+
+next_actions:
+  - id: action_send_released_hcp_email
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    action_type: SELECT_RELEASED_ASSET
+    channel: channel_hcp_email
+    permitted_journey_states: [journey_state_evaluation]
+    target_segments: [segment_dermatologist_evaluation_v1]
+    required_checks:
+      - contact_policy_us_hcp_email_v1
+      - current_journey_state_evidence
+      - released_asset_available
+      - claim_and_risk_versions_current
+    generated_draft_eligible_for_selection: false
+    human_approval_requirement: CLIENT_POLICY_DEPENDENT
+
+  - id: action_propose_field_followup
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    action_type: PROPOSE_TO_FIELD_WORKFLOW
+    channel: channel_field_detail
+    permitted_journey_states: [journey_state_evaluation]
+    target_segments: [segment_dermatologist_evaluation_v1]
+    required_checks:
+      - current_field_eligibility
+      - no_active_suppression
+      - current_journey_state_evidence
+    autonomous_execution_permitted: false
+
+  - id: action_serve_approved_web_resource
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    action_type: SELECT_RELEASED_ASSET
+    channel: channel_approved_web
+    permitted_journey_states: [journey_state_evaluation]
+    target_segments: [segment_dermatologist_evaluation_v1]
+    required_checks:
+      - authenticated_hcp
+      - approved_asset_available
+      - current_claim_and_risk_versions
+    generated_draft_eligible_for_selection: false
+
+decision_contract:
+  id: next_action_decision_contract_v1
+  required_input:
+    - opaque_subject_reference
+    - client
+    - brand
+    - market
+    - audience
+    - purpose
+    - decision_time
+    - segment_snapshot_id
+    - consent_snapshot_id
+    - suppression_snapshot_id
+    - journey_state_observations
+  required_output:
+    - decision_id
+    - eligible_actions_considered
+    - excluded_actions_with_reasons
+    - selected_or_proposed_action
+    - governing_policy_versions
+    - journey_state_and_evidence
+    - asset_and_claim_versions
+    - human_approval_requirement
+    - trust_envelope
+  missing_scope_behavior: ABSTAIN
+  missing_consent_or_suppression_authority_behavior: BLOCK
+  raw_identity_fields_permitted_in_receipt: false
+
+example_decision:
+  id: decision_synthetic_frequency_block_v1
+  synthetic: true
+  request:
+    opaque_subject_reference: synthetic_hcp_ref_001
+    market: US
+    audience: audience_us_hcp_dermatologist
+    purpose: PROMOTIONAL
+    journey_state: journey_state_evaluation
+    journey_confidence: 0.84
+    decision_time: 2026-06-25T10:00:00Z
+  considered:
+    - action: action_send_released_hcp_email
+      eligibility: EXCLUDED
+      reason: EMAIL_FREQUENCY_LIMIT_REACHED
+      governing_rule: contact_policy_us_hcp_email_v1
+    - action: action_propose_field_followup
+      eligibility: ELIGIBLE_FOR_PROPOSAL
+      reason: FIELD_ELIGIBLE_AND_NOT_SUPPRESSED
+    - action: action_serve_approved_web_resource
+      eligibility: ELIGIBLE_WHEN_AUTHENTICATED
+      reason: REQUIRES_HCP_AUTHENTICATION
+  selected_or_proposed: action_propose_field_followup
+  execution: HUMAN_WORKFLOW_REQUIRED
+  causal_claim_about_expected_outcome: NONE
+

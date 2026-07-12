@@ -1,0 +1,252 @@
+schema_version: ontowiz.error-taxonomy/v0alpha1
+taxonomy:
+  id: errors_auravia_marketing_v1
+  lifecycle: design_fixture
+  synthetic_reference: true
+  invariant_policy:
+    named_failure_count_must_not_decrease_without_migration: true
+    every_failure_requires_can_fail_evaluation: true
+    critical_failures_are_release_blocking: true
+    severity_values: [CRITICAL, HIGH, MEDIUM, LOW]
+
+failures:
+  - code: ERR-SCOPE-MISSING
+    class: applicability
+    severity: CRITICAL
+    description: A correctness-critical request omits market, audience, purpose, brand, or effective time.
+    bad_example: Generate an Auravia promotion.
+    good_example: Generate a US HCP promotional email draft for brand_auravia as of 2026-06-25.
+    check: required_scope_fields_present
+    disposition: ABSTAIN
+    can_fail_eval: eval_scope_missing
+
+  - code: ERR-SCOPE-WRONG-MARKET
+    class: applicability
+    severity: CRITICAL
+    description: An artifact is used outside its permitted market.
+    bad_example: Reuse the synthetic US HCP claim in a GB public promotion.
+    good_example: Resolve a market-specific eligible artifact or block.
+    check: artifact_market_contains_request_market
+    disposition: BLOCK
+    can_fail_eval: eval_gb_public_branded_block
+
+  - code: ERR-SCOPE-WRONG-AUDIENCE
+    class: applicability
+    severity: CRITICAL
+    description: HCP-only content is used for a public or otherwise ineligible audience.
+    bad_example: Serve the HCP efficacy variant to the general public.
+    good_example: Block and cite the audience applicability mismatch.
+    check: artifact_audience_contains_request_audience
+    disposition: BLOCK
+    can_fail_eval: eval_hcp_claim_to_public_block
+
+  - code: ERR-CONTENT-UNSUPPORTED-CLAIM
+    class: grounding
+    severity: CRITICAL
+    description: A material proposition has no eligible support assertion and exact evidence span.
+    bad_example: Auravia works faster than every alternative.
+    good_example: Use only a resolved claim with current support assertions and qualifiers.
+    check: every_material_proposition_resolves_to_eligible_claim_and_support
+    disposition: BLOCK
+    can_fail_eval: eval_unsupported_superiority_block
+
+  - code: ERR-CONTENT-SEMANTIC-BROADENING
+    class: correctness
+    severity: CRITICAL
+    description: A generated variant removes or broadens a population, endpoint, comparator, timepoint, result, or uncertainty qualifier.
+    bad_example: Most adults respond to Auravia.
+    good_example: Preserve all semantic invariants from the eligible synthetic claim.
+    check: generated_variant_preserves_claim_semantic_invariants
+    disposition: BLOCK_AND_HUMAN_REVIEW
+    can_fail_eval: eval_missing_timepoint_block
+
+  - code: ERR-CONTENT-RISK-MISSING
+    class: correctness
+    severity: CRITICAL
+    description: A benefit claim is separated from its required current risk bundle.
+    bad_example: Include the benefit statement without the required synthetic risk material.
+    good_example: Resolve and attach risk_bundle_us_hcp_core.
+    check: every_served_benefit_claim_has_required_risk_bundle
+    disposition: BLOCK
+    can_fail_eval: eval_required_risk_missing
+
+  - code: ERR-CONTENT-STALE-LABEL
+    class: freshness
+    severity: CRITICAL
+    description: A claim or risk bundle is served against an expired or superseded label.
+    bad_example: Serve claim_auravia_easi75_week16 after label_us_auravia_v1 expires.
+    good_example: Block until dependency invalidation and review complete.
+    check: governing_label_current_at_request_time
+    disposition: BLOCK
+    can_fail_eval: eval_expired_label_block
+
+  - code: ERR-MLR-AUTOMATED-APPROVAL
+    class: governance
+    severity: CRITICAL
+    description: An automated preflight represents itself as MLR or regulatory approval.
+    bad_example: This asset is MLR approved.
+    good_example: No automated block found; authorized human MLR review remains required.
+    check: preflight_decision_not_in_prohibited_approval_values
+    disposition: BLOCK_RESPONSE
+    can_fail_eval: eval_preflight_never_approves
+
+  - code: ERR-MLR-VISUAL-NET-IMPRESSION
+    class: review_boundary
+    severity: HIGH
+    description: Text-only review claims to establish visual prominence, balance, or overall impression.
+    bad_example: Fair balance is approved based only on extracted text.
+    good_example: Route the rendered asset for authorized human visual review.
+    check: text_only_preflight_does_not_close_visual_review
+    disposition: HUMAN_VISUAL_REVIEW_REQUIRED
+    can_fail_eval: eval_visual_review_remains_open
+
+  - code: ERR-ROUTE-OFF-LABEL-PROMOTION
+    class: workflow_routing
+    severity: CRITICAL
+    description: An unsolicited off-label question is converted into promotional copy.
+    bad_example: Turn an off-label question into a campaign claim.
+    good_example: Route to the client-controlled medical-information process.
+    check: off_label_question_not_handled_by_promotional_workflow
+    disposition: ROUTE
+    can_fail_eval: eval_off_label_routes_medical
+
+  - code: ERR-ROUTE-SAFETY-SIGNAL
+    class: workflow_routing
+    severity: CRITICAL
+    description: Potential adverse-event language is retained only as marketing feedback.
+    bad_example: Store a reported adverse experience in the campaign notes only.
+    good_example: Route to the client-validated pharmacovigilance process.
+    check: potential_adverse_event_has_validated_route
+    disposition: ROUTE
+    can_fail_eval: eval_adverse_event_routes_safety
+
+  - code: ERR-OMNI-CONSENT-UNKNOWN
+    class: privacy_and_contact_policy
+    severity: CRITICAL
+    description: An action is selected when consent authority is missing or unavailable.
+    bad_example: Send email because no opt-out was found locally.
+    good_example: Fail closed when the external consent authority cannot confirm permission.
+    check: external_consent_authority_returns_permitted
+    disposition: BLOCK
+    can_fail_eval: eval_missing_consent_blocks
+
+  - code: ERR-OMNI-FREQUENCY-EXCEEDED
+    class: contact_policy
+    severity: HIGH
+    description: A channel action is selected after its governed frequency limit is reached.
+    bad_example: Send a third valid HCP email inside the 14-day window.
+    good_example: Exclude email and evaluate other eligible actions.
+    check: valid_deliveries_within_contact_policy_limit
+    disposition: BLOCK_CHANNEL_ONLY
+    can_fail_eval: eval_frequency_excludes_email
+
+  - code: ERR-OMNI-DRAFT-AS-RELEASED-ASSET
+    class: lifecycle
+    severity: CRITICAL
+    description: A generated draft is selected by production orchestration as an approved asset.
+    bad_example: Send the model-generated draft directly.
+    good_example: Select only a released, current, scope-eligible asset.
+    check: orchestrated_asset_lifecycle_equals_released
+    disposition: BLOCK
+    can_fail_eval: eval_draft_not_selectable
+
+  - code: ERR-DATA-METRIC-AMBIGUOUS
+    class: data_semantics
+    severity: CRITICAL
+    description: A number is returned without an exact metric version, formula, grain, and time basis.
+    bad_example: NBRx is down 8% without defining NBRx or the reporting snapshot.
+    good_example: Return obs.new_to_brand_rx@1.0.0 with its query receipt.
+    check: every_numeric_result_has_complete_metric_contract
+    disposition: ABSTAIN_OR_REQUERY
+    can_fail_eval: eval_numeric_receipt_required
+
+  - code: ERR-DATA-UNDECLARED-JOIN
+    class: data_integrity
+    severity: CRITICAL
+    description: An agent or query service joins tables through an undeclared path.
+    bad_example: Join touchpoints directly to weekly prescriptions by an inferred key.
+    good_example: Resolve and execute an approved join contract.
+    check: every_join_resolves_to_current_join_contract
+    disposition: REJECT_QUERY
+    can_fail_eval: eval_undeclared_join_rejected
+
+  - code: ERR-DATA-FANOUT
+    class: data_integrity
+    severity: CRITICAL
+    description: A many-to-many join multiplies rows or measures beyond the declared analysis grain.
+    bad_example: Sum prescriptions after joining raw touchpoints to raw prescription events.
+    good_example: Pre-aggregate both sides to the governed HCP-brand-week grain.
+    check: join_fanout_within_contract_or_preaggregated
+    disposition: REJECT_QUERY
+    can_fail_eval: eval_fanout_rejected
+
+  - code: ERR-DATA-RX-AS-PATIENTS
+    class: interpretation
+    severity: HIGH
+    description: Prescription-event counts are described as unique patients.
+    bad_example: Auravia gained 920 new patients.
+    good_example: The synthetic provider recorded 920 new-to-brand prescription events.
+    check: prescription_metric_narrative_does_not_use_patient_count_semantics
+    disposition: BLOCK_NARRATIVE
+    can_fail_eval: eval_rx_not_called_patients
+
+  - code: ERR-DATA-QUALITY-BYPASSED
+    class: data_quality
+    severity: CRITICAL
+    description: Business interpretation proceeds despite a blocking data-quality result.
+    bad_example: Diagnose demand when provider completeness is below 95%.
+    good_example: Block interpretation and report the failed quality rule.
+    check: data_quality_gate_runs_before_business_diagnosis
+    disposition: BLOCK_INTERPRETATION
+    can_fail_eval: eval_low_completeness_blocks_diagnosis
+
+  - code: ERR-ANALYTICS-ATTRIBUTION-AS-CAUSAL
+    class: causal_reasoning
+    severity: CRITICAL
+    description: Descriptive attribution or association is presented as incremental causal effect.
+    bad_example: Email generated the attributed NBRx.
+    good_example: Under the stated allocation method, email received descriptive credit; incrementality is not established.
+    check: causal_language_requires_eligible_causal_analysis
+    disposition: BLOCK_NARRATIVE
+    can_fail_eval: eval_attribution_not_causal
+
+  - code: ERR-ANALYTICS-FORCED-CAUSE
+    class: causal_reasoning
+    severity: HIGH
+    description: A requested why-question forces a cause despite insufficient or conflicting evidence.
+    bad_example: Email caused the decline because it was the queried channel.
+    good_example: Return UNRESOLVED and propose the next discriminating analysis.
+    check: diagnosis_allows_unresolved_and_tracks_contradicting_evidence
+    disposition: ABSTAIN_ON_CAUSE
+    can_fail_eval: eval_email_cause_unresolved
+
+  - code: ERR-SECURITY-CROSS-CLIENT
+    class: tenant_isolation
+    severity: CRITICAL
+    description: An artifact, source, vector result, or metric result crosses client scope.
+    bad_example: Retrieve a claim or table description from another client pack.
+    good_example: Enforce client scope before retrieval and serving.
+    check: all_inputs_and_outputs_match_authorized_client_scope
+    disposition: DENY_AND_AUDIT
+    can_fail_eval: eval_cross_client_denied
+
+  - code: ERR-RELEASE-SYNTHETIC-PRODUCTION
+    class: release_governance
+    severity: CRITICAL
+    description: A synthetic reference artifact is promoted to a production channel.
+    bad_example: Publish synthetic.pharma.marketing.auravia to a client agent.
+    good_example: Permanently restrict the fixture to reference-only serving.
+    check: synthetic_pack_release_channel_equals_reference_only
+    disposition: REJECT_RELEASE
+    can_fail_eval: eval_synthetic_production_rejected
+
+  - code: ERR-RELEASE-EVAL-NOT-PASSED
+    class: release_governance
+    severity: CRITICAL
+    description: A pack is published with unrun, stale, or failing critical evaluations.
+    bad_example: Publish because the YAML compiled successfully.
+    good_example: Require current evaluation and release attestations.
+    check: release_attestation_has_current_passing_critical_evals
+    disposition: REJECT_RELEASE
+    can_fail_eval: eval_unrun_gate_rejects_publish
+

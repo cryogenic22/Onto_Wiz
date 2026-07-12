@@ -1,0 +1,191 @@
+schema_version: ontowiz.reference-output-examples/v0alpha1
+metadata:
+  synthetic_reference: true
+  production_eligible: false
+  warning: These outputs demonstrate contracts and are not real promotional or analytical results.
+
+content_and_mlr:
+  request:
+    task: Draft a short synthetic HCP email for dermatologists evaluating Auravia.
+    scope:
+      client: synthetic_client
+      brand: brand_auravia
+      market: US
+      audience: audience_us_hcp_dermatologist
+      purpose: PROMOTIONAL
+      channel: channel_hcp_email
+      as_of: 2026-06-25
+  content_brief:
+    id: brief_us_hcp_email_evaluation_v1
+    eligible_claims: [claim_auravia_easi75_week16]
+    required_risk_bundles: [risk_bundle_us_hcp_core]
+    allowed_ctas: [VIEW_SYNTHETIC_PRESCRIBING_INFORMATION]
+    state: DRAFT_REQUIRES_HUMAN_MLR
+  illustrative_draft:
+    subject: Synthetic Auravia efficacy fixture for architecture review
+    preheader: Fictional data for Onto_Wiz testing only
+    body: >
+      In the synthetic VELA-1 fixture, 62% of trial-eligible adults receiving
+      fictional Auravia achieved the synthetic EASI-75 endpoint at week 16,
+      compared with 28% receiving placebo. Fictional safety statement for
+      architecture testing only. Refer to the complete synthetic prescribing-
+      information fixture. Auravia, velunimab, and all values here are fictional
+      and must not be used in real promotional or clinical communication.
+    cta: View synthetic prescribing information
+    references:
+      - support_vela1_primary_endpoint
+  preflight:
+    decision: NO_AUTOMATED_BLOCK_FOUND
+    findings:
+      - code: ERR-MLR-VISUAL-NET-IMPRESSION
+        disposition: HUMAN_VISUAL_REVIEW_REQUIRED
+        explanation: Extracted text cannot establish prominence, layout, or overall impression.
+    unresolved_items: [rendered_asset_visual_review]
+    human_review_required: true
+    mandatory_statement: Automated preflight is not MLR approval.
+    trust_envelope:
+      pack_id: synthetic.pharma.marketing.auravia
+      release_id: 0.1.0-reference-not-released
+      artifact_ids_and_versions:
+        - claim_auravia_easi75_week16@1.0.0
+        - claim_variant_easi75_us_hcp_v1@1.0.0
+        - risk_bundle_us_hcp_core@1.0.0
+      policy_versions: [policy_us_hcp_synthetic_promotion@1.0.0]
+      label_versions: [label_us_auravia_v1]
+      evidence_spans:
+        - source_id: source_synthetic_study_report_v1
+          section: efficacy_results
+          table: table_2_primary_endpoint
+          rows: [easi75_week16]
+      synthetic_reference: true
+      production_eligible: false
+      human_approval_requirement: AUTHORIZED_HUMAN_MLR
+
+omnichannel:
+  request:
+    opaque_subject_reference: synthetic_hcp_ref_001
+    journey_state: journey_state_evaluation
+    journey_confidence: 0.84
+    valid_email_deliveries_in_prior_14_days: 2
+    consent_authority: PERMITTED
+    suppression_authority: NOT_SUPPRESSED
+  decision_receipt:
+    decision_id: decision_synthetic_frequency_block_v1
+    considered:
+      - action: action_send_released_hcp_email
+        eligibility: EXCLUDED
+        reason: EMAIL_FREQUENCY_LIMIT_REACHED
+      - action: action_propose_field_followup
+        eligibility: ELIGIBLE_FOR_PROPOSAL
+      - action: action_serve_approved_web_resource
+        eligibility: ELIGIBLE_WHEN_AUTHENTICATED
+    selected_or_proposed: action_propose_field_followup
+    execution: HUMAN_WORKFLOW_REQUIRED
+    causal_claim_about_expected_outcome: NONE
+    raw_identity_in_receipt: false
+    trust_envelope:
+      pack_id: synthetic.pharma.marketing.auravia
+      release_id: 0.1.0-reference-not-released
+      policy_versions: [contact_policy_us_hcp_email_v1@1.0.0]
+      synthetic_reference: true
+      production_eligible: false
+
+brand_performance:
+  request:
+    question: Why was Auravia Northeast NBRx below plan in 2026-W26, and was weak email performance responsible?
+    scope: {client: synthetic_client, brand: brand_auravia, market: US, region: NORTHEAST, iso_week: 2026-W26}
+  performance_brief:
+    headline: >
+      Synthetic Auravia Northeast NBRx was 80 prescription events, or 8.0%,
+      below the approved plan in provisional 2026-W26 data.
+    observations:
+      - text: NBRx was 920 versus an approved plan of 1,000.
+        assertion_type: OBSERVATION
+        receipt: query_receipt_nbrx_vs_plan_w26
+      - text: Active writers increased approximately 2.8% versus the prior-four-week average.
+        assertion_type: OBSERVATION
+        receipt: query_receipt_active_writers_w26
+      - text: Writer depth decreased approximately 10.1% versus the prior-four-week average.
+        assertion_type: OBSERVATION
+        receipt: query_receipt_writer_depth_w26
+      - text: Paid-claim rate decreased from 74% to 67%; 75% of the shortfall was concentrated in two synthetic payer plans.
+        assertion_type: OBSERVATION
+        receipt: query_receipt_paid_claim_rate_w26
+      - text: Eligible HCP reach was stable and the email engagement proxy increased from 20% to 21%.
+        assertion_type: OBSERVATION
+        receipt: query_receipt_engagement_w26
+    data_quality:
+      provider_completeness: 0.987
+      period_status: PROVISIONAL
+      interpretation: ELIGIBLE_WITH_WARNING
+    hypotheses:
+      - id: hypothesis_access_friction
+        status: SUPPORTED_FOR_FURTHER_INVESTIGATION
+        causal_status: NOT_ESTABLISHED
+        for: [paid_claim_rate_decline, payer_plan_concentration]
+      - id: hypothesis_email_underperformance
+        status: NOT_SUPPORTED_BY_OBSERVED_EMAIL_PROXY
+        causal_status: UNRESOLVED_NO_CONTROLLED_EXPERIMENT
+        against: [stable_reach, increased_email_engagement_proxy]
+    causal_findings: []
+    unresolved_questions:
+      - Whether any marketing intervention caused the NBRx variance.
+    next_analyses:
+      - payer_plan_transition_and_formulary_effective_date_alignment
+      - compare_affected_and_unaffected_plans
+      - validate_provider_restatement_in_finalized_period
+    permissible_action_candidates:
+      - investigate_access_change_under_client_analytics_governance
+    prohibited_actions:
+      - autonomous_budget_reallocation
+      - represent_access_as_proven_cause
+      - represent_email_as_proven_cause
+    query_receipts:
+      - id: query_receipt_nbrx_vs_plan_w26
+        metrics: [obs.new_to_brand_rx@1.0.0, plan.new_to_brand_rx@1.0.0]
+        provider_snapshot: provider_snapshot_2026_w26_r1
+        planning_version: approved_plan_2026_v3
+        actual: 920
+        plan: 1000
+        absolute_variance: -80
+        rate_variance: -0.08
+        unit: PRESCRIPTION_EVENTS
+        completeness: 0.987
+        period_status: PROVISIONAL
+      - id: query_receipt_active_writers_w26
+        metrics: [obs.active_writers@1.0.0]
+        provider_snapshot: provider_snapshot_2026_w26_r1
+        actual: 184
+        baseline_prior_4w_average: 179
+        change_rate: 0.0279
+        unit: HCP_IDENTIFIERS
+      - id: query_receipt_writer_depth_w26
+        metrics: [obs.writer_depth@1.0.0]
+        provider_snapshot: provider_snapshot_2026_w26_r1
+        actual: 5.00
+        baseline_prior_4w_average: 5.56
+        change_rate: -0.1007
+        unit: PRESCRIPTION_EVENTS_PER_ACTIVE_WRITER
+      - id: query_receipt_paid_claim_rate_w26
+        metrics: [obs.paid_claim_rate@1.0.0]
+        provider_snapshot: provider_snapshot_2026_w26_r1
+        actual: 0.67
+        baseline: 0.74
+        shortfall_concentration_two_plans: 0.75
+        unit: PROPORTION
+      - id: query_receipt_engagement_w26
+        metrics: [obs.eligible_hcp_reach_30d@1.0.0, obs.email_engagement_proxy_rate@1.0.0]
+        source_snapshot: engagement_snapshot_2026_w26_r1
+        eligible_hcp_reach_actual: 0.68
+        eligible_hcp_reach_baseline: 0.68
+        email_engagement_proxy_actual: 0.21
+        email_engagement_proxy_baseline: 0.20
+        unit: PROPORTION
+        caveat: Engagement is a proxy and does not establish causal impact.
+    trust_envelope:
+      pack_id: synthetic.pharma.marketing.auravia
+      release_id: 0.1.0-reference-not-released
+      synthetic_reference: true
+      production_eligible: false
+      human_approval_requirement: BUSINESS_REVIEW_BEFORE_ACTION
+

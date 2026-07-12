@@ -1,0 +1,111 @@
+schema_version: ontowiz.reference-domain-pack/v0alpha1
+pack:
+  id: synthetic.pharma.marketing.auravia
+  name: auravia_marketing_reference
+  version: 0.1.0
+  description: >
+    Synthetic reference pack for pharma marketing content generation, MLR
+    assistance, omnichannel decisioning, and brand performance analytics.
+  domain: pharma_commercial_marketing
+  lifecycle: design_fixture
+  synthetic_reference: true
+  production_eligible: false
+  owner: ontowiz_reference_team
+  compatibility:
+    current_compiler: incompatible_schema_extension_required
+    target_contract: ontowiz-spec/vNext
+
+scope:
+  clients: [synthetic_client]
+  brands: [brand_auravia]
+  markets: [US, GB]
+  primary_market: US
+  audiences: [HCP_DERMATOLOGIST, GENERAL_PUBLIC]
+  purposes: [PROMOTIONAL, INTERNAL_TRAINING]
+  channels: [HCP_EMAIL, FIELD_DETAIL, APPROVED_WEB]
+  valid_from: 2026-01-01
+  valid_to: 2026-12-31
+
+layers:
+  - id: pharma_commercial_base
+    precedence: 10
+    may_broaden_correctness_constraint: false
+  - id: market_policy_us_synthetic
+    precedence: 20
+    extends: pharma_commercial_base
+    may_broaden_correctness_constraint: false
+  - id: therapy_dermatology_synthetic
+    precedence: 30
+    extends: market_policy_us_synthetic
+    may_broaden_correctness_constraint: false
+  - id: brand_auravia_synthetic
+    precedence: 40
+    extends: therapy_dermatology_synthetic
+    may_broaden_correctness_constraint: false
+  - id: client_operating_model_synthetic
+    precedence: 50
+    extends: brand_auravia_synthetic
+    may_broaden_correctness_constraint: false
+
+modules:
+  - path: sources/source_manifest.yaml
+    kind: source_manifest
+    required: true
+  - path: ontology/marketing_ontology.yaml
+    kind: ontology_module
+    required: true
+  - path: knowledge/content_mlr.yaml
+    kind: content_mlr_module
+    required: true
+  - path: omnichannel/decisioning.yaml
+    kind: omnichannel_module
+    required: true
+  - path: analytics/brand_performance.yaml
+    kind: semantic_analytics_module
+    required: true
+  - path: agents/contracts.yaml
+    kind: agent_contract_module
+    required: true
+  - path: quality/error_taxonomy.yaml
+    kind: error_taxonomy
+    required: true
+  - path: evaluations/golden_cases.yaml
+    kind: evaluation_suite
+    required: true
+
+compiled_outputs:
+  - canonical_artifact_bundle
+  - ontology_graph_projection
+  - lexical_retrieval_projection
+  - vector_retrieval_projection
+  - semantic_data_catalog_projection
+  - typed_agent_contracts
+  - evaluation_bundle
+  - release_manifest
+
+release_gates:
+  hard_fail_categories:
+    - synthetic_production_promotion
+    - tenant_isolation
+    - access_control
+    - unsupported_claim
+    - wrong_applicability
+    - required_risk_missing
+    - numeric_correctness
+    - undeclared_join
+    - causal_overstatement
+  minimum_held_out_cases: 20
+  require_exact_manifest: true
+  require_cross_reference_integrity: true
+  require_deterministic_rebuild: true
+  require_source_spans_for_material_claims: true
+  require_eval_receipt: true
+  require_release_diff: true
+  require_rollback_test: true
+
+permanent_production_blockers:
+  - pack.synthetic_reference_must_equal_true
+  - pack.production_eligible_must_equal_false
+  - every_artifact_must_remain_synthetic
+  - compiled_release_channel_must_equal_reference_only
+

@@ -1,0 +1,278 @@
+schema_version: ontowiz.content-mlr-module/v0alpha1
+module:
+  id: content_mlr_auravia_v1
+  lifecycle: design_fixture
+  synthetic_reference: true
+  production_eligible: false
+
+claims:
+  - id: claim_auravia_easi75_week16
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    claim_type: EFFICACY
+    proposition:
+      subject: brand_auravia
+      predicate: ACHIEVED_ENDPOINT
+      object: endpoint_easi75_week16
+      population: population_trial_eligible_adults
+      indication: indication_adult_moderate_severe_ad
+      intervention_result:
+        value: 62
+        unit: PERCENT
+      comparator:
+        type: PLACEBO
+        result:
+          value: 28
+          unit: PERCENT
+      timepoint:
+        value: 16
+        unit: WEEK
+    applicability:
+      client: synthetic_client
+      brand: brand_auravia
+      markets: [US]
+      audiences: [audience_us_hcp_dermatologist]
+      purposes: [PROMOTIONAL, INTERNAL_TRAINING]
+      channels: [channel_hcp_email, channel_field_detail]
+      valid_from: 2026-01-01
+      valid_to: 2026-12-31
+    governing_label: label_us_auravia_v1
+    support_assertions: [support_vela1_primary_endpoint]
+    required_risk_bundles: [risk_bundle_us_hcp_core]
+    mandatory_qualifiers:
+      - synthetic_trial_population
+      - synthetic_week_16_timepoint
+      - synthetic_placebo_comparator
+      - fictional_data_disclaimer
+    prohibited_transformations:
+      - remove_population_qualifier
+      - remove_timepoint
+      - remove_comparator
+      - convert_group_result_to_individual_guarantee
+      - imply_superiority_beyond_stated_synthetic_endpoint
+      - generalize_to_unstudied_population
+    owner: synthetic_brand_mlr
+
+support_assertions:
+  - id: support_vela1_primary_endpoint
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    claim: claim_auravia_easi75_week16
+    evidence_source: source_synthetic_study_report_v1
+    support_type: DIRECT
+    evidence_strength: SYNTHETIC_CONTROLLED_FIXTURE
+    spans:
+      - source_id: source_synthetic_study_report_v1
+        locator_kind: structured
+        section: efficacy_results
+        table: table_2_primary_endpoint
+        rows: [easi75_week16]
+        fields: [population, intervention_result, comparator_result, timepoint]
+      - source_id: source_synthetic_us_label_v1
+        locator_kind: structured
+        section: clinical_studies
+        table: efficacy_summary
+        rows: [easi75_week16]
+    limitations:
+      - synthetic_reference_only
+      - does_not_support_individual_response_prediction
+      - does_not_support_unqualified_superiority
+    reviewer: synthetic_medical_reviewer
+    reviewed_at: 2026-01-05T00:00:00Z
+
+claim_variants:
+  - id: claim_variant_easi75_us_hcp_v1
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    realizes_claim: claim_auravia_easi75_week16
+    text: >
+      In the synthetic VELA-1 fixture, 62% of trial-eligible adults receiving
+      fictional Auravia achieved the synthetic EASI-75 endpoint at week 16,
+      compared with 28% receiving placebo.
+    applicability:
+      market: US
+      audience: audience_us_hcp_dermatologist
+      purpose: PROMOTIONAL
+      channels: [channel_hcp_email, channel_field_detail]
+      valid_from: 2026-01-01
+      valid_to: 2026-12-31
+    required_risk_bundles: [risk_bundle_us_hcp_core]
+    must_remain_verbatim: false
+    semantic_invariants:
+      - population_trial_eligible_adults
+      - endpoint_easi75_week16
+      - intervention_result_62_percent
+      - comparator_placebo_28_percent
+      - timepoint_week_16
+      - fictional_status
+
+risk_bundles:
+  - id: risk_bundle_us_hcp_core
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    title: Synthetic core risk and limitation bundle for US HCP reference content
+    applicability:
+      markets: [US]
+      audiences: [audience_us_hcp_dermatologist]
+      purposes: [PROMOTIONAL, INTERNAL_TRAINING]
+      channels: [channel_hcp_email, channel_field_detail]
+      valid_from: 2026-01-01
+      valid_to: 2026-12-31
+    statements:
+      - id: risk_statement_synthetic_warning
+        class: WARNING
+        text: >
+          Fictional safety statement for architecture testing only. Refer to the
+          complete synthetic prescribing-information fixture.
+        source_spans:
+          - source_id: source_synthetic_us_label_v1
+            locator_kind: structured
+            section: warnings_and_precautions
+            fields: [synthetic_core_warning]
+      - id: risk_statement_synthetic_adverse_reactions
+        class: ADVERSE_REACTIONS
+        text: >
+          Fictional adverse-reaction statement for architecture testing only.
+        source_spans:
+          - source_id: source_synthetic_us_label_v1
+            locator_kind: structured
+            section: adverse_reactions
+            fields: [synthetic_common_reactions]
+      - id: risk_statement_fixture_disclaimer
+        class: FIXTURE_DISCLOSURE
+        text: >
+          Auravia, velunimab, and all clinical values in this example are fictional
+          and must not be used in real promotional or clinical communication.
+    presentation_policy:
+      require_with_benefit_claim: true
+      text_only_preflight_can_approve_prominence: false
+      visual_review_required: true
+      omission_severity: CRITICAL
+
+content_briefs:
+  - id: brief_us_hcp_email_evaluation_v1
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    objective: SUPPORT_HCP_EVALUATION
+    request_scope:
+      client: synthetic_client
+      brand: brand_auravia
+      market: US
+      audience: audience_us_hcp_dermatologist
+      purpose: PROMOTIONAL
+      channel: channel_hcp_email
+    format:
+      content_type: HCP_EMAIL
+      maximum_body_words: 120
+      subject_line_required: true
+      preheader_required: true
+      references_required: true
+    eligible_claims: [claim_auravia_easi75_week16]
+    eligible_variants: [claim_variant_easi75_us_hcp_v1]
+    required_risk_bundles: [risk_bundle_us_hcp_core]
+    allowed_ctas: [VIEW_SYNTHETIC_PRESCRIBING_INFORMATION]
+    prohibited:
+      - guaranteed_response
+      - unsupported_superiority
+      - off_label_population
+      - omitted_comparator
+      - omitted_timepoint
+      - draft_presented_as_approved
+      - real_world_use_of_synthetic_content
+    output_state: DRAFT_REQUIRES_HUMAN_MLR
+
+marketing_purpose_rules:
+  - id: rule_purpose_required
+    severity: CRITICAL
+    condition: request.communication_purpose_is_missing
+    decision: ABSTAIN
+    rationale: Promotional eligibility cannot be resolved without purpose.
+  - id: rule_off_label_route_medical_information
+    severity: CRITICAL
+    condition: request_is_unsolicited_off_label_question
+    decision: ROUTE
+    route_to: CLIENT_CONTROLLED_MEDICAL_INFORMATION
+  - id: rule_adverse_event_route
+    severity: CRITICAL
+    condition: content_contains_potential_adverse_event
+    decision: ROUTE
+    route_to: CLIENT_VALIDATED_PHARMACOVIGILANCE_PROCESS
+  - id: rule_product_complaint_route
+    severity: CRITICAL
+    condition: content_contains_potential_product_complaint
+    decision: ROUTE
+    route_to: CLIENT_VALIDATED_QUALITY_PROCESS
+
+market_policies:
+  - id: policy_us_hcp_synthetic_promotion
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    market: US
+    audience: audience_us_hcp_dermatologist
+    purpose: PROMOTIONAL
+    governing_source: source_synthetic_us_promo_policy_v1
+    rules:
+      - claims_must_be_eligible_for_current_label_and_scope
+      - support_must_resolve_to_exact_source_spans
+      - risk_bundle_must_remain_coupled_to_benefit_claim
+      - references_must_match_served_claim_version
+      - output_must_remain_draft_until_authorized_human_review
+      - asset_level_review_required_after_rendering
+
+  - id: policy_gb_public_synthetic_branded_block
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    market: GB
+    audience: audience_gb_general_public
+    purpose: PROMOTIONAL
+    governing_source: source_synthetic_gb_policy_v1
+    decision: BLOCK
+    reason_code: SYNTHETIC_GB_PUBLIC_BRANDED_PROMOTION_BLOCK
+
+mlr_preflight_contract:
+  id: mlr_preflight_contract_v1
+  input_required:
+    - draft_text
+    - declared_claim_ids
+    - brand
+    - market
+    - audience
+    - purpose
+    - channel
+    - intended_format
+  output:
+    fields:
+      - decision
+      - findings
+      - governing_artifacts
+      - evidence_spans
+      - unresolved_items
+      - human_review_required
+      - trust_envelope
+    decision_values: [NO_AUTOMATED_BLOCK_FOUND, BLOCK, ROUTE, ABSTAIN]
+    prohibited_decision_values: [APPROVED, MLR_APPROVED, REGULATORY_APPROVED]
+  mandatory_statement: Automated preflight is not MLR approval.
+
+example_findings:
+  - id: finding_example_missing_timepoint
+    synthetic: true
+    rule: ERR-CONTENT-SEMANTIC-BROADENING
+    severity: HIGH
+    artifact: claim_variant_easi75_us_hcp_v1
+    observed: Draft omitted the week 16 qualifier.
+    expected: Preserve the claim timepoint.
+    disposition: BLOCK_AND_HUMAN_REVIEW
+  - id: finding_example_visual_review
+    synthetic: true
+    rule: ERR-MLR-VISUAL-NET-IMPRESSION
+    severity: HIGH
+    observed: Text-only preflight cannot establish prominence or overall impression.
+    disposition: HUMAN_VISUAL_REVIEW_REQUIRED
+

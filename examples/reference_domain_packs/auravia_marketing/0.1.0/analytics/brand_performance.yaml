@@ -1,0 +1,621 @@
+schema_version: ontowiz.semantic-analytics-module/v0alpha1
+module:
+  id: analytics_auravia_brand_performance_v1
+  lifecycle: design_fixture
+  synthetic_reference: true
+  default_currency: USD
+  default_timezone: America/New_York
+  raw_patient_rows_available_to_general_marketing_agents: false
+
+question_catalogue:
+  - id: question_brand_vs_plan
+    question: Is Auravia ahead of or behind the approved plan, where, and by how much?
+    required_capabilities: [compare_metric, decompose_variance, get_dataset_health]
+  - id: question_demand_driver
+    question: Is a demand change associated with writer breadth, writer depth, access, execution, supply, or measurement?
+    required_capabilities: [diagnose_brand_variance, trace_metric_lineage]
+  - id: question_campaign_performance
+    question: Which governed audience was reached, with which released content, and what outcomes were observed?
+    required_capabilities: [query_metric, get_campaign_performance]
+  - id: question_incrementality
+    question: Is there eligible evidence that an intervention caused an incremental outcome?
+    required_capabilities: [get_experiment_result]
+  - id: question_mlr_operations
+    question: Where are MLR rework, cycle time, and approved-module reuse affecting deployment?
+    required_capabilities: [query_metric, decompose_variance]
+
+metric_namespaces:
+  obs: Reproducible descriptive observations.
+  plan: Approved plan or forecast snapshots.
+  attr: Descriptive allocation of credit; never causal.
+  model: Predictions, scores, and modeled outcomes.
+  causal: Eligible incremental-effect estimates with governed assumptions.
+  dq: Data-quality observations.
+
+kpi_tree:
+  id: kpi_tree_auravia_us_v1
+  root: kpi.auravia_commercial_performance
+  nodes:
+    - kpi.auravia_commercial_performance
+    - kpi.financial_outcome
+    - kpi.demand_and_adoption
+    - kpi.access_and_fulfilment
+    - kpi.continuity
+    - kpi.commercial_engagement
+    - kpi.efficiency
+    - kpi.operating_effectiveness
+    - kpi.measurement_health
+    - obs.new_to_brand_rx
+    - obs.total_rx
+    - obs.active_writers
+    - obs.writer_depth
+    - obs.paid_claim_rate
+    - obs.eligible_hcp_reach_30d
+    - obs.email_engagement_proxy_rate
+    - obs.mlr_cycle_time_business_days
+    - obs.first_pass_mlr_rate
+    - dq.provider_completeness_rate
+  edges:
+    - parent: kpi.auravia_commercial_performance
+      child: kpi.financial_outcome
+      relation: DIAGNOSTIC_INDICATOR
+    - parent: kpi.auravia_commercial_performance
+      child: kpi.demand_and_adoption
+      relation: DIAGNOSTIC_INDICATOR
+    - parent: kpi.auravia_commercial_performance
+      child: kpi.access_and_fulfilment
+      relation: CONSTRAINT
+    - parent: kpi.auravia_commercial_performance
+      child: kpi.continuity
+      relation: DIAGNOSTIC_INDICATOR
+    - parent: kpi.auravia_commercial_performance
+      child: kpi.commercial_engagement
+      relation: DIAGNOSTIC_INDICATOR
+    - parent: kpi.auravia_commercial_performance
+      child: kpi.measurement_health
+      relation: CONSTRAINT
+    - parent: kpi.demand_and_adoption
+      child: obs.new_to_brand_rx
+      relation: DIAGNOSTIC_INDICATOR
+    - parent: kpi.demand_and_adoption
+      child: obs.total_rx
+      relation: DIAGNOSTIC_INDICATOR
+    - parent: kpi.demand_and_adoption
+      child: obs.active_writers
+      relation: DIAGNOSTIC_INDICATOR
+    - parent: kpi.demand_and_adoption
+      child: obs.writer_depth
+      relation: DIAGNOSTIC_INDICATOR
+    - parent: kpi.access_and_fulfilment
+      child: obs.paid_claim_rate
+      relation: CONSTRAINT
+    - parent: kpi.commercial_engagement
+      child: obs.eligible_hcp_reach_30d
+      relation: DIAGNOSTIC_INDICATOR
+    - parent: kpi.commercial_engagement
+      child: obs.email_engagement_proxy_rate
+      relation: DIAGNOSTIC_INDICATOR
+    - parent: kpi.operating_effectiveness
+      child: obs.mlr_cycle_time_business_days
+      relation: DIAGNOSTIC_INDICATOR
+    - parent: kpi.operating_effectiveness
+      child: obs.first_pass_mlr_rate
+      relation: FUNNEL_TRANSITION
+    - parent: kpi.measurement_health
+      child: dq.provider_completeness_rate
+      relation: CONSTRAINT
+
+metrics:
+  - id: obs.new_to_brand_rx
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    metric_type: COUNT
+    definition: >
+      Count of prescription events classified by the synthetic licensed-data
+      provider as new to Auravia using 365 days of observable history.
+    calculation:
+      expression: SUM(new_to_brand_rx_count)
+      source: commercial.fact_rx_market_week.new_to_brand_rx_count
+      zero_behavior: RETURN_ZERO
+      null_behavior: FAIL_DATA_QUALITY
+    grain: [brand_id, geo_id, iso_week]
+    time_basis: provider_reporting_week
+    lookback_days: 365
+    allowed_dimensions: [brand_id, product_id, region_id, territory_id, specialty, iso_week]
+    unit: PRESCRIPTION_EVENTS
+    rounding: 0
+    data_latency_days: 7
+    revision_policy:
+      provisional_weeks: 4
+      behavior: REPLACE_WITH_LATEST_PROVIDER_SNAPSHOT
+    valid_uses: [trend, approved_plan_variance, geographic_comparison, diagnostic_input]
+    prohibited_interpretations:
+      - unique_patient_count
+      - indication_confirmed_use
+      - causal_effect_of_marketing
+      - demand_without_provider_coverage_qualification
+    source_spec: source_synthetic_metric_spec_v1
+    owner: synthetic_commercial_analytics_governance
+
+  - id: plan.new_to_brand_rx
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    metric_type: COUNT
+    definition: Approved synthetic plan value for new-to-brand prescription events.
+    calculation:
+      expression: SUM(plan_value)
+      source: commercial.fact_plan_metric.plan_value
+      required_filter: metric_id_equals_obs.new_to_brand_rx
+    grain: [planning_version, brand_id, geo_id, iso_week]
+    allowed_dimensions: [planning_version, brand_id, region_id, territory_id, iso_week]
+    unit: PRESCRIPTION_EVENTS
+    valid_uses: [approved_plan_variance]
+    prohibited_interpretations: [latest_forecast_unless_planning_version_matches]
+    source_spec: source_synthetic_plan_snapshot_w26
+
+  - id: obs.total_rx
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    metric_type: COUNT
+    definition: Synthetic provider count of total prescription events for the scoped product and period.
+    calculation:
+      expression: SUM(total_rx_count)
+      source: commercial.fact_rx_market_week.total_rx_count
+    grain: [brand_id, geo_id, iso_week]
+    allowed_dimensions: [brand_id, product_id, region_id, territory_id, specialty, iso_week]
+    unit: PRESCRIPTION_EVENTS
+    prohibited_interpretations: [unique_patient_count, adherence, causal_effect_of_marketing]
+
+  - id: obs.active_writers
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    metric_type: COUNT_DISTINCT
+    definition: Count of eligible HCP identifiers with at least one observable Auravia prescription event in the reporting period.
+    calculation:
+      expression: COUNT_DISTINCT(hcp_key WHERE total_rx_count > 0)
+      source: commercial.fact_hcp_brand_week
+    grain: [brand_id, geo_id, iso_week]
+    allowed_dimensions: [brand_id, region_id, territory_id, specialty, iso_week]
+    unit: HCP_IDENTIFIERS
+    privacy:
+      minimum_cell_count: 11
+      suppressed_result_behavior: RETURN_SUPPRESSED
+    prohibited_interpretations: [verified_prescriber_identity_outside_source_coverage]
+
+  - id: obs.writer_depth
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    metric_type: RATE
+    definition: Observable Auravia prescription events divided by active writer identifiers for the same scope and period.
+    calculation:
+      numerator: obs.total_rx
+      denominator: obs.active_writers
+      expression: SAFE_DIVIDE(obs.total_rx, obs.active_writers)
+      zero_denominator_behavior: RETURN_NULL_WITH_REASON
+    grain: [brand_id, geo_id, iso_week]
+    unit: PRESCRIPTION_EVENTS_PER_ACTIVE_WRITER
+    valid_uses: [trend, approved_plan_variance, diagnostic_input]
+    prohibited_interpretations: [individual_hcp_quality, causal_effect_of_marketing]
+
+  - id: obs.paid_claim_rate
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    metric_type: RATE
+    definition: Final paid claim events divided by final paid plus final rejected claim events in the observable synthetic feed.
+    calculation:
+      numerator: COUNT(final_disposition = PAID)
+      denominator: COUNT(final_disposition IN [PAID, REJECTED])
+      source: restricted.fact_payer_claim_event
+      zero_denominator_behavior: RETURN_NULL_WITH_REASON
+    exclusions:
+      - duplicate_events
+      - reversed_without_final_disposition
+      - events_outside_observable_window
+    grain: [brand_id, payer_plan_id, iso_week]
+    unit: PROPORTION
+    rounding: 4
+    data_latency_days: 10
+    privacy:
+      minimum_cell_count: 11
+      aggregate_query_only: true
+    valid_uses: [access_monitoring, diagnostic_input]
+    prohibited_interpretations: [affordability_alone, patient_adherence, causal_effect_of_marketing]
+
+  - id: obs.eligible_hcp_reach_30d
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    metric_type: RATE
+    definition: Distinct eligible HCP references with a valid governed touchpoint divided by the governed segment snapshot population over 30 days.
+    calculation:
+      numerator: DISTINCT_ELIGIBLE_HCPS_WITH_VALID_TOUCHPOINT
+      denominator: ELIGIBLE_HCPS_IN_SEGMENT_SNAPSHOT
+      source_tables: [commercial.fact_hcp_touchpoint, commercial.dim_segment_snapshot]
+      lookback_days: 30
+      zero_denominator_behavior: RETURN_NULL_WITH_REASON
+    grain: [brand_id, segment_snapshot_id, as_of_date]
+    unit: PROPORTION
+    caveats:
+      - attempted_delivery_is_not_a_valid_touchpoint
+      - reach_does_not_establish_attention
+      - reach_does_not_establish_causal_impact
+    prohibited_interpretations: [incremental_demand, content_effectiveness]
+
+  - id: obs.email_engagement_proxy_rate
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    metric_type: RATE
+    definition: Governed synthetic email engagement events divided by valid delivered email events.
+    calculation:
+      numerator: COUNT(valid_engagement_event)
+      denominator: COUNT(valid_delivered_email)
+      source: commercial.fact_hcp_touchpoint
+      zero_denominator_behavior: RETURN_NULL_WITH_REASON
+    grain: [campaign_id, asset_version, iso_week]
+    unit: PROPORTION
+    caveats:
+      - privacy_features_and_security_scanners_can_distort_open_events
+      - engagement_is_a_proxy_not_proof_of_attention
+      - targeted_selection_creates_confounding
+    prohibited_interpretations: [incremental_prescriptions, causal_effect, return_on_investment]
+
+  - id: dq.provider_completeness_rate
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    metric_type: RATE
+    definition: Received expected provider records divided by expected records for the governed snapshot.
+    calculation:
+      numerator: received_expected_records
+      denominator: expected_records
+      source: governance.fact_data_quality
+    grain: [dataset_id, snapshot_id]
+    unit: PROPORTION
+    thresholds:
+      interpretation_block_below: 0.95
+      warning_below: 0.99
+
+  - id: obs.mlr_cycle_time_business_days
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    metric_type: DURATION
+    definition: Business days from accepted review start to final review decision, excluding requester-controlled pause intervals.
+    calculation:
+      expression: BUSINESS_DAYS(review_start, final_decision) - REQUESTER_PAUSE_DAYS
+      source: mlr.fact_review_cycle
+    grain: [asset_version, review_cycle_id]
+    unit: BUSINESS_DAYS
+    prohibited_interpretations: [review_quality, reviewer_productivity_without_case_mix]
+
+  - id: obs.first_pass_mlr_rate
+    version: 1.0.0
+    lifecycle: RATIFIED
+    synthetic: true
+    metric_type: RATE
+    definition: Assets receiving an eligible terminal decision in the first complete review cycle divided by assets entering a complete first cycle.
+    calculation:
+      numerator: COUNT(first_cycle_terminal_eligible_decision)
+      denominator: COUNT(complete_first_review_cycle)
+      source: mlr.fact_review_cycle
+    grain: [brand_id, asset_type, reporting_month]
+    unit: PROPORTION
+    prohibited_interpretations: [regulatory_quality_alone, reviewer_leniency]
+
+table_contracts:
+  - id: commercial.fact_rx_market_week
+    version: 1.0.0
+    grain: [provider_snapshot_id, product_id, geo_id, iso_week]
+    primary_key: [provider_snapshot_id, product_id, geo_id, iso_week]
+    measures: [new_to_brand_rx_count, total_rx_count]
+    event_time: week_end_date
+    reporting_time: provider_snapshot_at
+    privacy_class: RESTRICTED_COMMERCIAL_AGGREGATE
+    quality_rules:
+      - type: UNIQUE
+        fields: [provider_snapshot_id, product_id, geo_id, iso_week]
+      - type: NON_NEGATIVE
+        fields: [new_to_brand_rx_count, total_rx_count]
+      - type: LESS_THAN_OR_EQUAL
+        left: new_to_brand_rx_count
+        right: total_rx_count
+
+  - id: commercial.fact_hcp_brand_week
+    version: 1.0.0
+    grain: [provider_snapshot_id, hcp_key, brand_id, iso_week]
+    primary_key: [provider_snapshot_id, hcp_key, brand_id, iso_week]
+    measures: [new_to_brand_rx_count, total_rx_count]
+    event_time: week_end_date
+    privacy_class: RESTRICTED_COMMERCIAL_PSEUDONYMOUS
+    general_marketing_agent_access: AGGREGATE_QUERY_ONLY
+
+  - id: commercial.fact_plan_metric
+    version: 1.0.0
+    grain: [planning_version, metric_id, brand_id, geo_id, iso_week]
+    primary_key: [planning_version, metric_id, brand_id, geo_id, iso_week]
+    measures: [plan_value]
+    privacy_class: CONFIDENTIAL_COMMERCIAL
+    quality_rules:
+      - type: APPROVED_PLANNING_VERSION_REQUIRED
+
+  - id: restricted.fact_payer_claim_event
+    version: 1.0.0
+    grain: [claim_event_id]
+    primary_key: [claim_event_id]
+    fields: [claim_event_id, brand_id, payer_plan_id, event_date, final_disposition]
+    privacy_class: HIGHLY_RESTRICTED_PSEUDONYMOUS
+    general_marketing_agent_access: DENIED
+    governed_aggregate_query_access: REQUIRED
+
+  - id: commercial.fact_hcp_touchpoint
+    version: 1.0.0
+    grain: [touchpoint_id]
+    primary_key: [touchpoint_id]
+    foreign_keys: [opaque_hcp_ref, campaign_id, asset_version, channel_id]
+    event_time: touchpoint_at
+    privacy_class: RESTRICTED_COMMERCIAL_PSEUDONYMOUS
+    limitations:
+      - attempted_touchpoint_is_not_reach
+      - touchpoint_is_not_attention
+      - targeted_exposure_is_confounding
+
+  - id: commercial.bridge_hcp_territory_effective
+    version: 1.0.0
+    grain: [hcp_key, territory_id, valid_from]
+    fields: [hcp_key, territory_id, valid_from, valid_to]
+    privacy_class: RESTRICTED_COMMERCIAL_PSEUDONYMOUS
+    quality_rules:
+      - type: NO_OVERLAPPING_EFFECTIVE_INTERVALS
+        partition_by: [hcp_key]
+
+  - id: governance.fact_data_quality
+    version: 1.0.0
+    grain: [dataset_id, snapshot_id, rule_id]
+    measures: [received_expected_records, expected_records, failed_records]
+    privacy_class: INTERNAL
+
+  - id: commercial.dim_geo
+    version: 1.0.0
+    grain: [geo_id, dimension_version]
+    primary_key: [geo_id, dimension_version]
+    fields: [geo_id, geography_type, territory_id, region_id, valid_from, valid_to]
+    privacy_class: INTERNAL_REFERENCE
+    quality_rules:
+      - type: NO_OVERLAPPING_EFFECTIVE_INTERVALS
+        partition_by: [geo_id]
+
+  - id: commercial.dim_asset
+    version: 1.0.0
+    grain: [asset_version]
+    primary_key: [asset_version]
+    fields: [asset_version, asset_id, campaign_id, channel_id, lifecycle, approved_at, expires_at]
+    privacy_class: CONFIDENTIAL_COMMERCIAL
+    quality_rules:
+      - type: RELEASED_ASSET_REQUIRES_APPROVAL_AND_EXPIRY
+
+  - id: commercial.dim_segment_snapshot
+    version: 1.0.0
+    grain: [segment_snapshot_id, opaque_hcp_ref]
+    primary_key: [segment_snapshot_id, opaque_hcp_ref]
+    fields: [segment_snapshot_id, segment_definition_id, opaque_hcp_ref, snapshot_at, eligibility_state]
+    privacy_class: RESTRICTED_COMMERCIAL_PSEUDONYMOUS
+    general_marketing_agent_access: AGGREGATE_QUERY_ONLY
+    quality_rules:
+      - type: SEGMENT_DEFINITION_AND_SNAPSHOT_TIME_REQUIRED
+
+  - id: mlr.fact_review_cycle
+    version: 1.0.0
+    grain: [review_cycle_id]
+    primary_key: [review_cycle_id]
+    fields:
+      - review_cycle_id
+      - asset_version
+      - brand_id
+      - asset_type
+      - review_start
+      - final_decision
+      - requester_pause_days
+      - cycle_number
+      - terminal_decision
+    privacy_class: CONFIDENTIAL_OPERATIONAL
+    quality_rules:
+      - type: FINAL_DECISION_NOT_BEFORE_REVIEW_START
+      - type: NON_NEGATIVE
+        fields: [requester_pause_days, cycle_number]
+
+join_contracts:
+  - id: join_rx_week_to_geo
+    version: 1.0.0
+    left: commercial.fact_rx_market_week
+    right: commercial.dim_geo
+    keys: [geo_id]
+    cardinality: MANY_TO_ONE
+    temporal_rule: dimension_version_effective_at_week_end
+    fanout_policy: FAIL
+    allowed_metrics: [obs.new_to_brand_rx, obs.total_rx]
+
+  - id: join_hcp_week_to_territory_asof
+    version: 1.0.0
+    left: commercial.fact_hcp_brand_week
+    right: commercial.bridge_hcp_territory_effective
+    keys: [hcp_key]
+    cardinality: MANY_TO_ONE
+    temporal_rule: valid_from <= week_end_date AND week_end_date < valid_to
+    fanout_policy: FAIL
+    allowed_metrics: [obs.active_writers, obs.writer_depth]
+
+  - id: join_touchpoint_to_asset_exact_version
+    version: 1.0.0
+    left: commercial.fact_hcp_touchpoint
+    right: commercial.dim_asset
+    keys: [asset_version]
+    cardinality: MANY_TO_ONE
+    fanout_policy: FAIL
+    allowed_metrics: [obs.eligible_hcp_reach_30d, obs.email_engagement_proxy_rate]
+
+  - id: join_touchpoints_to_rx_hcp_week_analysis
+    version: 1.0.0
+    left: commercial.fact_hcp_touchpoint
+    right: commercial.fact_hcp_brand_week
+    keys: [opaque_hcp_ref_to_hcp_key, analysis_week]
+    cardinality: MANY_TO_MANY_BEFORE_AGGREGATION
+    required_preaggregation:
+      left_grain: [hcp_key, brand_id, analysis_week]
+      right_grain: [hcp_key, brand_id, analysis_week]
+    fanout_policy: FAIL_UNLESS_PREAGGREGATED
+    allowed_uses: [descriptive_association, governed_experiment_analysis]
+    prohibited_uses: [row_level_sum, naive_causal_attribution]
+
+driver_taxonomy:
+  - id: driver.measurement
+    children: [incomplete_data, late_data, definition_change, identity_match_change, plan_version_mismatch]
+  - id: driver.market
+    children: [class_growth, class_contraction, competitor_event, seasonality, diagnosis_change]
+  - id: driver.adoption
+    children: [writer_breadth, writer_depth, patient_identification, product_consideration]
+  - id: driver.access
+    children: [formulary_coverage, prior_authorization, affordability, rejection, abandonment, time_to_therapy]
+  - id: driver.continuity
+    children: [refill_proxy, persistence_proxy, discontinuation_proxy]
+  - id: driver.commercial_execution
+    children: [eligible_reach, frequency, channel_mix, field_coverage, content_availability, mlr_delay]
+  - id: driver.supply
+    children: [availability, stocking, specialty_pharmacy_constraint]
+  - id: driver.unresolved
+    children: [insufficient_evidence, conflicting_evidence]
+
+attribution_contract:
+  id: descriptive_attribution_v1
+  permitted_methods: [FIRST_TOUCH, LAST_TOUCH, LINEAR, TIME_DECAY]
+  required_fields:
+    - allocation_method
+    - eligible_touches
+    - lookback_window
+    - conversion_event
+    - identity_match_coverage
+    - unattributed_share
+    - known_missing_channels
+  permanent_cannot_support: [incrementality, causality, return_on_investment]
+
+causal_evidence_contract:
+  id: causal_analysis_v1
+  required_fields:
+    - identification_strategy
+    - unit_of_assignment
+    - unit_of_analysis
+    - treatment_definition
+    - control_definition
+    - prespecified_primary_outcome
+    - exposure_window
+    - outcome_window
+    - analysis_population
+    - uncertainty_interval
+    - missing_data_method
+    - spillover_assessment
+    - reviewer
+    - review_status
+  eligible_designs:
+    - RANDOMIZED_HCP_HOLDOUT
+    - RANDOMIZED_ACCOUNT_OR_TERRITORY_HOLDOUT
+    - RANDOMIZED_ROLLOUT
+    - APPROVED_QUASI_EXPERIMENT
+  observational_association_can_promote_to_causal: false
+
+synthetic_fixture:
+  id: fixture_auravia_northeast_2026_w26
+  synthetic: true
+  scope:
+    brand: brand_auravia
+    region: NORTHEAST
+    iso_week: 2026-W26
+    provider_snapshot: provider_snapshot_2026_w26_r1
+    planning_version: approved_plan_2026_v3
+  values:
+    obs.new_to_brand_rx: 920
+    plan.new_to_brand_rx: 1000
+    calculated_nbrx_variance_absolute: -80
+    calculated_nbrx_variance_rate: -0.08
+    obs.active_writers: 184
+    baseline.active_writers_prior_4w_average: 179
+    calculated_active_writer_change_rate: 0.0279
+    obs.writer_depth: 5.00
+    baseline.writer_depth_prior_4w_average: 5.56
+    calculated_writer_depth_change_rate: -0.1007
+    obs.paid_claim_rate: 0.67
+    baseline.paid_claim_rate: 0.74
+    obs.eligible_hcp_reach_30d: 0.68
+    baseline.eligible_hcp_reach_30d: 0.68
+    obs.email_engagement_proxy_rate: 0.21
+    baseline.email_engagement_proxy_rate: 0.20
+    dq.provider_completeness_rate: 0.987
+    payer_plan_concentration_of_nbrx_shortfall: 0.75
+  period_status: PROVISIONAL
+  controlled_email_experiment_available: false
+
+expected_diagnostic:
+  id: diagnostic_auravia_northeast_w26_expected
+  fixture: fixture_auravia_northeast_2026_w26
+  observations:
+    - statement: NBRx was 80 prescription events, or 8.0%, below the approved plan.
+      assertion_type: OBSERVATION
+      metrics: [obs.new_to_brand_rx, plan.new_to_brand_rx]
+    - statement: Active writers increased by approximately 2.8% versus the prior-four-week average.
+      assertion_type: OBSERVATION
+      metrics: [obs.active_writers]
+    - statement: Writer depth decreased by approximately 10.1% versus its prior-four-week average.
+      assertion_type: OBSERVATION
+      metrics: [obs.writer_depth]
+    - statement: Paid-claim rate decreased from 74% to 67%, with 75% of the NBRx shortfall concentrated in two synthetic payer plans.
+      assertion_type: OBSERVATION
+      metrics: [obs.paid_claim_rate]
+    - statement: Eligible HCP reach was stable and the email engagement proxy increased from 20% to 21%.
+      assertion_type: OBSERVATION
+      metrics: [obs.eligible_hcp_reach_30d, obs.email_engagement_proxy_rate]
+  hypotheses:
+    - id: hypothesis_access_friction
+      driver: driver.access
+      status: SUPPORTED_FOR_FURTHER_INVESTIGATION
+      supporting_observations: [paid_claim_rate_decline, payer_plan_concentration]
+      causal_status: NOT_ESTABLISHED
+    - id: hypothesis_email_underperformance
+      driver: driver.commercial_execution
+      status: NOT_SUPPORTED_BY_OBSERVED_EMAIL_PROXY
+      contradicting_observations: [stable_reach, increased_email_engagement_proxy]
+      causal_status: UNRESOLVED_NO_CONTROLLED_EXPERIMENT
+  required_caveats:
+    - period_is_provisional
+    - provider_completeness_is_below_warning_threshold
+    - email_engagement_is_a_proxy
+    - targeting_creates_selection_bias
+    - no_controlled_email_experiment_is_available
+  next_analyses:
+    - payer_plan_transition_and_formulary_effective_date_alignment
+    - compare_affected_and_unaffected_plans
+    - validate_provider_restatement_in_finalized_period
+  prohibited_conclusions:
+    - email_caused_nbrx_decline
+    - access_caused_nbrx_decline
+    - reallocate_budget_autonomously
+
+example_query_receipt:
+  id: query_receipt_nbrx_vs_plan_w26
+  metric_versions:
+    - obs.new_to_brand_rx@1.0.0
+    - plan.new_to_brand_rx@1.0.0
+  scope: {brand: brand_auravia, region: NORTHEAST, iso_week: 2026-W26}
+  provider_snapshot: provider_snapshot_2026_w26_r1
+  planning_version: approved_plan_2026_v3
+  result: {actual: 920, plan: 1000, absolute_variance: -80, rate_variance: -0.08}
+  unit: PRESCRIPTION_EVENTS
+  period_status: PROVISIONAL
+  completeness: 0.987
+  suppression_applied: false
+  pack_release: synthetic.pharma.marketing.auravia@0.1.0-reference
+

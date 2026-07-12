@@ -1,0 +1,272 @@
+schema_version: ontowiz.ontology-module/v0alpha1
+module:
+  id: ontology_auravia_marketing_v1
+  lifecycle: design_fixture
+  synthetic_reference: true
+  default_namespace: owz:synthetic:auravia
+
+controlled_vocabularies:
+  lifecycle_state:
+    - PROPOSED
+    - SME_ENDORSED
+    - RATIFIED
+    - RELEASED
+    - DEPRECATED
+    - WITHDRAWN
+  communication_purpose:
+    - PROMOTIONAL
+    - DISEASE_AWARENESS
+    - MEDICAL_INFORMATION
+    - SCIENTIFIC_EXCHANGE
+    - PATIENT_SUPPORT
+    - CORPORATE_COMMUNICATION
+    - INTERNAL_TRAINING
+  evidence_support:
+    - DIRECT
+    - DERIVED
+    - CONSISTENT_WITH_LABEL
+    - INSUFFICIENT
+    - CONFLICTING
+    - WITHDRAWN
+  analytical_assertion:
+    - OBSERVATION
+    - DESCRIPTIVE_ATTRIBUTION
+    - ASSOCIATION
+    - PREDICTION
+    - CAUSAL_ESTIMATE
+    - HYPOTHESIS
+    - RECOMMENDATION
+    - UNRESOLVED
+  kpi_relation:
+    - ARITHMETIC_COMPONENT
+    - FUNNEL_TRANSITION
+    - DIAGNOSTIC_INDICATOR
+    - OBSERVED_ASSOCIATION
+    - CAUSAL_EFFECT
+    - CONSTRAINT
+
+entity_types:
+  - id: type.brand
+    description: Marketed product identity scoped by owner and market.
+  - id: type.active_ingredient
+    description: Active molecular or chemical ingredient.
+  - id: type.indication
+    description: Authorized or studied disease-use scope.
+  - id: type.population
+    description: Qualifying patient or stakeholder population definition.
+  - id: type.label_version
+    description: Versioned governing product label for one market.
+  - id: type.study
+    description: Versioned evidence-generating study.
+  - id: type.clinical_endpoint
+    description: Defined clinical outcome and measurement rule.
+  - id: type.claim
+    description: Semantic proposition with applicability and evidence requirements.
+  - id: type.claim_variant
+    description: Governed textual realization of a claim.
+  - id: type.risk_bundle
+    description: Required collection of risk and limitation statements.
+  - id: type.message
+    description: Communication unit composed from eligible claims and context.
+  - id: type.asset
+    description: Versioned rendered content requiring asset-level review.
+  - id: type.audience
+    description: Governed recipient class, not a raw person record.
+  - id: type.segment_definition
+    description: Versioned decision rule that defines an addressable audience.
+  - id: type.journey_state
+    description: Time-bound estimate supported by observations and confidence.
+  - id: type.channel
+    description: Governed communication channel.
+  - id: type.next_action
+    description: Candidate commercial action subject to policy and approval.
+  - id: type.metric
+    description: Versioned semantic measure with formula, grain, and valid uses.
+  - id: type.table
+    description: Governed table contract with grain and access policy.
+  - id: type.join_contract
+    description: Approved relationship between data contracts.
+  - id: type.performance_observation
+    description: Reproducible numeric or categorical observation.
+  - id: type.driver_hypothesis
+    description: Testable explanation distinct from an observed fact.
+  - id: type.experiment
+    description: Governed design capable of supporting an eligible causal estimate.
+  - id: type.review_decision
+    description: Human or system governance decision with authority and rationale.
+
+relation_types:
+  - id: rel.has_active_ingredient
+    source_types: [type.brand]
+    target_types: [type.active_ingredient]
+    cardinality: MANY_TO_ONE
+  - id: rel.has_indication
+    source_types: [type.brand, type.label_version]
+    target_types: [type.indication]
+    cardinality: MANY_TO_MANY
+  - id: rel.governed_by_label
+    source_types: [type.claim, type.brand]
+    target_types: [type.label_version]
+    cardinality: MANY_TO_ONE
+  - id: rel.supported_by
+    source_types: [type.claim]
+    target_types: [type.study]
+    cardinality: MANY_TO_MANY
+    requires_evidence_assertion: true
+  - id: rel.measures
+    source_types: [type.study]
+    target_types: [type.clinical_endpoint]
+    cardinality: MANY_TO_MANY
+  - id: rel.requires_risk
+    source_types: [type.claim, type.message, type.asset]
+    target_types: [type.risk_bundle]
+    cardinality: MANY_TO_MANY
+  - id: rel.realizes_claim
+    source_types: [type.claim_variant, type.message, type.asset]
+    target_types: [type.claim]
+    cardinality: MANY_TO_MANY
+  - id: rel.allowed_for
+    source_types: [type.claim, type.claim_variant, type.asset, type.next_action]
+    target_types: [type.audience, type.channel]
+    cardinality: MANY_TO_MANY
+  - id: rel.targets_segment
+    source_types: [type.asset, type.next_action]
+    target_types: [type.segment_definition]
+    cardinality: MANY_TO_MANY
+  - id: rel.permitted_in_state
+    source_types: [type.next_action]
+    target_types: [type.journey_state]
+    cardinality: MANY_TO_MANY
+  - id: rel.uses_channel
+    source_types: [type.next_action, type.asset]
+    target_types: [type.channel]
+    cardinality: MANY_TO_ONE
+  - id: rel.computed_from
+    source_types: [type.metric]
+    target_types: [type.table]
+    cardinality: MANY_TO_MANY
+  - id: rel.diagnostic_of
+    source_types: [type.metric, type.performance_observation]
+    target_types: [type.metric, type.driver_hypothesis]
+    cardinality: MANY_TO_MANY
+    causal_semantics: false
+  - id: rel.causal_effect_on
+    source_types: [type.experiment]
+    target_types: [type.metric]
+    cardinality: MANY_TO_MANY
+    requires_approved_causal_analysis: true
+
+nodes:
+  - id: brand_auravia
+    type: type.brand
+    preferred_label: Auravia
+    fictional: true
+    lifecycle: RATIFIED
+    applicability:
+      client: synthetic_client
+      markets: [US]
+      valid_from: 2026-01-01
+      valid_to: 2026-12-31
+
+  - id: ingredient_velunimab
+    type: type.active_ingredient
+    preferred_label: velunimab
+    fictional: true
+    lifecycle: RATIFIED
+
+  - id: indication_adult_moderate_severe_ad
+    type: type.indication
+    preferred_label: synthetic adult moderate-to-severe atopic dermatitis indication
+    fictional: true
+    lifecycle: RATIFIED
+
+  - id: population_trial_eligible_adults
+    type: type.population
+    preferred_label: synthetic trial-eligible adult population
+    fictional: true
+    lifecycle: RATIFIED
+
+  - id: label_us_auravia_v1
+    type: type.label_version
+    preferred_label: Synthetic Auravia US label v1
+    fictional: true
+    lifecycle: RATIFIED
+    applicability:
+      markets: [US]
+      valid_from: 2026-01-01
+      valid_to: 2026-12-31
+
+  - id: study_vela1
+    type: type.study
+    preferred_label: Synthetic VELA-1 study
+    fictional: true
+    lifecycle: RATIFIED
+
+  - id: endpoint_easi75_week16
+    type: type.clinical_endpoint
+    preferred_label: Synthetic EASI-75 at week 16 endpoint
+    fictional: true
+    lifecycle: RATIFIED
+
+  - id: audience_us_hcp_dermatologist
+    type: type.audience
+    preferred_label: US dermatologist HCP
+    fictional: true
+    lifecycle: RATIFIED
+
+  - id: audience_gb_general_public
+    type: type.audience
+    preferred_label: GB general public
+    fictional: true
+    lifecycle: RATIFIED
+
+  - id: channel_hcp_email
+    type: type.channel
+    preferred_label: HCP email
+    lifecycle: RATIFIED
+
+  - id: channel_field_detail
+    type: type.channel
+    preferred_label: field detail
+    lifecycle: RATIFIED
+
+  - id: channel_approved_web
+    type: type.channel
+    preferred_label: approved authenticated web
+    lifecycle: RATIFIED
+
+relationships:
+  - id: edge_auravia_ingredient
+    type: rel.has_active_ingredient
+    source: brand_auravia
+    target: ingredient_velunimab
+  - id: edge_auravia_indication
+    type: rel.has_indication
+    source: brand_auravia
+    target: indication_adult_moderate_severe_ad
+  - id: edge_label_indication
+    type: rel.has_indication
+    source: label_us_auravia_v1
+    target: indication_adult_moderate_severe_ad
+  - id: edge_study_endpoint
+    type: rel.measures
+    source: study_vela1
+    target: endpoint_easi75_week16
+
+terminology:
+  - id: term_auravia_preferred
+    concept: brand_auravia
+    text: Auravia
+    role: preferred
+    applicability: {market: US, purpose: PROMOTIONAL}
+  - id: term_velunimab_preferred
+    concept: ingredient_velunimab
+    text: velunimab
+    role: preferred
+    applicability: {market: US, purpose: PROMOTIONAL}
+  - id: term_guaranteed_response_prohibited
+    concept: endpoint_easi75_week16
+    text: guaranteed response
+    role: prohibited_expression
+    reason: Converts a population-level synthetic result into an individual guarantee.
+

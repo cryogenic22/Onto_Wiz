@@ -1,0 +1,124 @@
+schema_version: ontowiz.synthetic-source-fixture/v0alpha1
+fixture:
+  id: auravia_synthetic_authoritative_sources_v1
+  synthetic_reference: true
+  production_eligible: false
+  canonical_subtree_digest_required_at_compile: true
+  warning: All products, results, policies, and commercial values are fictional.
+
+documents:
+  synthetic_us_label_v1:
+    title: Synthetic Auravia US Prescribing Information
+    sections:
+      indications_and_usage:
+        brand: brand_auravia
+        indication: indication_adult_moderate_severe_ad
+        population: population_trial_eligible_adults
+        fictional: true
+      clinical_studies:
+        efficacy_summary:
+          easi75_week16:
+            study: study_vela1
+            population: population_trial_eligible_adults
+            endpoint: endpoint_easi75_week16
+            intervention_result: {value: 62, unit: PERCENT}
+            comparator: PLACEBO
+            comparator_result: {value: 28, unit: PERCENT}
+            timepoint: {value: 16, unit: WEEK}
+            fictional: true
+      warnings_and_precautions:
+        synthetic_core_warning: >
+          Fictional safety statement for architecture testing only. Refer to the
+          complete synthetic prescribing-information fixture.
+      adverse_reactions:
+        synthetic_common_reactions: >
+          Fictional adverse-reaction statement for architecture testing only.
+
+  synthetic_study_report_v1:
+    title: Synthetic VELA-1 Study Report
+    sections:
+      methods:
+        study_design: SYNTHETIC_RANDOMIZED_CONTROLLED_FIXTURE
+        population: population_trial_eligible_adults
+        intervention: brand_auravia
+        comparator: PLACEBO
+        fictional: true
+      efficacy_results:
+        table_2_primary_endpoint:
+          easi75_week16:
+            population: population_trial_eligible_adults
+            endpoint: endpoint_easi75_week16
+            intervention_result: {value: 62, unit: PERCENT}
+            comparator_result: {value: 28, unit: PERCENT}
+            timepoint: {value: 16, unit: WEEK}
+            limitations:
+              - does_not_predict_individual_response
+              - does_not_support_unqualified_superiority
+            fictional: true
+
+  synthetic_us_promo_policy_v1:
+    title: Synthetic US Promotional Review Policy
+    rules:
+      claims_must_match_current_synthetic_label: true
+      exact_evidence_spans_required: true
+      risk_must_remain_coupled_to_benefit: true
+      automated_preflight_can_approve: false
+      rendered_asset_requires_authorized_human_review: true
+      potential_adverse_event_route: CLIENT_VALIDATED_PHARMACOVIGILANCE_PROCESS
+      unsolicited_off_label_route: CLIENT_CONTROLLED_MEDICAL_INFORMATION
+
+  synthetic_gb_policy_v1:
+    title: Synthetic GB Public Promotion Policy
+    rules:
+      branded_prescription_product_promotion_to_general_public:
+        decision: BLOCK
+        reason_code: SYNTHETIC_GB_PUBLIC_BRANDED_PROMOTION_BLOCK
+      note: Synthetic policy fixture; not a statement of current law or code.
+
+  synthetic_metric_spec_v1:
+    title: Synthetic Auravia Commercial Metric Specification
+    metrics:
+      obs.new_to_brand_rx:
+        provider_definition: >
+          Prescription events classified as new to the synthetic brand after
+          365 days of observable history.
+        not_equivalent_to: [unique_patients, confirmed_indication, causal_marketing_outcome]
+      obs.paid_claim_rate:
+        numerator: final_paid_claim_events
+        denominator: final_paid_claim_events + final_rejected_claim_events
+        not_equivalent_to: [affordability, adherence]
+      obs.email_engagement_proxy_rate:
+        numerator: governed_engagement_events
+        denominator: valid_delivered_emails
+        not_equivalent_to: [attention, incrementality, causal_effect]
+
+  synthetic_data_contract_v1:
+    title: Synthetic Auravia Warehouse Data Contract
+    tables:
+      commercial.fact_rx_market_week:
+        grain: [provider_snapshot_id, product_id, geo_id, iso_week]
+        measures: [new_to_brand_rx_count, total_rx_count]
+      commercial.fact_hcp_brand_week:
+        grain: [provider_snapshot_id, hcp_key, brand_id, iso_week]
+        access: AGGREGATE_QUERY_ONLY_FOR_GENERAL_MARKETING_AGENT
+      restricted.fact_payer_claim_event:
+        grain: [claim_event_id]
+        access: DENIED_TO_GENERAL_MARKETING_AGENT
+      commercial.fact_hcp_touchpoint:
+        grain: [touchpoint_id]
+        limitations: [attempt_is_not_reach, touchpoint_is_not_attention, targeting_is_confounding]
+    join_rules:
+      undeclared_join: REJECT
+      many_to_many_without_preaggregation: REJECT
+      temporal_dimension_join: AS_OF_EVENT_TIME
+
+  synthetic_plan_snapshot_w26:
+    title: Synthetic Approved Auravia Plan Snapshot for 2026-W26
+    planning_version: approved_plan_2026_v3
+    approved: true
+    scope: {brand: brand_auravia, region: NORTHEAST, iso_week: 2026-W26}
+    values:
+      plan.new_to_brand_rx: 1000
+    approved_at: 2026-06-20T00:00:00Z
+    fictional: true
+

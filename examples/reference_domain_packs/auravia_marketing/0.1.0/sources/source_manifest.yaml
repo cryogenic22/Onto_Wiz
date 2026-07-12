@@ -1,0 +1,145 @@
+schema_version: ontowiz.source-manifest/v0alpha1
+manifest:
+  id: source_manifest_auravia_marketing_v1
+  lifecycle: design_fixture
+  synthetic_reference: true
+  digest_policy: compute_sha256_at_ingest
+  immutable_content_identity_separate_from_source_instance: true
+
+content_objects:
+  - id: content_synthetic_us_label_v1
+    media_type: application/yaml
+    content_digest: null
+    digest_status: required_at_compile
+    synthetic: true
+  - id: content_synthetic_study_report_v1
+    media_type: application/yaml
+    content_digest: null
+    digest_status: required_at_compile
+    synthetic: true
+  - id: content_synthetic_us_promo_policy_v1
+    media_type: application/yaml
+    content_digest: null
+    digest_status: required_at_compile
+    synthetic: true
+  - id: content_synthetic_gb_policy_v1
+    media_type: application/yaml
+    content_digest: null
+    digest_status: required_at_compile
+    synthetic: true
+  - id: content_synthetic_metric_spec_v1
+    media_type: application/yaml
+    content_digest: null
+    digest_status: required_at_compile
+    synthetic: true
+  - id: content_synthetic_data_contract_v1
+    media_type: application/yaml
+    content_digest: null
+    digest_status: required_at_compile
+    synthetic: true
+  - id: content_synthetic_plan_snapshot_w26
+    media_type: application/yaml
+    content_digest: null
+    digest_status: required_at_compile
+    synthetic: true
+
+source_instances:
+  - id: source_synthetic_us_label_v1
+    content_id: content_synthetic_us_label_v1
+    title: Synthetic Auravia US Prescribing Information
+    source_type: governing_label
+    authority: synthetic_regulatory_fixture
+    captured_at: 2026-01-02T00:00:00Z
+    effective_from: 2026-01-01
+    effective_to: 2026-12-31
+    market: US
+    access_class: confidential_reference
+    retention_class: reference_fixture
+    approved_uses: [reference_compilation, automated_evaluation]
+    prohibited_uses: [production_promotion, clinical_decision_support]
+
+  - id: source_synthetic_study_report_v1
+    content_id: content_synthetic_study_report_v1
+    title: Synthetic VELA-1 Study Report
+    source_type: synthetic_clinical_evidence
+    authority: synthetic_evidence_fixture
+    captured_at: 2026-01-02T00:00:00Z
+    effective_from: 2026-01-01
+    effective_to: 2026-12-31
+    market: GLOBAL_SYNTHETIC
+    access_class: confidential_reference
+    retention_class: reference_fixture
+    approved_uses: [reference_compilation, automated_evaluation]
+    prohibited_uses: [production_promotion, medical_decision_support]
+
+  - id: source_synthetic_us_promo_policy_v1
+    content_id: content_synthetic_us_promo_policy_v1
+    title: Synthetic US Promotional Review Policy
+    source_type: client_policy
+    authority: synthetic_client_mlr
+    captured_at: 2026-01-02T00:00:00Z
+    effective_from: 2026-01-01
+    effective_to: 2026-12-31
+    market: US
+    access_class: confidential_reference
+    approved_uses: [reference_compilation, automated_evaluation]
+
+  - id: source_synthetic_gb_policy_v1
+    content_id: content_synthetic_gb_policy_v1
+    title: Synthetic GB Public Promotion Policy
+    source_type: market_policy
+    authority: synthetic_market_policy_fixture
+    captured_at: 2026-01-02T00:00:00Z
+    effective_from: 2026-01-01
+    effective_to: 2026-12-31
+    market: GB
+    access_class: internal_reference
+    approved_uses: [reference_compilation, automated_evaluation]
+
+  - id: source_synthetic_metric_spec_v1
+    content_id: content_synthetic_metric_spec_v1
+    title: Synthetic Auravia Commercial Metric Specification
+    source_type: metric_specification
+    authority: synthetic_commercial_analytics_governance
+    captured_at: 2026-06-01T00:00:00Z
+    effective_from: 2026-01-01
+    effective_to: 2026-12-31
+    market: US
+    access_class: confidential_reference
+    approved_uses: [reference_compilation, automated_evaluation]
+
+  - id: source_synthetic_data_contract_v1
+    content_id: content_synthetic_data_contract_v1
+    title: Synthetic Auravia Warehouse Data Contract
+    source_type: data_contract
+    authority: synthetic_data_governance
+    captured_at: 2026-06-01T00:00:00Z
+    effective_from: 2026-01-01
+    effective_to: 2026-12-31
+    market: US
+    access_class: restricted_commercial
+    approved_uses: [schema_resolution, governed_aggregate_query, automated_evaluation]
+    prohibited_uses: [general_agent_row_access, patient_reidentification]
+
+  - id: source_synthetic_plan_snapshot_w26
+    content_id: content_synthetic_plan_snapshot_w26
+    title: Synthetic Approved Auravia Plan Snapshot for 2026-W26
+    source_type: approved_plan_snapshot
+    authority: synthetic_brand_finance
+    captured_at: 2026-06-20T00:00:00Z
+    effective_from: 2026-06-22
+    effective_to: 2026-06-28
+    market: US
+    access_class: restricted_commercial
+    approved_uses: [plan_variance, automated_evaluation]
+
+locator_contract:
+  type: SourceSpan[]
+  requirements:
+    - one_artifact_may_reference_multiple_spans
+    - spans_preserve_source_instance_identity
+    - spans_are_resolvable_against_the_captured_source_version
+    - byte_or_character_offsets_are_required_for_unstructured_text
+    - structured_sources_may_add_section_table_row_and_field_coordinates
+    - displayed_citations_must_not_exceed_authorized_access
+
