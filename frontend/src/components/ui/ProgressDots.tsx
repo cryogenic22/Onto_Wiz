@@ -8,13 +8,16 @@ interface ProgressDotsProps {
 
 export default function ProgressDots({ steps, currentIndex, className }: ProgressDotsProps) {
   return (
-    <div className={cn('flex items-center gap-1', className)}>
+    <div className={cn('flex items-center gap-1', className)} role="list" aria-label="Progress">
       {steps.map((step, i) => (
         <div
           key={step}
+          data-slot="dot"
+          role="listitem"
+          aria-current={i === currentIndex ? 'step' : undefined}
           className={cn(
-            'w-2 h-2 rounded-full transition-colors',
-            i < currentIndex ? 'bg-emerald-500' : i === currentIndex ? 'bg-blue-400' : 'bg-slate-700',
+            'h-2 w-2 rounded-full transition-colors',
+            i < currentIndex ? 'bg-jade' : i === currentIndex ? 'bg-cyan' : 'bg-edge2',
           )}
           title={step}
         />

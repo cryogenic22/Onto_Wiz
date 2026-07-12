@@ -22,6 +22,7 @@ export default defineConfig({
         // D0 design system (foundry tokens + gallery + ui/ primitives)
         'src/ui/**/*.{ts,tsx}',
         'src/app/ui/**/*.tsx',
+        'src/components/ui/**/*.tsx',
       ],
       thresholds: { lines: 85, functions: 85, statements: 85 },
     },

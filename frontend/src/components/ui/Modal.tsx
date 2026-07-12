@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { cn } from '@/lib/cn';
 import { X } from 'lucide-react';
 
@@ -14,12 +14,21 @@ interface ModalProps {
 
 export default function Modal({ open, onClose, title, children, className }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
 
   useEffect(() => {
     if (!open) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const opener = document.activeElement as HTMLElement | null;
+    panelRef.current?.focus();
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
     document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
+    return () => {
+      document.removeEventListener('keydown', handler);
+      opener?.focus?.(); // return focus to the opener
+    };
   }, [open, onClose]);
 
   if (!open) return null;
@@ -28,16 +37,35 @@ export default function Modal({ open, onClose, title, children, className }: Mod
     <div
       ref={overlayRef}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-      onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
+      onClick={(e) => {
+        if (e.target === overlayRef.current) onClose();
+      }}
     >
-      <div className={cn('bg-slate-800 border border-slate-700 rounded-lg shadow-xl w-full max-w-md mx-4', className)}>
-        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-700">
-          <h2 className="text-sm font-semibold text-slate-200">{title}</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-200">
-            <X className="w-4 h-4" />
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className={cn(
+          'mx-4 w-full max-w-md rounded-lg border border-edge bg-carbon shadow-xl focus:outline-none',
+          className,
+        )}
+      >
+        <div className="flex items-center justify-between border-b border-edge px-5 py-3">
+          <h2 id={titleId} className="text-sm font-semibold text-ink">
+            {title}
+          </h2>
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={onClose}
+            className="rounded text-ink2 transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan"
+          >
+            <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="px-5 py-4">{children}</div>
+        <div className="px-5 py-4 text-ink2">{children}</div>
       </div>
     </div>
   );

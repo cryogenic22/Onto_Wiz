@@ -5,32 +5,12 @@
 @import 'tailwindcss' source('../');
 @import '../ui/tokens.css';
 
-/* Foundry surface defaults (Prototype 9). Persona density vars below stay until the
- * primitives are rebased in D0.4. */
+/* Foundry surface defaults (Prototype 9). The legacy persona density vars were retired
+ * in D0.4 when the primitives rebased onto a single Foundry density; `lib/persona.ts`
+ * (the mode hook the dashboards still use) is unaffected. */
 :root {
   --background: var(--color-void);
   --foreground: var(--color-ink);
-
-  /* Persona: SME (warm) — legacy, retired in D0.4 */
-  --persona-spacing-sm: 0.75rem;
-  --persona-spacing-md: 1.25rem;
-  --persona-spacing-lg: 2rem;
-  --persona-radius: 0.75rem;
-  --persona-font-sm: 0.9375rem;
-  --persona-font-base: 1.0625rem;
-  --persona-font-lg: 1.25rem;
-  --persona-font-xl: 1.5rem;
-}
-
-.persona-curator {
-  --persona-spacing-sm: 0.375rem;
-  --persona-spacing-md: 0.75rem;
-  --persona-spacing-lg: 1.25rem;
-  --persona-radius: 0.375rem;
-  --persona-font-sm: 0.8125rem;
-  --persona-font-base: 0.875rem;
-  --persona-font-lg: 1rem;
-  --persona-font-xl: 1.125rem;
 }
 
 body {

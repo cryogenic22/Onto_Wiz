@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { FOUNDRY_COLORS } from '@/ui/tokens';
 import { LIFECYCLE_STATES } from '@/ui/LifecycleBadge';
@@ -38,5 +38,26 @@ describe('/ui gallery', () => {
     for (const layer of ONTOLOGY_LAYERS) {
       expect(screen.getByTestId(`layer-chip-${layer}`)).toBeInTheDocument();
     }
+  });
+
+  it('renders a Primitives section with buttons, a nested card, and fields', () => {
+    render(<UIGalleryPage />);
+    expect(
+      screen.getByRole('heading', { name: /^primitives$/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Primary' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Disabled' })).toBeDisabled();
+    // nested card renders a distinct inner surface
+    expect(screen.getByText(/nested inset card/i)).toBeInTheDocument();
+    // fields with linked labels + an error field
+    expect(screen.getByLabelText('Search field')).toBeInTheDocument();
+    expect(screen.getByLabelText('Scope')).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('opens the Modal demo dialog on click', () => {
+    render(<UIGalleryPage />);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /open dialog/i }));
+    expect(screen.getByRole('dialog')).toHaveAttribute('aria-modal', 'true');
   });
 });

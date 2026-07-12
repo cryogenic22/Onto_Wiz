@@ -8,6 +8,12 @@ import {
   ProvenanceChip,
   type ProvenanceSource,
 } from '@/ui/chips';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import Input from '@/components/ui/Input';
+import Textarea from '@/components/ui/Textarea';
+import ProgressDots from '@/components/ui/ProgressDots';
+import ModalDemo from './ModalDemo';
 
 /** Realistic locators (icon supplied by the component, not the string). */
 const PROVENANCE_DEMO: Record<ProvenanceSource, string> = {
@@ -187,6 +193,44 @@ export default function UIGalleryPage() {
           {ONTOLOGY_LAYERS.map((layer) => (
             <LayerChip key={layer} layer={layer} />
           ))}
+        </div>
+      </GallerySection>
+
+      <GallerySection title="Primitives">
+        <div className="mb-2 font-mono text-[10px] uppercase tracking-[1px] text-ink3">
+          Buttons
+        </div>
+        <div className="mb-6 flex flex-wrap items-center gap-2">
+          <Button variant="primary">Primary</Button>
+          <Button variant="secondary">Secondary</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="danger">Danger</Button>
+          <Button variant="primary" disabled>
+            Disabled
+          </Button>
+          <ModalDemo />
+        </div>
+
+        <div className="mb-2 font-mono text-[10px] uppercase tracking-[1px] text-ink3">
+          Card (nesting)
+        </div>
+        <Card className="mb-6 max-w-md">
+          <div className="mb-3 text-[13px] text-ink">Panel</div>
+          <Card variant="inset">
+            <span className="text-[12px] text-ink2">Nested inset card — distinct surface</span>
+          </Card>
+        </Card>
+
+        <div className="mb-2 font-mono text-[10px] uppercase tracking-[1px] text-ink3">
+          Fields &amp; progress
+        </div>
+        <div className="grid max-w-2xl gap-4 sm:grid-cols-3">
+          <Input id="ui-search" label="Search field" placeholder="Filter…" />
+          <Input id="ui-scope" label="Scope" error="Required" defaultValue="" />
+          <Textarea id="ui-notes" label="Notes" placeholder="Rationale…" rows={3} />
+        </div>
+        <div className="mt-4">
+          <ProgressDots steps={['Compile', 'Evaluate', 'Review', 'Publish']} currentIndex={1} />
         </div>
       </GallerySection>
     </main>

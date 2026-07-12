@@ -1,21 +1,20 @@
-'use client';
-
 import { cn } from '@/lib/cn';
-import { usePersona } from '@/lib/persona';
 
 interface CardProps {
+  /** `inset` uses a lighter surface so a nested Card reads as nested, not doubled. */
+  variant?: 'default' | 'inset';
   children: React.ReactNode;
   className?: string;
 }
 
-export default function Card({ children, className }: CardProps) {
-  const persona = usePersona();
-  const density = persona === 'sme'
-    ? 'p-[var(--persona-spacing-lg)] rounded-[var(--persona-radius)]'
-    : 'p-[var(--persona-spacing-md)] rounded-[var(--persona-radius)]';
+const SURFACES = {
+  default: 'bg-carbon border-edge',
+  inset: 'bg-slab2 border-edge',
+} as const;
 
+export default function Card({ variant = 'default', children, className }: CardProps) {
   return (
-    <div className={cn('bg-slate-800/50 border border-slate-700/50', density, className)}>
+    <div className={cn('rounded-lg border p-4', SURFACES[variant] ?? SURFACES.default, className)}>
       {children}
     </div>
   );
