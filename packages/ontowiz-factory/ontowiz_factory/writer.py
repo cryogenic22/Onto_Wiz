@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
 import shutil
 import tempfile
 from pathlib import Path
@@ -27,6 +28,7 @@ from .compiler import (
     CANDIDATE_MANIFEST_VERSION,
     CandidateDigestConflictError,
     CompiledPack,
+    CorruptCandidateError,
     StagedCandidateInvalidError,
     UnsafeCandidatePathError,
     _candidate_digest,
@@ -36,6 +38,32 @@ from .compiler import (
     _validate_name,
     _validate_version,
 )
+
+# The exact payload-path grammar the verifier trusts. A declared inventory path
+# is either one of the two fixed CTX files or a single-level artifacts/*.yaml —
+# no directory traversal, absolute path, drive, or control file can match.
+_FIXED_PAYLOAD = frozenset({"context.ctx", "index.l3.ctx"})
+_PAYLOAD_RE = re.compile(r"^artifacts/[A-Za-z0-9._-]+\.yaml$")
+
+
+def _valid_payload_path(path: str) -> bool:
+    return path in _FIXED_PAYLOAD or bool(_PAYLOAD_RE.match(path))
+
+
+def _paths_are_safe(output_inventory: list) -> bool:
+    """Every declared path matches the payload grammar and is unique (case-folded).
+
+    Validated **before** any filesystem access, so a malicious manifest cannot
+    steer ``verify_candidate_dir`` into hashing files outside the candidate, nor
+    declare a control file, traversal, absolute path, or duplicate.
+    """
+    seen: set[str] = set()
+    for o in output_inventory:
+        key = o.path.casefold()
+        if not _valid_payload_path(o.path) or key in seen:
+            return False
+        seen.add(key)
+    return True
 
 
 def _pack_digest(pack_dir: Path) -> str:
@@ -94,20 +122,31 @@ def _read_manifest(pack_dir: Path) -> PackManifest:
     return PackManifest.model_validate(data if isinstance(data, dict) else {})
 
 
-def _relpaths(root: Path) -> set[str]:
-    return {p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file()}
+def _no_symlinks_and_only_declared(pack_dir: Path, declared: set[str]) -> bool:
+    """No symlink/reparse entry anywhere, and every real file is control or declared."""
+    for p in pack_dir.rglob("*"):
+        if p.is_symlink():                    # reject before it can point outside
+            return False
+        if p.is_file():
+            rel = p.relative_to(pack_dir).as_posix()
+            if rel not in _CONTROL_FILES and rel not in declared:
+                return False
+    return True
 
 
-def _only_declared_files(pack_dir: Path, declared: set[str]) -> bool:
-    """No undeclared payload and no unexpected control file may exist on disk."""
-    return all(rel in _CONTROL_FILES or rel in declared for rel in _relpaths(pack_dir))
+def _within(root_real: str, fp: Path) -> bool:
+    try:
+        return os.path.commonpath([root_real, os.path.realpath(fp)]) == root_real
+    except ValueError:                        # different drive/UNC on Windows
+        return False
 
 
 def _declared_files_match(pack_dir: Path, output_inventory: list) -> bool:
-    """Every declared payload file is present and byte-exact."""
+    """Every declared payload file is present, a contained non-symlink, and byte-exact."""
+    root_real = os.path.realpath(pack_dir)
     for o in output_inventory:
         fp = pack_dir / o.path
-        if not fp.is_file():
+        if fp.is_symlink() or not fp.is_file() or not _within(root_real, fp):
             return False
         data = fp.read_bytes()
         if len(data) != o.byte_count or _sha256_hex(data) != o.sha256:
@@ -132,8 +171,10 @@ def verify_candidate_dir(pack_dir: str | Path) -> bool:
         return False
     if m.manifest_version != CANDIDATE_MANIFEST_VERSION:
         return False
+    if not _paths_are_safe(m.output_inventory):   # grammar + uniqueness, BEFORE fs access
+        return False
     declared = {o.path for o in m.output_inventory}
-    if not _only_declared_files(pack_dir, declared):
+    if not _no_symlinks_and_only_declared(pack_dir, declared):
         return False
     if not _declared_files_match(pack_dir, m.output_inventory):
         return False
@@ -201,7 +242,15 @@ def write_pack(pack: CompiledPack, dest_root: str | Path) -> Path:
                 raise                            # a real error, not a promote race
             existing = _read_manifest(target)
             if existing.candidate_digest and existing.candidate_digest == m.candidate_digest:
-                return target                    # idempotent: same version, same bytes
+                # Same-digest target — only idempotent if it is actually intact on
+                # disk. A missing/tampered/bad-seal target must not report success.
+                if not verify_candidate_dir(target):
+                    raise CorruptCandidateError(
+                        f"existing {m.name}@{m.version} has candidate_digest "
+                        f"{m.candidate_digest} but failed verification "
+                        f"(missing, tampered, or bad seal)"
+                    ) from None
+                return target                    # idempotent: same version, verified bytes
             raise CandidateDigestConflictError(
                 f"{m.name}@{m.version} already present with a different candidate_digest "
                 f"(existing={existing.candidate_digest!r}, new={m.candidate_digest!r}); "

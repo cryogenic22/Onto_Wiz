@@ -80,6 +80,10 @@ class CandidateDigestConflictError(CompileError):
     """The target version already exists with a different candidate_digest."""
 
 
+class CorruptCandidateError(CompileError):
+    """An existing target matches the digest but fails verification (missing/tampered)."""
+
+
 # ── canonicalization primitives (NFC + canonical JSON + sha256) ──────────────
 
 
@@ -411,4 +415,5 @@ __all__ = [
     "UnsafeCandidatePathError",
     "StagedCandidateInvalidError",
     "CandidateDigestConflictError",
+    "CorruptCandidateError",
 ]

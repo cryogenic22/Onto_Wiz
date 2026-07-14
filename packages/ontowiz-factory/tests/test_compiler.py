@@ -373,3 +373,63 @@ def test_mutable_metadata_stripped_bytes_unchanged(tmp_path):  # amend-2
         assert stripped not in text
     assert "candidate_digest" in text and "signed" in text  # kept
     assert PackManifest.model_validate(yaml.safe_load(text)).candidate_digest == pk.manifest.candidate_digest
+
+
+# ── review-2 hardening: verifier path safety (#1) + idempotency re-verify (#2) ──
+
+from ontowiz_factory.compiler import CorruptCandidateError  # noqa: E402
+
+
+def _set_output_inventory(pack_dir, paths):
+    """Overwrite the declared output_inventory with attacker-chosen paths."""
+    data = yaml.safe_load((pack_dir / "pack.yaml").read_text(encoding="utf-8"))
+    data["output_inventory"] = [{"path": p, "byte_count": 1, "sha256": "0" * 64} for p in paths]
+    (pack_dir / "pack.yaml").write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
+
+
+@pytest.mark.parametrize("bad_path", [
+    "/etc/passwd",                              # absolute (POSIX)
+    "C:/Windows/System32/drivers/etc/hosts",   # absolute (Windows drive)
+    "artifacts/../../secret.yaml",             # traversal out of artifacts/
+    "../escape.yaml",                          # traversal out of the candidate
+    "pack.yaml",                               # control file declared as payload
+    "pack.sig",
+    "artifacts/sub/nested.yaml",               # multi-level (violates single-level grammar)
+])
+def test_verify_rejects_unsafe_inventory_path(tmp_path, bad_path):  # #1
+    d = write_pack(compile_pack([_dq("dq1")], name="p", version="0.1.0"), tmp_path)
+    _set_output_inventory(d, [bad_path])
+    assert verify_candidate_dir(d) is False  # rejected BEFORE any filesystem access
+
+
+def test_verify_rejects_casefold_duplicate_inventory_paths(tmp_path):  # #1
+    d = write_pack(compile_pack([_dq("dq1")], name="p", version="0.1.0"), tmp_path)
+    _set_output_inventory(d, ["artifacts/A.yaml", "artifacts/a.yaml"])
+    assert verify_candidate_dir(d) is False
+
+
+def test_verify_rejects_symlinked_payload(tmp_path):  # #1
+    d = write_pack(compile_pack([_dq("dq1")], name="p", version="0.1.0"), tmp_path)
+    outside = tmp_path / "outside.yaml"
+    outside.write_text("kind: data_quirk\nid: evil\n", encoding="utf-8")
+    payload = next((d / "artifacts").glob("*.yaml"))
+    payload.unlink()
+    try:
+        os.symlink(outside, payload)
+    except (OSError, NotImplementedError):
+        pytest.skip("symlink creation not permitted on this platform")
+    assert verify_candidate_dir(d) is False  # a symlinked payload is refused, not hashed
+
+
+def test_idempotent_hit_rejects_tampered_existing_target(tmp_path):  # #2
+    write_pack(compile_pack([_dq("dq1")], name="p", version="0.1.0"), tmp_path)
+    (tmp_path / "p" / "0.1.0" / "context.ctx").write_text("tampered", encoding="utf-8")
+    with pytest.raises(CorruptCandidateError):  # same digest, bad bytes → not success
+        write_pack(compile_pack([_dq("dq1")], name="p", version="0.1.0"), tmp_path)
+
+
+def test_idempotent_hit_rejects_missing_payload_in_target(tmp_path):  # #2
+    d = write_pack(compile_pack([_dq("dq1")], name="p", version="0.1.0"), tmp_path)
+    next((d / "artifacts").glob("*.yaml")).unlink()
+    with pytest.raises(CorruptCandidateError):
+        write_pack(compile_pack([_dq("dq1")], name="p", version="0.1.0"), tmp_path)
