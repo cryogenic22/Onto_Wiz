@@ -23,6 +23,12 @@ export default defineConfig({
         'src/ui/**/*.{ts,tsx}',
         'src/app/ui/**/*.tsx',
         'src/components/ui/**/*.tsx',
+        // D1.0 pack-explorer vertical slice (real ontowiz-serve data)
+        'src/services/http.ts',
+        'src/services/packs.ts',
+        'src/types/packs.ts',
+        'src/features/packs/**/*.tsx',
+        'src/app/packs/**/*.tsx',
       ],
       thresholds: { lines: 85, functions: 85, statements: 85 },
     },
