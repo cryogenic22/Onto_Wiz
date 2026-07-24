@@ -5,6 +5,12 @@
 > `scripts/verify-audit.sh`. "Written" / "committed" ≠ "done" (see ADR-015,
 > adopted from Content_medical_hub ADR-0001).
 
+_**Current (2026-07-24) — BE lane.** S1.1 sits SUBMITTED at `build/S1.1` @ `4eead82` awaiting
+the read-only review (**A1**) that gates the rest of the Step-1 wave. **A2** (this ledger truth
+pass) and **F0.10** (serve-door contract parity) are the two units that do **not** depend on
+that review — F0.10 touches no file on `build/S1.1`, so the two branches merge in either
+order. See the capability table below for what the system can actually do today._
+
 _**In progress (2026-07-12) — Domain Pack Platform build (BE lane), architecture + Step-1 specs at the review gate; NO new VERIFIED code since F0.2.** The build pivoted to make Onto_Wiz a domain-independent pharma-grade platform. **Step 0 DONE** (architecture baseline committed `3670db6`,`1dc26ca`): ADR-018 (three-part split — KP_SDLC delivery / Onto_Wiz platform / domain-pack repos; Auravia stays the conformance exam), ADR-019 (one monorepo → 3 deployables; `PackSource`/`ArtifactRegistry` seams; frontend Context Control Plane), and `docs/specs/PLATFORM_BASELINE_STRUCTURE_2026-07.md` (live step↔unit crosswalk — the current-state map). **Step 1 audited** (domain doc's 8 hardening items all OPEN) → split into **S1.1** deterministic-compile (`d748f73`), **S1.2** manifest-driven load / verify-before-load (`801a35f`), **S1.3** immutable eval receipt (`801a35f`) — mini-specs submitted, **awaiting the read-only reviewer**; on READY they build S1.1→S1.2→S1.3. Decisions: governance write-model → `ontowiz-core` (Tier B) at F0.3 via outbox (durable store stays a Tier-A adapter); sequencing Steps 0/1/2 before F0.4A/F0.2H resume. Pre-pivot F0.2H v4 + F0.4A v2 specs remain at `2a493d4` (F0.4A #7 superseded by ADR-018)._
 _Last audit (2026-07-10, after **F0.2 — Governance persistence** (Foundry build, Loop 0, backend lane): the delta lifecycle — proposed deltas, approvals, audit trail, SME contributions — now persists on the `db.py` SQLite seam via a new **Tier A** `GovernanceStore` (tables `deltas`/`delta_events`/`approvals`/`audit_log`/`contributions`), mirroring the `CommentStore` pattern (no new persistence machinery). **Restart-survival proven**: approve a delta → fresh store instance on the same DB → approval + audit survive. Tier A holds (no Tier B import); R1's one pipe untouched. 218 package + 312 src/gov tests green; coverage 98.49%; `bash scripts/verify-audit.sh` → PASS._
 _Prior audit (2026-07-09, after **F0.1 — CI gate set = R3** (Foundry build, Loop 0, backend lane): frontend Vitest wired into CI as a **blocking** step (`npm run test:cov`), quality-gate + slop_checker demoted to advisory, and the `.env`/API-key hygiene **verified** (never committed → history purge is a no-op). New governance test `tests/test_ci_gate_set.py` machine-checks the blocking/advisory split. 209 package + **312** src/gov tests green; coverage 98.38%; `bash scripts/verify-audit.sh` → PASS. Frontend gate: 20 Vitest tests, 96.1% stmts (≥85%)._
@@ -12,6 +18,54 @@ _Prior audit (2026-06-15, after the **catalog frontend port + DB + RBAC** — Lo
 _Prior audit (2026-06-14, after the **served Domain Intelligence Catalog** — Loops C1–C10: catalog index/search, function-slice + artifact surfaces, a live-served catalog page, comments, RBAC-lite, version diff, telemetry, + a forecasting eval suite): 191 package + 308 src tests green; coverage 98.2%; ruff/mypy(Tier A)/boundary clean; CK new-code clean (6 tracked legacy-debt findings). `bash scripts/verify-audit.sh` → PASS._
 _Prior audit (2026-06-13, after **functionalizing the commercial pack** — L1–L5: per-function tags, multi-module seed, tag-sliced serving, a new forecasting module): 163 package + 308 src tests; the one licensable `commercial_analytics` pack is sub-divided by `TagDimension.FUNCTION` and serves any function slice in isolation; recompiled to `0.3.0` (24 artifacts, sealed)._
 _Prior audit (2026-06-13, after the **end-to-end living-loop MVP** — consume→signal→mission→evolve→serve): 151 package + 308 src tests green; coverage ~98%. Pack: `agent_lift 0.308`, with-pack 26/26; living loop produces `commercial_analytics@0.2.0` from a usage gap._
+
+## Capability truth (2026-07-24, unit A2)
+
+**Two status vocabularies, two different axes — do not mix them.**
+
+- ***Unit workflow*** (backlog §0A): `PLANNED · READY · IN PROGRESS · READY FOR REVIEW ·
+  CHANGES REQUIRED · VERIFIED · BLOCKED`. Answers *"where is this card in the loop?"*.
+  Who-may-set rules apply: the **builder never sets `VERIFIED`** — INT alone does, after a
+  read-only REV verdict on an immutable review SHA.
+- ***Capability truth*** (VDP §02): `VERIFIED · SUBMITTED · SPECIFIED · DESIGN-FIXTURE ·
+  MISSING`. Answers *"can the system do this today?"*. `SUBMITTED` = code exists on a
+  `build/*` branch, unreviewed and unmerged — **it is not a capability yet**.
+  `DESIGN-FIXTURE` = it exists to demonstrate a design, and must never be cited as evidence
+  the system functions.
+
+The tables below this section are unit-workflow rows. This one is capability truth.
+
+| Capability | Truth | Where the evidence is | Owning card |
+|---|---|---|---|
+| Unified artifact model (19 kinds), YAML round-trip | ✅ VERIFIED | F1 #2 row below | — |
+| Governed transitions (only via an approved Delta) | ✅ VERIFIED | F1 #4 row; `bridge.py` 100% cov | — |
+| Pack compile → registry → REST/MCP serve | ✅ VERIFIED | F2 / F3 rows | — |
+| Durable governance **persistence** | ✅ VERIFIED | F0.2 row; restart-survival test | — |
+| Domain Intelligence Catalog (API + Next.js) | ✅ VERIFIED | Loops C1–C10, F-FE rows | — |
+| Governed-term-adoption lift on `0.1.0` | ✅ VERIFIED, **dated** | receipt of 2026-06-12, single run, temp 0, Haiku 4.5, 26/26 with-pack. **Not** a graded-accuracy number. `0.3.0` ships unmeasured. | F0.6B re-measures |
+| Deterministic, digest-addressed compile | 🟡 SUBMITTED | `build/S1.1` @ `4eead82`, unreviewed, unmerged | **A1** (review) |
+| Verify-before-load (no glob load) | 📝 SPECIFIED | `docs/specs/S1-2_MANIFEST_DRIVEN_LOAD.md` @ `801a35f` | **S1.2** |
+| Immutable external eval receipt | 📝 SPECIFIED | `docs/specs/S1-3_IMMUTABLE_EVAL_RECEIPT.md` @ `801a35f` | **S1.3** |
+| Serve door honors its own contract | 📝 SPECIFIED | `docs/specs/F0-10_SERVE_DOOR_CONTRACT_PARITY.md` | **F0.10** |
+| Governance **endpoints** (`/v1/deltas`) | ❌ MISSING | store persists; nothing is wired to a route | F0.3A–D |
+| Authenticated approver / transition legality | ❌ MISSING | `/v1/context` has no auth at all; `X-OntoWiz-Role` is a dev fallback | F0.3B/C, F0.2H, F0.8A |
+| Pack-eval CI gate (a failed pack cannot publish) | ❌ MISSING | latest pack ships `gate_passed: false` | F0.6A/F0.6B |
+| Document → candidate intake (real extraction) | ❌ MISSING | no parser→artifact path; LLM extraction is placeholder/dead | F0.4A v3, F0.4B, E1.1, E1.2 |
+| **Consolidation** (multi-SME dedup, contradiction, merge) | ❌ MISSING | the only dedup logic in the repo is dead code | E3.1-be → B6 |
+| Multi-pack composition / resolver | ❌ MISSING | `layers`/`depends_on` are schema-only; `get_context` serves one pack | E4-be + Step-5 |
+| Scale & real-token (BPE) break points | ❌ MISSING | `tokens_estimate` is a word count; L3 directory grows linearly | SCALE-1 |
+| Adopter-facing quickstart | ❌ MISSING | no doc lets an outsider stand the system up | DOC-1 |
+| MLR / analytics / MR vertical kinds | ❌ MISSING | blocked behind the one-line BODY ceiling (G16) | V1–V4 |
+| Auravia reference pack | 🎨 DESIGN-FIXTURE | synthetic, `production_eligible: false`, non-compilable | V4 |
+| `/control-plane` frontend | 🎨 DESIGN-FIXTURE | a simulator — **never** cite as evidence of system function | Slices A–J |
+
+**Plan of record.** `docs/reviews/ONTOWIZ_VALIDATED_DOMAIN_PACK_BLUEPRINT_2026-07.html`
+(2026-07-21) is the team-facing architecture baseline;
+`docs/reviews/PLATFORM_READINESS_AUDIT_2026-07.html` (2026-07-20) is **archived** — an
+evidence snapshot, superseded where the two disagree (notably: the audit reported "zero
+pivot implementation" because its readers scanned `foundry-build` only and missed the
+unmerged `build/S1.1`). `docs/specs/DELIVERY_LOOPS_BACKLOG_2026-07.md` v2.0 is the card
+inventory of record; `docs/specs/VDP_GAP_CLOSURE_LOOPS_2026-07.md` v2 sequences it.
 
 ## Build status
 

@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Onto_Wiz — Platform Readiness Audit &amp; Context-Layer Strategy (2026-07)</title>
+<style>
+  :root{
+    color-scheme: light dark;
+    --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --baseline:#c3c2b7; --ring:rgba(11,11,11,.10);
+    --s1:#2a78d6; --s1-track:#cde2fb; --s2:#1baf7a; --s5:#4a3aa7;
+    --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
+    --good-ink:#006300; --warn-ink:#8a5b00; --serious-ink:#a34a24; --crit-ink:#b02f2f;
+    --good-wash:rgba(12,163,12,.10); --warn-wash:rgba(250,178,25,.14);
+    --serious-wash:rgba(236,131,90,.13); --crit-wash:rgba(208,59,59,.10);
+    --code-bg:#f0efec;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --page:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --baseline:#383835; --ring:rgba(255,255,255,.10);
+      --s1:#3987e5; --s1-track:#104281; --s2:#199e70; --s5:#9085e9;
+      --good-ink:#3fbf3f; --warn-ink:#fab219; --serious-ink:#ec835a; --crit-ink:#e66767;
+      --code-bg:#242422;
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--page); color:var(--ink);
+    font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:40px 28px 100px}
+  header.doc{border-bottom:1px solid var(--grid);padding-bottom:28px;margin-bottom:36px}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  h1{font-size:31px;line-height:1.22;margin:10px 0 8px;font-weight:750;letter-spacing:-.01em}
+  .sub{color:var(--ink2);font-size:15.5px;max-width:70ch}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:16px;font-size:13px;color:var(--muted)}
+  .meta b{color:var(--ink2);font-weight:600}
+  h2{font-size:22px;margin:56px 0 6px;font-weight:720;letter-spacing:-.005em}
+  h2 .no{color:var(--muted);font-weight:600;margin-right:10px;font-variant-numeric:tabular-nums}
+  h3{font-size:16.5px;margin:30px 0 8px;font-weight:700}
+  h4{font-size:14px;margin:22px 0 6px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2)}
+  p{margin:10px 0;max-width:76ch}
+  .lede{font-size:17px;color:var(--ink)}
+  ul,ol{margin:8px 0 14px;padding-left:22px;max-width:76ch}
+  li{margin:5px 0}
+  li::marker{color:var(--muted)}
+  code,.mono{font-family:ui-monospace,"Cascadia Code",Consolas,monospace;font-size:.88em;background:var(--code-bg);border-radius:4px;padding:.08em .35em}
+  .rule{border:0;border-top:1px solid var(--grid);margin:44px 0}
+  a{color:var(--s1);text-decoration:none}
+
+  /* status chips — reserved palette, icon + label, never color alone */
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:650;
+    border-radius:999px;padding:2px 10px 2px 8px;white-space:nowrap;line-height:1.5}
+  .chip .i{font-size:11px}
+  .c-real{background:var(--good-wash);color:var(--good-ink)}
+  .c-part{background:var(--warn-wash);color:var(--warn-ink)}
+  .c-thin{background:var(--serious-wash);color:var(--serious-ink)}
+  .c-abs{background:var(--crit-wash);color:var(--crit-ink)}
+  .c-doc{background:var(--code-bg);color:var(--ink2)}
+
+  /* stat tiles */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:24px 0}
+  .tile{background:var(--surface);border:1px solid var(--ring);border-radius:12px;padding:16px 18px}
+  .tile .lbl{font-size:12.5px;color:var(--ink2);font-weight:600}
+  .tile .val{font-size:27px;font-weight:680;margin-top:3px;letter-spacing:-.01em}
+  .tile .note{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.45}
+
+  /* verdict cards */
+  .verdicts{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin:22px 0}
+  .vcard{background:var(--surface);border:1px solid var(--ring);border-radius:12px;padding:18px 20px}
+  .vcard h5{margin:0 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+  .vcard p{font-size:14px;margin:0;color:var(--ink2)}
+  .vcard p b{color:var(--ink)}
+
+  /* maturity chart */
+  .chart{background:var(--surface);border:1px solid var(--ring);border-radius:12px;padding:22px 24px;margin:24px 0}
+  .chart .title{font-weight:700;font-size:15px;margin-bottom:2px}
+  .chart .subtitle{font-size:12.5px;color:var(--muted);margin-bottom:18px}
+  .brow{display:grid;grid-template-columns:220px 1fr 44px;align-items:center;gap:12px;margin:9px 0}
+  .brow .name{font-size:13px;color:var(--ink2);text-align:right;line-height:1.3}
+  .brow .name small{display:block;color:var(--muted);font-size:11px}
+  .track{position:relative;height:16px;background:transparent;border-left:1px solid var(--baseline)}
+  .track .gl{position:absolute;top:0;bottom:0;width:1px;background:var(--grid)}
+  .bar{position:relative;height:16px;background:var(--s1);border-radius:0 4px 4px 0}
+  .brow .v{font-size:13px;font-weight:650;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .xaxis{display:grid;grid-template-columns:220px 1fr 44px;gap:12px;margin-top:10px}
+  .xaxis .ticks{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);border-top:1px solid var(--baseline);padding-top:4px}
+
+  /* tables */
+  .tblwrap{overflow-x:auto;margin:18px 0;border:1px solid var(--ring);border-radius:12px;background:var(--surface)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px}
+  th{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+     text-align:left;padding:12px 14px;border-bottom:1px solid var(--grid);font-weight:650;white-space:nowrap}
+  td{padding:11px 14px;border-bottom:1px solid var(--grid);vertical-align:top;color:var(--ink2)}
+  tr:last-child td{border-bottom:0}
+  td b, td strong{color:var(--ink)}
+  td .mono{font-size:.85em}
+  .num{font-variant-numeric:tabular-nums}
+
+  /* pipeline */
+  .pipe{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0;align-items:stretch}
+  .stage{flex:1 1 140px;min-width:138px;background:var(--surface);border:1px solid var(--ring);
+    border-radius:10px;padding:12px 13px;position:relative}
+  .stage .nm{font-weight:700;font-size:13px;margin-bottom:2px}
+  .stage .st{font-size:11px;margin-bottom:6px}
+  .stage .d{font-size:12px;color:var(--ink2);line-height:1.45}
+  .stage::after{content:"→";position:absolute;right:-11px;top:42%;color:var(--muted);font-size:13px;z-index:2}
+  .stage:last-child::after{content:""}
+  .edge{border-top:3px solid var(--good)}
+  .edge-p{border-top:3px solid var(--warn)}
+  .edge-t{border-top:3px solid var(--serious)}
+  .edge-a{border-top:3px solid var(--crit)}
+
+  /* callouts */
+  .call{border-left:3px solid var(--s1);background:var(--surface);border-radius:0 10px 10px 0;
+    padding:14px 18px;margin:20px 0;font-size:14.5px}
+  .call.warn{border-left-color:var(--warn)}
+  .call.crit{border-left-color:var(--crit)}
+  .call.good{border-left-color:var(--good)}
+  .call b{font-weight:700}
+  .call p{margin:6px 0}
+
+  /* milestone cards */
+  .mile{background:var(--surface);border:1px solid var(--ring);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .mile .mh{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;margin-bottom:6px}
+  .mile .mh .mn{font-weight:750;font-size:16px}
+  .mile .mh .me{font-size:12px;color:var(--muted);font-weight:600}
+  .mile p{font-size:14px;margin:6px 0}
+  .mile .crit-row{font-size:13px;color:var(--ink2);margin-top:8px}
+  .mile .crit-row b{color:var(--ink)}
+
+  /* file tree */
+  pre.tree{background:var(--code-bg);border-radius:10px;padding:16px 18px;overflow-x:auto;
+    font:12.5px/1.55 ui-monospace,"Cascadia Code",Consolas,monospace;color:var(--ink2)}
+  pre.tree b{color:var(--ink);font-weight:650}
+  pre.tree .cm{color:var(--muted)}
+
+  .foot{margin-top:70px;border-top:1px solid var(--grid);padding-top:18px;font-size:12.5px;color:var(--muted)}
+  .toc{background:var(--surface);border:1px solid var(--ring);border-radius:12px;padding:16px 22px;margin:26px 0;font-size:14px;columns:2;column-gap:36px}
+  .toc a{display:block;padding:3px 0;color:var(--ink2)}
+  .toc a b{color:var(--ink)}
+  @media(max-width:640px){.toc{columns:1}.brow{grid-template-columns:130px 1fr 38px}.xaxis{grid-template-columns:130px 1fr 38px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc">
+  <div class="kicker">Onto_Wiz · Domain Pack Platform · Audit &amp; Strategy Review</div>
+  <h1>Functional &amp; Technical Readiness Audit,<br>and the Design of the Context-Layer Deliverable</h1>
+  <p class="sub">A ground-up, code-verified assessment of the Onto_Wiz codebase against the SME Knowledge Codification
+  Blueprint (2026-03-28) and the Domain Pack Platform pivot (ADR-018/019) — scored against three pharma target
+  workloads: brand-analytics agents, market-research agents fusing structured + unstructured data, and MLR content review.</p>
+  <div class="meta">
+    <span><b>Date</b> 2026-07-20</span>
+    <span><b>Branch</b> foundry-build</span>
+    <span><b>Method</b> 14-agent code audit (10 subsystem readers · 3 analysts · 1 adversarial critic), claims spot-checked in source</span>
+    <span><b>Gates</b> <code>verify-audit.sh</code> executed cold during the audit → PASS</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#s1"><b>1.</b> Executive verdict</a>
+  <a href="#s2"><b>2.</b> Blueprint promises vs. code</a>
+  <a href="#s3"><b>3.</b> The pipeline as actually built</a>
+  <a href="#s4"><b>4.</b> Subsystem audit</a>
+  <a href="#s5"><b>5.</b> Pharma use-case readiness</a>
+  <a href="#s6"><b>6.</b> Context-layer deliverable — target design</a>
+  <a href="#s7"><b>7.</b> Governance · traceability · eval · lifecycle scorecard</a>
+  <a href="#s8"><b>8.</b> The consolidation gap</a>
+  <a href="#s9"><b>9.</b> Milestones to first real usage</a>
+  <a href="#s10"><b>10.</b> Risk &amp; honesty ledger</a>
+</nav>
+
+<!-- ================================================================ -->
+<h2 id="s1"><span class="no">1</span>Executive verdict</h2>
+
+<p class="lede"><b>Yes — the repo is genuinely becoming a harness for governed domain packs, but it is one-sided.</b>
+The <b>consume side</b> (govern → compile → seal → lifecycle-gate → serve with a trust envelope → measure agent lift)
+is real, tested, and demonstrated end-to-end on one authentic pharma-commercial pack. The <b>produce side</b> — capture
+from SMEs and documents, consolidation across sources, an authoring path a client team could operate — is the thinnest
+part of the codebase: mining is a two-regex stub, the LLM extractor is dead code, and every artifact that has ever
+shipped was hand-authored YAML run through Tier-B Python by the core team. The July platform pivot (ADR-018/019, S1.x
+specs) targets exactly the right defects, but is so far <b>documentation plus zero implementation</b>.</p>
+
+<div class="verdicts">
+  <div class="vcard"><h5>What is real</h5>
+    <p>A signed<sup>†</sup>, versioned <b>commercial_analytics</b> pack (24 governed artifacts, lifecycle history, audit
+    delta-ids) served through a governance gate that provably never exposes DRAFT knowledge, with a trust envelope
+    carrying backing deltas — behind 218 package tests (98.49% cov), 312 legacy tests, ~75 FE tests, and a
+    six-gate <code>verify-audit</code> that passed cold. <b>+0.308 measured agent lift</b> on v0.1.0 (see honesty note).</p></div>
+  <div class="vcard"><h5>What is thin</h5>
+    <p><b>Capture &amp; consolidation.</b> No SME interview agent, no document→knowledge path (parsers exist; extraction is a
+    placeholder), no dedup/conflict machinery outside dead code, one pack family ever compiled (n=1), multi-pack
+    composition is dead schema (<code>PackLayer</code>/<code>depends_on</code> never read), and governance approval in the live
+    pipeline is an unauthenticated in-process field-write.</p></div>
+  <div class="vcard"><h5>What it means</h5>
+    <p>A <b>guided pilot could consume today</b>; no team can self-serve author. First real usage is ~3 milestones
+    (~8–10 unit-weeks) away by riding the already-specced S1.1→S1.3 + F0.3 + control-plane Slices B/D — no new
+    roadmap needed. The bottleneck is the review gate’s throughput, not the architecture.</p></div>
+</div>
+
+<div class="tiles">
+  <div class="tile"><div class="lbl">Backend tests green</div><div class="val">530</div>
+    <div class="note">218 package @ 98.49% cov + 312 legacy — verify-audit PASS, run cold 2026-07-20</div></div>
+  <div class="tile"><div class="lbl">Domain packs ever compiled</div><div class="val">1</div>
+    <div class="note">commercial_analytics ×3 versions; 11 authored ontology domain modules sit uncompiled</div></div>
+  <div class="tile"><div class="lbl">Agent lift (v0.1.0 receipt)</div><div class="val">+0.308</div>
+    <div class="note">2026-06-12, Haiku 4.5, temp 0, 26/26 with-pack. Governed-<i>term-adoption</i> lift, not graded accuracy. Latest v0.3.0: unmeasured</div></div>
+  <div class="tile"><div class="lbl">Artifact kinds in contract</div><div class="val">19</div>
+    <div class="note">All YAML-roundtrip tested; 6 newer kinds have no per-kind prompt renderer yet</div></div>
+  <div class="tile"><div class="lbl">Pivot plan implemented</div><div class="val">0<span style="font-size:16px;color:var(--muted)"> / ~40 units</span></div>
+    <div class="note">Step 0 docs done; S1.1–S1.3 specs review-ready; no pivot code exists (<code>candidate_digest</code>: 0 hits)</div></div>
+  <div class="tile"><div class="lbl">Least-verified component</div><div class="val">12.9k<span style="font-size:16px;color:var(--muted)"> lines</span></div>
+    <div class="note">ontowiz-ctx serving engine: 3 smoke tests, excluded from every coverage/lint/type gate</div></div>
+</div>
+
+<p style="font-size:12.5px;color:var(--muted)">† “Signed” throughout this document means a <b>SHA-256 content seal</b>
+(<code>pack.sig</code>), tamper-evident only — no authorship/PKI, and <b>not verified at load time</b> today. §10 has the full wording rules.</p>
+
+<div class="chart">
+  <div class="title">Subsystem maturity — code-grounded scores</div>
+  <div class="subtitle">0 absent · 1 stub · 2 prototype · 3 solid MVP with tests · 4 production-hardened · 5 enterprise-ready</div>
+  <!-- single series → slot-1 blue, no legend; value at bar tip -->
+  <div class="brow"><div class="name">Delivery harness<small>verify-audit · CI · boundary</small></div><div class="track"><span class="gl" style="left:20%"></span><span class="gl" style="left:40%"></span><span class="gl" style="left:60%"></span><span class="gl" style="left:80%"></span><div class="bar" style="width:70%"></div></div><div class="v">3.5</div></div>
+  <div class="brow"><div class="name">Contracts (ontowiz-spec)<small>19 kinds · lifecycle · tags</small></div><div class="track"><span class="gl" style="left:20%"></span><span class="gl" style="left:40%"></span><span class="gl" style="left:60%"></span><span class="gl" style="left:80%"></span><div class="bar" style="width:60%"></div></div><div class="v">3.0</div></div>
+  <div class="brow"><div class="name">Serving (runtime + serve)<small>registry · gate · REST/MCP · RBAC</small></div><div class="track"><span class="gl" style="left:20%"></span><span class="gl" style="left:40%"></span><span class="gl" style="left:60%"></span><span class="gl" style="left:80%"></span><div class="bar" style="width:60%"></div></div><div class="v">3.0</div></div>
+  <div class="brow"><div class="name">Factory pipeline (Tier B)<small>govern · compile · eval · evolve</small></div><div class="track"><span class="gl" style="left:20%"></span><span class="gl" style="left:40%"></span><span class="gl" style="left:60%"></span><span class="gl" style="left:80%"></span><div class="bar" style="width:60%"></div></div><div class="v">3.0</div></div>
+  <div class="brow"><div class="name">Legacy app (src/)<small>parsers · HITL loop · frozen</small></div><div class="track"><span class="gl" style="left:20%"></span><span class="gl" style="left:40%"></span><span class="gl" style="left:60%"></span><span class="gl" style="left:80%"></span><div class="bar" style="width:60%"></div></div><div class="v">3.0</div></div>
+  <div class="brow"><div class="name">CTX engine (ontowiz-ctx)<small>parse · pack · hydrate</small></div><div class="track"><span class="gl" style="left:20%"></span><span class="gl" style="left:40%"></span><span class="gl" style="left:60%"></span><span class="gl" style="left:80%"></span><div class="bar" style="width:50%"></div></div><div class="v">2.5</div></div>
+  <div class="brow"><div class="name">Frontend<small>catalog real · control-plane mock</small></div><div class="track"><span class="gl" style="left:20%"></span><span class="gl" style="left:40%"></span><span class="gl" style="left:60%"></span><span class="gl" style="left:80%"></span><div class="bar" style="width:50%"></div></div><div class="v">2.5</div></div>
+  <div class="brow"><div class="name">Domain knowledge content<small>1 pack · rich uncompiled source</small></div><div class="track"><span class="gl" style="left:20%"></span><span class="gl" style="left:40%"></span><span class="gl" style="left:60%"></span><span class="gl" style="left:80%"></span><div class="bar" style="width:40%"></div></div><div class="v">2.0</div></div>
+  <div class="brow"><div class="name">Platform pivot (Steps 0–10)<small>ADR-018/019 · S1.x · B0–B12</small></div><div class="track"><span class="gl" style="left:20%"></span><span class="gl" style="left:40%"></span><span class="gl" style="left:60%"></span><span class="gl" style="left:80%"></span><div class="bar" style="width:20%"></div></div><div class="v">1.0</div></div>
+  <div class="xaxis"><div></div><div class="ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div><div></div></div>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="s2"><span class="no">2</span>Blueprint promises vs. what the code delivers</h2>
+
+<p>The SME Knowledge Codification Blueprint promised a five-layer “Knowledge Codification Agent.” Four months on, the
+repo implemented the blueprint’s <i>artifact models nearly verbatim</i> and evolved <i>past</i> it on distribution
+(compiled CTX context + seals were never in the doc) — while building almost none of its capture layer. Status per layer,
+verified in source:</p>
+
+<div class="tblwrap"><table>
+  <tr><th>Blueprint layer</th><th>Promise</th><th>Status</th><th>Ground truth in code</th></tr>
+  <tr><td><b>Capture</b></td><td>SME Interview Agent · doc ingestion · workflow observer · game sessions</td>
+      <td><span class="chip c-abs"><span class="i">✕</span>Mostly absent</span></td>
+      <td>No <code>InterviewAgent</code> anywhere. Doc parsers (PDF/DOCX/chunker/type-detector) exist in frozen <code>src/knowledge/parsers/</code> but the extraction stage is a placeholder returning empty entities; no upload endpoint. The legacy SME game loop works but emits legacy-schema deltas the pack pipeline can’t consume.</td></tr>
+  <tr><td><b>Extraction</b></td><td>Typed artifacts from raw input; LLM-assisted; dedup; cross-reference</td>
+      <td><span class="chip c-thin"><span class="i">◔</span>Stub</span></td>
+      <td><code>mining.py</code> is 67 lines and two regexes (if/then, “X lags N weeks”), fixed 0.4 confidence. The written LLM <code>PatternExtractor</code> (with 0.8-Jaccard dedup) has <b>zero callers and zero tests</b> — dead code.</td></tr>
+  <tr><td><b>Curation</b></td><td>Delta governance · HITL review · quality gates · conflict detection · consolidation</td>
+      <td><span class="chip c-part"><span class="i">◑</span>Partial</span></td>
+      <td>Delta-gated promotion is <b>genuinely enforced</b> (promotion to ACTIVE without a delta raises, at both transition and YAML-load). But approval identity is an unauthenticated string; three competing write models coexist (§7); conflict detection &amp; consolidation: nothing (§8).</td></tr>
+  <tr><td><b>Distribution</b></td><td>Versioned packs · layer stacking (base/therapy/client) · registry · SDK</td>
+      <td><span class="chip c-part"><span class="i">◑</span>Partial — beyond &amp; behind</span></td>
+      <td><i>Beyond:</i> compiled CTX L2/L3 context, sha256 seals, live catalog + REST/MCP doors — none promised in the blueprint. <i>Behind:</i> layer stacking is dead schema (<code>PackLayer</code> never constructed, <code>depends_on</code> never read); no pack CLI/registry/pip distribution; population n=1.</td></tr>
+  <tr><td><b>Feedback</b></td><td>Corrections → deltas · staleness detection · usage analytics</td>
+      <td><span class="chip c-part"><span class="i">◑</span>Partial</span></td>
+      <td>Living loop <b>proven once</b> (v0.1.0 → v0.2.0 gained a capability from one governed mission — offline test + live driver). Corrections→REVIEW path wired but never driven; EWMA reliability has no sample count; nothing consumes <code>valid_for_days</code>; usage telemetry is voluntary client-posted.</td></tr>
+</table></div>
+
+<div class="tblwrap"><table>
+  <tr><th>Named blueprint component</th><th>Status</th><th>Where it landed</th></tr>
+  <tr><td>DecisionHeuristic / DataQuirk / ProcessPlaybook models</td><td><span class="chip c-real"><span class="i">✓</span>Built</span></td><td><code>ontowiz_spec/library.py</code> — near-verbatim, plus 6 new first-class kinds (EvalCase, MetricDefinition, SourceContract, QuestionPlaybook, AntiPattern, ExceptionRule)</td></tr>
+  <tr><td>DomainPackManifest + quality metrics</td><td><span class="chip c-part"><span class="i">◑</span>Partial</span></td><td><code>pack_manifest.py</code> — shape exists + eval summary added; <code>coverage</code>/<code>freshness_days</code> never computed (UI echoes defaults)</td></tr>
+  <tr><td>SME Interview Agent</td><td><span class="chip c-abs"><span class="i">✕</span>Absent</span></td><td>No code. Successor plan = SME “Grill Me” instruction set (GM0–GM7), doc-only</td></tr>
+  <tr><td>DomainPackBuilder</td><td><span class="chip c-real"><span class="i">✓</span>Superseded</span></td><td><code>ontowiz_factory/compiler.py</code> — ACTIVE-only compile, collision checks, injection escaping, seal/verify/reseal</td></tr>
+  <tr><td>ArtifactBridge / GovernanceBridge</td><td><span class="chip c-abs"><span class="i">✕</span>Absent — and still needed</span></td><td>Unified spec kinds removed half the need, but the legacy SME-game <code>DeltaGenerator</code> still emits legacy-schema content no converter can feed to the pack compiler — the SME capture path is <b>broken, not obsoleted</b></td></tr>
+  <tr><td>Blast-radius routing · review SLAs · auto-approve tiers</td><td><span class="chip c-part"><span class="i">◑</span>Legacy only</span></td><td>Lives in the in-memory <code>DeltaStore</code> wired only to the frozen src/ app — dead code for the pack path</td></tr>
+  <tr><td>Conflict detection (4 classes) + Consolidation agent</td><td><span class="chip c-abs"><span class="i">✕</span>Absent</span></td><td>Undesigned then, unbuilt now — see §8</td></tr>
+  <tr><td>Token-budgeted assembly, guardrails never cut</td><td><span class="chip c-part"><span class="i">◑</span>Legacy only</span></td><td>True in frozen <code>src/knowledge/assembler.py</code>. In the <b>live</b> gate, <code>ALWAYS_INCLUDED_KINDS</code> is declared but <b>unenforced</b> — a Guardrail without a matching tag is silently dropped. A safety claim the code does not honor.</td></tr>
+</table></div>
+
+<!-- ================================================================ -->
+<h2 id="s3"><span class="no">3</span>The pipeline as actually built</h2>
+
+<p>Sophistication is unevenly distributed: the middle of the pipeline is solid, both ends are thin, and two seams leak.
+Color = status of each stage <i>as wired into the live pack path</i>.</p>
+
+<div class="pipe">
+  <div class="stage edge-a"><div class="nm">Capture</div><div class="st"><span class="chip c-abs"><span class="i">✕</span>Absent</span></div><div class="d">No interview agent, no upload API. Parsers exist (frozen src/), unconnected.</div></div>
+  <div class="stage edge-t"><div class="nm">Extract</div><div class="st"><span class="chip c-thin"><span class="i">◔</span>Stub</span></div><div class="d">2 regexes. LLM extractor = dead code. Zero shipped artifacts ever mined.</div></div>
+  <div class="stage edge-p"><div class="nm">Govern</div><div class="st"><span class="chip c-part"><span class="i">◑</span>Partial</span></div><div class="d">Delta-gated promotion enforced; approver is an unauthenticated string; 3 write models.</div></div>
+  <div class="stage edge"><div class="nm">Compile</div><div class="st"><span class="chip c-real"><span class="i">✓</span>Real</span></div><div class="d">ACTIVE-only, injection-escaped, sealed. Deterministic build = S1.1 (spec-only).</div></div>
+  <div class="stage edge-p"><div class="nm">Serve</div><div class="st"><span class="chip c-part"><span class="i">◑</span>Real, 2 leaks</span></div><div class="d">Gate provably hides non-ACTIVE. But seal unverified at load; hydrate tool not registered on the door.</div></div>
+  <div class="stage edge-p"><div class="nm">Eval</div><div class="st"><span class="chip c-part"><span class="i">◑</span>Unenforced</span></div><div class="d">Real harness, live lift receipt on v0.1.0 — but v0.2.0/v0.3.0 shipped gate_passed:false.</div></div>
+  <div class="stage edge-p"><div class="nm">Evolve</div><div class="st"><span class="chip c-part"><span class="i">◑</span>Proven ×1</span></div><div class="d">Mission→delta→recompile ran once (v0.2.0). Corrections path wired, undriven.</div></div>
+</div>
+
+<h4>The load-bearing seams, with evidence</h4>
+<div class="tblwrap"><table>
+  <tr><th>Seam</th><th>Verdict</th><th>Evidence</th></tr>
+  <tr><td>Lifecycle gate → served directory</td><td><b>Airtight</b> (the best design in the repo)</td><td><code>runtime/context.py</code> gate + <code>_restrict_doc</code>; test proves a gated-out section never appears in the system prompt; client <code>dev_mode</code> flags can’t self-escalate (REST + MCP parity tests)</td></tr>
+  <tr><td>Ungoverned promotion</td><td><b>Blocked at two levels</b></td><td><code>UngovernedTransitionError</code> at <code>transition()</code> and at model-validation/YAML-load — the tampered-pack bypass is closed (<code>ontowiz_spec/artifacts.py</code>)</td></tr>
+  <tr><td>Agent hydration loop</td><td><b>Broken at the production door</b></td><td>Served prompt instructs <code>ctx/hydrate(section=…)</code>; serve MCP registers only <code>context/get · pack/list · pack/query</code>. The ctx package’s own hydrate server reads raw files and <b>bypasses the governance gate</b> if pointed at <code>context.ctx</code>. <code>hydrate_by_name</code> silently no-ops on unknown names.</td></tr>
+  <tr><td>Pack integrity at load</td><td><b>Advertised, unchecked</b></td><td><code>verify_pack</code> is Tier-B-only; runtime <code>registry.py</code> never reads <code>pack.sig</code>; catalog still shows a “signed” flag. Also: the benchmark <i>mutates</i> pack.yaml and reseals after eval — exactly what S1.3’s external receipt fixes.</td></tr>
+  <tr><td>Load discovery</td><td><b>Ungoverned glob</b></td><td><code>registry.py:43,60</code> — artifacts discovered by <code>*.yaml</code> glob, no manifest-driven inventory (S1.1/S1.2 target precisely this)</td></tr>
+  <tr><td>Content fidelity ceiling</td><td><b>Structure-lossy by design</b></td><td>Compiler flattens every artifact BODY to one sanitized line (brackets/backticks rewritten). Tables, metric formulas, nested MLR criteria cannot survive compilation — a format ceiling that matters for §5’s UC1-metrics and UC3.</td></tr>
+  <tr><td>Token economics</td><td><b>Heuristic everywhere</b></td><td>All counts are whitespace splits; no tokenizer dependency exists. L3 directory grows linearly, identifier extraction is O(n²) — fine at 24 artifacts, unquantified beyond (§10).</td></tr>
+</table></div>
+
+<!-- ================================================================ -->
+<h2 id="s4"><span class="no">4</span>Subsystem audit — what each piece really is</h2>
+
+<div class="tblwrap"><table>
+  <tr><th>Subsystem</th><th style="white-space:nowrap">Maturity</th><th>What’s real</th><th>Sharpest gaps</th></tr>
+  <tr><td><b>ontowiz-spec</b><br><span class="mono">~1.2k LOC · 42 asserts</span></td><td class="num">3.0</td>
+      <td>19-kind registry, all YAML-roundtrip tested; 6-state lifecycle with immutable audit trail; two-level ungoverned-promotion defense; 9 pharma-native tag dimensions; consumed by 49 downstream files.</td>
+      <td>Dead schema accumulating: <code>TagQuery</code>, <code>Tag.parent</code>, <code>PackLayer/depends_on</code>, <code>EvalCase.rubric</code>, <code>coverage/freshness</code>, <code>ALWAYS_INCLUDED_KINDS</code>. No transition legality matrix (DRAFT→ACTIVE succeeds). No <code>schema_version</code>/migration story.</td></tr>
+  <tr><td><b>ontowiz-ctx</b><br><span class="mono">12.9k LOC · 3 tests</span></td><td class="num">2.5</td>
+      <td>Real parse→serialize→pack→L3-gist→hydrate loop, zero-dependency, genuinely consumed by factory/runtime/serve. Provenance lines, hydration telemetry, conflict detection in the packer.</td>
+      <td>3 smoke tests over 12.9k lines; outside every coverage/lint/type gate. Level-3 operator algebra is unwired dead code; ~3.4k dormant lines; whitespace token math; lexical-only retrieval.</td></tr>
+  <tr><td><b>ontowiz-core + factory</b> (Tier B)<br><span class="mono">~6.3k LOC · 82 tests</span></td><td class="num">3.0</td>
+      <td>The welded loop: mine→govern→compile→serve→consult→mission→evolve, tested offline end-to-end; live benchmark harness runs the real router loop; SME mission contract structurally refuses submissions without a gold EvalCase.</td>
+      <td>Mining = 2 regexes. Pipeline approval = unauthenticated attribute write, no queue/persistence. The rich legacy DeltaStore (routing, SLAs, audit) serves only the frozen app. Forge rating/consensus are pure functions wired to nothing. Nothing in Tier B persists state.</td></tr>
+  <tr><td><b>ontowiz-runtime + serve</b> (Tier A)<br><span class="mono">~2.4k LOC · 90 tests</span></td><td class="num">3.0</td>
+      <td>Traversal-safe registry; gated <code>get_context</code> with trust envelope + backing deltas; function slicing with real token-leanness numbers; catalog/search/diff/lineage surfaces; durable SQLite stores incl. GovernanceStore (restart-survival tested); ~20 REST routes + 3-tool MCP door; JWT/bcrypt RBAC where a Bearer principal can’t be header-escalated.</td>
+      <td>GovernanceStore has <b>zero endpoints</b> (F0.3 pending) — governance durable but unreachable. “Review” writes a comment, not a transition. <code>X-OntoWiz-Role</code> header fallback is always on (unauthenticated “curator” works). All reads unauthenticated. Postgres is a comment. MCP omits backing_deltas.</td></tr>
+  <tr><td><b>Packs &amp; ontology content</b></td><td class="num">2.0</td>
+      <td>23 authentically pharma-literate diagnostic heuristics (formulary vs field execution, 340B, copay accumulator, biosimilar/LOE, pathway vs guideline) + 16-entity registry; ~10 rules carry “what this is NOT” anti-patterns; 30-case eval suite with a no-answer-leak invariant.</td>
+      <td>One kind of knowledge only (tag-match heuristics + entities) — no metrics-bound-to-data, claims, or source manifests in any compiled pack. 11 domain modules (~1.9k lines), 23 metrics, TA files, few-shots: all uncompiled, consumed by nothing. All MLR/metric-layer/fusion content lives only in the non-compilable Auravia fixture.</td></tr>
+  <tr><td><b>Frontend</b></td><td class="num">2.5</td>
+      <td>/catalog is real: wired 1:1 (a 14-endpoint subset) to the live API, JWT login, artifact drawer with governance history, ~23 tests. D0 design system (tokens with drift-guard test, 13-state LifecycleBadge sourced from backend enums) is disciplined, on side branches. </td>
+      <td>The control plane — the five screens that <i>are</i> the product thesis (workbench, eval center, release center, simulator) — is 100% synthetic: hardcoded fixtures, canned scenario outcomes, self-declared <code>simulation:true</code>, untracked. No authoring UI anywhere; no nav shell; two backends (:8080 new, :8000 legacy) coexist.</td></tr>
+  <tr><td><b>Legacy app (src/)</b></td><td class="num">3.0</td>
+      <td>Frozen but green (312 selected tests, kept as verify-audit gate 6). Working HITL loop (game→delta→review→promote) and a genuinely reusable parser stack: PDF fallback chain, DOCX heading trees, token-aware chunker, pharma doc-type detector (label/formulary/field-note/clinical-study/competitive-intel/guideline — maps 1:1 to MR/MLR source types).</td>
+      <td>Parts donor, not a foundation: in-memory state, no auth, extraction placeholder, PatternExtractor dead, no upload endpoint. Deploy config (Procfile/railway.toml) targets the <i>new</i> serve package — correct direction.</td></tr>
+  <tr><td><b>Platform pivot docs</b></td><td class="num">1.0</td>
+      <td>Unusually honest and precise: 18 invariants, pin/lock contract, three review-grade S1 specs whose targeted defects are <i>verified real</i> (glob load; benchmark reseal). Auravia fixture matches its spec’s counts exactly.</td>
+      <td>Zero implementation (<code>candidate_digest</code>/<code>manifest_version</code>: 0 hits in packages/). Fusion has no execution design; multi-pack <i>serving</i> appears in no doc; SSO/OCI/Sigstore aspirational; ~40 units, 3 specced, no aggregate schedule.</td></tr>
+</table></div>
+
+<!-- ================================================================ -->
+<h2 id="s5"><span class="no">5</span>Pharma use-case readiness</h2>
+
+<p>Scored against the three workloads you named, plus omnichannel (a fourth workload your own platform docs name —
+flagged here so it stops being a blind spot).</p>
+
+<h3>UC1 · Brand-analytics agents <span class="chip c-real" style="vertical-align:2px"><span class="i">✓</span>Demo-able in days</span></h3>
+<p><b>The one proven slice.</b> The compiled pack measurably lifted a mid-tier model on root-cause diagnosis
+(+0.308 term-adoption lift, 26/26 with-pack at temp 0), the knowledge is genuinely expert (the discriminations a
+capable model misses blind: copay-accumulator vs price war, pathway exclusion vs guideline shift, 340B erosion), and
+/catalog can browse and review it live.</p>
+<ul>
+  <li><b>Missing:</b> any numeric grounding — the pack classifies narratives but holds no MetricDefinition bound to data;
+  <code>ontology/metrics.yaml</code> (23 metrics: TRx, NBRx, PDC, pa_reject_rate…) is authored but uncompiled and unbound.
+  The latest pack version ships un-evaluated (gate_passed:false).</li>
+  <li><b>Shortest path (~1 week):</b> extend <code>seed.py</code> to compile MetricDefinition + SourceContract + QuestionPlaybook
+  artifacts into a 0.4.0; re-run the existing benchmark so “latest” carries a fresh receipt. <i>Caveat verified in code:</i>
+  the 6 new kinds have no per-kind prompt renderer (base fallback = <code>[kind] name</code>; the compiler’s k=v BODY dump carries
+  content) — <b>compile one MetricDefinition and read the served BODY before trusting the estimate</b>.</li>
+</ul>
+
+<h3>UC2 · Market-research agents, structured + unstructured fusion <span class="chip c-thin" style="vertical-align:2px"><span class="i">◔</span>Capture seam broken; fusion design-stage</span></h3>
+<p><b>The trust primitives are exactly right and already servable</b> — SourceContract (trusted_for / not_trusted_for /
+known_lag / reliability), DataQuirk, JargonMap are precisely the vocabulary for fusing tracker/Rx data with verbatims.
+The parser stack for MR source types exists. But:</p>
+<ul>
+  <li><b>Unstructured side:</b> transcripts/verbatims cannot become pack artifacts today except by hand-authoring YAML —
+  mining can’t read them, the LLM extractor is dead code, there is no ingest API.</li>
+  <li><b>Structured side:</b> no connectors, no query engine, no semantic-layer execution anywhere; TableContract/JoinContract/QueryReceipt
+  are schemas in the pivot docs only. <b>Both halves of “fusion” are unbuilt; only the serving spine between them is real.</b></li>
+  <li><b>Unowned design question (make-or-break):</b> if the agent runs SQL itself, <i>who verifies the query matches the
+  governed MetricDefinition?</i> And can the one-line-BODY format ever carry table/join contracts? These need an explicit
+  decision before the fusion roadmap is credible (§6 proposes where they land).</li>
+  <li><b>Shortest honest demo (~2 weeks):</b> swap mining’s regex internals for an LLM extraction step behind the same
+  <code>mine_to_deltas</code> contract (reuse PatternExtractor’s prompt/dedup + the parser stack); 3–5 mock IDI/ATU transcripts →
+  mined candidates → curator approves → compiled <code>market_research</code> pack; structured data stays <i>agent-side</i>
+  (DuckDB/SQLite fixture) governed by the pack’s SourceContracts and metric semantics — platform-side fusion stays
+  correctly deferred to B11.</li>
+</ul>
+
+<h3>UC3 · MLR content review <span class="chip c-abs" style="vertical-align:2px"><span class="i">✕</span>Paper excellence, zero executable path</span></h3>
+<p><b>The design is the best MLR spec this codebase could ask for</b> — the Auravia fixture has typed claim propositions,
+support assertions with source spans down to table+row, risk-bundle coupling, semantic invariants, prohibited
+transformations, and a preflight contract that <i>structurally cannot return APPROVED</i>. That posture (assist, never
+approve) is the differentiator MLR teams respond to. But:</p>
+<ul>
+  <li>No Claim/SupportAssertion/RiskBundle kinds exist in the 19-kind registry; the fixture self-declares
+  <code>production_eligible:false</code> and is referenced by zero code; the frontend MLR demo is a hardcoded switch statement.
+  <b>Nothing computes.</b></li>
+  <li>Even the working spine has compliance-disqualifying holes for this audience: unenforced always-include for guardrails,
+  unauthenticated attribution, seal unverified at load, no Part-11-shaped e-signature discipline, no integration story with
+  systems of record (PromoMats-class claim libraries) or the human-reviewer workflow product.</li>
+  <li><b>Shortest demo-grade path (~2 weeks, labeled synthetic):</b> add 3 artifact kinds following the established
+  pattern, hand-port 5–8 Auravia claims/risk-bundles into a compilable <code>mlr_reference</code> pack, build a 15–20 case suite
+  with <code>must_not_contain: APPROVED</code> as the signature invariant. Compliance-grade is a separate, months-scale program —
+  never conflate the two in front of a client.</li>
+</ul>
+
+<h3>UC4 · Omnichannel decisioning <span class="chip c-doc" style="vertical-align:2px">Named, unanalyzed until now</span></h3>
+<p>A first-class workload in your own platform reference (frequency caps, next-best-action, suppression windows) and a
+control-plane mock scenario. Structurally it is UC1’s shape (heuristics + guardrails + metric semantics) plus
+<i>action</i> governance — the ExceptionRule/Guardrail kinds fit, and it should ride UC1’s pack rather than get its own
+lane until after M3 (§9).</p>
+
+<!-- ================================================================ -->
+<h2 id="s6"><span class="no">6</span>The context-layer deliverable — target design</h2>
+
+<p class="lede">What a client team should <i>receive</i>, and how it scales across domains, functions, therapy areas and
+clients without a rewrite. Four rules, each grounded in schema that already exists in the repo — this is a finishing
+plan, not a new architecture.</p>
+
+<h3>Rule 1 — Coordinates, not hierarchies</h3>
+<p>The address space for all knowledge is the <b>9 existing tag dimensions</b>
+(<code>therapy_area · drug · indication · data_source · analytics_domain · task_type · geography · function · client</code>) —
+not a directory taxonomy. Function slicing through tags already works through the real serving path (with measured
+slice-vs-full token leanness); keep function <b>intra-pack</b>, never a pack species. Make <code>Tag.parent</code> real
+(oncology→NSCLC rollups) or delete it — today it is dead schema a contract reader will believe.</p>
+
+<h3>Rule 2 — Two pack species, and resolution instead of merging</h3>
+<p><b>BASE domain packs</b> (commercial_analytics today; market_access/medical_affairs/HEOR next — compilable from the
+11 already-written <code>ontology/domains</code> modules) and thin <b>OVERLAY packs</b> (therapy-area, client, engagement)
+that contain only additions/overrides and declare <code>depends_on</code> pins + <code>PackLayer</code> precedence
+(10/50/100 per the blueprint — the schema has existed unread since the manifest was written).</p>
+<div class="call good"><p><b>The composition decision this repo should commit to (ADR-worthy):</b> overlays are resolved at
+<b>compile time</b> by the Step-5 resolver into <b>one digest-addressed, sealed, resolved release</b>. The runtime always
+serves exactly one pack per agent. Serve-time multi-pack merging is <b>rejected</b>: it multiplies the conflict,
+eval-validity and provenance surface — and it means the served composition was never the thing the eval gate measured.
+Compile-time resolution preserves the repo’s single best invariant: <i>the served thing IS the eval-gated thing.</i></p></div>
+
+<h3>Rule 3 — One governance write model</h3>
+<p>Blueprint Open Decision 4 is still unresolved <i>in code</i>, and it is the riskiest hole in the platform: today the
+legacy in-memory DeltaStore (routing/SLAs/audit — wired only to the frozen app), the factory’s unauthenticated in-process
+approval, and the durable-but-endpointless GovernanceStore all coexist. Decide: <b>GovernanceStore
+(<code>ontowiz-runtime/governance.py</code> — durable, transactional, restart-survival-tested) becomes the single system of
+record.</b> The factory bridge writes through it; approvals require an authenticated principal from the existing JWT/RBAC
+layer; serve exposes read-only <code>GET /v1/deltas/{id}</code> so every <code>backing_delta</code> in every trust envelope
+finally <i>resolves to who approved what, when, why</i>.</p>
+
+<h3>Rule 4 — Receipts outside the artifact</h3>
+<p>Exactly as S1.3 specs it: eval receipts are append-only records keyed by <code>candidate_digest</code>, never written into
+the pack and resealed (today’s benchmark literally mutates the candidate it certifies). Combined with S1.1 (deterministic,
+digest-addressed compile with input/output inventories) and S1.2 (verify-before-load with typed refusal), the deliverable
+becomes <i>pinned, verifiable, and externally receipted</i>.</p>
+
+<h4>The deliverable, structurally</h4>
+<pre class="tree">
+packs/
+├── <b>commercial_analytics/1.0.0/</b>            <span class="cm"># BASE pack — unit of governance, versioning, eval, distribution</span>
+│   ├── pack.yaml                          <span class="cm"># manifest v2: candidate_digest, input/output inventory (S1.1)</span>
+│   ├── pack.sig                           <span class="cm"># content seal — VERIFIED AT LOAD (S1.2)</span>
+│   ├── artifacts/*.yaml                   <span class="cm"># governed atoms: lifecycle history + delta_id + source_document_ids</span>
+│   ├── context.ctx · index.l3.ctx         <span class="cm"># compiled L2 body + L3 router directory</span>
+│   └── evals/  → receipts live OUTSIDE    <span class="cm"># external append-only EvalReceipts keyed by digest (S1.3)</span>
+├── <b>oncology_overlay/0.1.0/</b>                <span class="cm"># OVERLAY pack: additions/overrides only</span>
+│   └── pack.yaml                          <span class="cm">#   layer: therapy_area (50) · depends_on: commercial_analytics@^1</span>
+├── <b>client_acme_overlay/…</b>                  <span class="cm"># client overlays live in SEPARATE repos (ADR-018 tenancy)</span>
+└── <b>releases/acme_brand_agent/2026.07/</b>     <span class="cm"># RESOLVED RELEASE = the client deliverable</span>
+    ├── pack.yaml                          <span class="cm">#   pins: base digests + overlay digests + source commit + eval-suite digest</span>
+    └── …                                  <span class="cm">#   one sealed pack; conflicts resolved & surfaced at compile time</span>
+</pre>
+
+<h4>The traceability chain, end-to-end queryable (target)</h4>
+<div class="tblwrap"><table>
+  <tr><th>Link</th><th>Mechanism</th><th>Today</th></tr>
+  <tr><td>source document → artifact</td><td><code>source_document_ids</code> (+ span locators from the discovery lane)</td><td><span class="chip c-abs"><span class="i">✕</span>Empty everywhere</span> — seed provenance should cite ontology file+line until mining exists</td></tr>
+  <tr><td>artifact → approval</td><td>lifecycle history <code>delta_id</code> → <code>GET /v1/deltas/{id}</code> (who/when/why)</td><td><span class="chip c-part"><span class="i">◑</span>Half</span> — delta_ids carried, resolve to nothing at serve time</td></tr>
+  <tr><td>artifacts → release</td><td><code>candidate_digest</code> + input pins (manifest v2)</td><td><span class="chip c-abs"><span class="i">✕</span>S1.1 spec-only</span></td></tr>
+  <tr><td>release → quality</td><td>external EvalReceipt keyed by digest</td><td><span class="chip c-abs"><span class="i">✕</span>S1.3 spec-only</span> — receipt currently mutates the candidate</td></tr>
+  <tr><td>release → served answer</td><td>TrustEnvelope: pack@version · artifacts_used · confidence · backing_deltas</td><td><span class="chip c-real"><span class="i">✓</span>Works (REST)</span> — MCP omits backing_deltas; close the parity gap</td></tr>
+</table></div>
+
+<p><b>Shortest path from today:</b> S1.1→S1.2→S1.3 (specs are review-ready) → write-model ADR + <code>/v1/deltas</code> (F0.3)
+→ minimal resolver as the <i>first consumer</i> of PackLayer/depends_on, proven with a thin oncology overlay compiled from
+content that already exists in <code>ontology/domains</code> + <code>therapeutic_areas</code> → hydrate seam closed → eval gate
+enforced at the release boundary. Disk layout barely changes; overlays are just more packs.</p>
+
+<!-- ================================================================ -->
+<h2 id="s7"><span class="no">7</span>Do we have mechanisms for governance, traceability, eval, lifecycle?</h2>
+
+<p>Direct answers, capability by capability. “Mechanism” means enforced code with tests — not schema, not docs.</p>
+
+<div class="tblwrap"><table>
+  <tr><th>Capability</th><th>Mechanism?</th><th>Ground truth</th></tr>
+  <tr><td colspan="3" style="background:var(--code-bg);font-weight:700;color:var(--ink)">Governance</td></tr>
+  <tr><td>Delta-gated promotion (nothing reaches ACTIVE ungoverned)</td><td><span class="chip c-real"><span class="i">✓</span>Enforced</span></td><td>Two-level defense (transition + YAML-load), tested — the platform’s best idea, mechanized</td></tr>
+  <tr><td>Approver identity &amp; authorization</td><td><span class="chip c-abs"><span class="i">✕</span>Absent</span></td><td><code>promote_candidate</code> accepts any string as approver; no queue; review endpoint writes a comment</td></tr>
+  <tr><td>Durable governance record</td><td><span class="chip c-part"><span class="i">◑</span>Stored, unreachable</span></td><td>GovernanceStore survives restart (tested) but has zero endpoints; F0.3 closes this</td></tr>
+  <tr><td>Single write model</td><td><span class="chip c-abs"><span class="i">✕</span>Undecided</span></td><td>Three competing homes; Blueprint Open Decision 4 unresolved in code — §6 Rule 3</td></tr>
+  <tr><td colspan="3" style="background:var(--code-bg);font-weight:700;color:var(--ink)">Traceability</td></tr>
+  <tr><td>Served answer → backing artifacts &amp; deltas</td><td><span class="chip c-real"><span class="i">✓</span>Works (REST)</span></td><td>TrustEnvelope + artifact drawer with full lifecycle history + explain-concept lineage</td></tr>
+  <tr><td>Source → artifact provenance</td><td><span class="chip c-abs"><span class="i">✕</span>Unpopulated</span></td><td><code>source_document_ids</code> empty on every shipped artifact (all knowledge hand-seeded)</td></tr>
+  <tr><td>Delta id → approval record (queryable)</td><td><span class="chip c-abs"><span class="i">✕</span>Dead-ends</span></td><td>Opaque strings; deltas live in process memory or the unexposed store</td></tr>
+  <tr><td>Release integrity (tamper evidence honored)</td><td><span class="chip c-part"><span class="i">◑</span>Sealed, unverified</span></td><td>SHA-256 seal written, never checked at load; benchmark reseals after mutating</td></tr>
+  <tr><td colspan="3" style="background:var(--code-bg);font-weight:700;color:var(--ink)">Eval</td></tr>
+  <tr><td>Eval cases as governed artifacts + deterministic judge</td><td><span class="chip c-real"><span class="i">✓</span>Real</span></td><td>30-case suite, word-boundary judge, no-answer-leak invariant, gateable agent-lift</td></tr>
+  <tr><td>Live measured lift</td><td><span class="chip c-part"><span class="i">◑</span>Once, stale</span></td><td>+0.308 on v0.1.0 (2026-06-12); measures governed-<i>term adoption</i>, not graded reasoning; LLM-judge path (<code>rubric</code>) has zero consumers</td></tr>
+  <tr><td>Eval gate enforced at release</td><td><span class="chip c-abs"><span class="i">✕</span>Not binding</span></td><td>v0.2.0 and v0.3.0 shipped <code>gate_passed:false</code>; no CI step runs pack evals — a gate that doesn’t bind is a dashboard</td></tr>
+  <tr><td>Immutable eval receipts</td><td><span class="chip c-abs"><span class="i">✕</span>Spec-only</span></td><td>S1.3, review-ready, unimplemented</td></tr>
+  <tr><td colspan="3" style="background:var(--code-bg);font-weight:700;color:var(--ink)">Lifecycle management</td></tr>
+  <tr><td>Versioning + evolution loop</td><td><span class="chip c-real"><span class="i">✓</span>Works</span></td><td>Semver dirs; <code>evolve_pack</code> proven once (v0.2.0 gained a capability from one governed mission); <code>pack_diff</code> with per-function deltas</td></tr>
+  <tr><td>Transition legality</td><td><span class="chip c-abs"><span class="i">✕</span>Absent</span></td><td>Any state → any state with a non-blank delta string (ARCHIVED→ACTIVE succeeds)</td></tr>
+  <tr><td>Freshness / staleness / decay</td><td><span class="chip c-abs"><span class="i">✕</span>Stubbed</span></td><td>Nothing consumes <code>valid_for_days</code>; <code>coverage/freshness_days</code> defaults echoed to the UI as if measured</td></tr>
+  <tr><td>Deprecation · rollback · consumer pinning</td><td><span class="chip c-abs"><span class="i">✕</span>Absent</span></td><td>States exist; no channels, no pins read, no migration story, no <code>schema_version</code></td></tr>
+</table></div>
+
+<!-- ================================================================ -->
+<h2 id="s8"><span class="no">8</span>The consolidation gap — the word in your mandate</h2>
+
+<div class="call crit">
+<p><b>“Consolidating the domain packs” is the one capability with no owner, no design, and no milestone anywhere in the
+program.</b> Everything built so far assumes a single hand-authored source per pack. The moment two SMEs, three engagement
+decks, and a transcript batch feed the same domain, you need: dedup of near-identical candidates, detection of
+contradicting heuristics (same trigger, different verdict), scope-collision handling, cross-layer override validation, and
+a merge/supersede policy with an audit trail. The blueprint named four conflict classes and a Consolidation agent —
+both undesigned then, both unbuilt now. The only dedup logic in the repo (0.8-Jaccard) sits in dead code.</p>
+</div>
+<p><b>Where consolidation should live</b> (two insertion points, both in existing seams):</p>
+<ul>
+  <li><b>Curation-time (intra-pack):</b> a candidate-set consolidation pass between mining and delta-proposal —
+  dedup + contradiction detection over DRAFT candidates, surfacing conflict pairs to the curator queue rather than
+  silently proposing both. Home: <code>ontowiz-factory</code>, consuming the same artifact contracts; the SME
+  “Grill Me” plan (GM-series) should submit <i>into</i> this pass, not around it.</li>
+  <li><b>Compile-time (cross-pack):</b> the Step-5 resolver’s conflict surface (§6 Rule 2) — overlay-vs-base override
+  legality, same-id collisions, terminology conflicts across <code>depends_on</code> inputs. Fail loud; a human confirms
+  resolution; the resolution itself is a governed delta.</li>
+</ul>
+<p>Sequencing: a minimal curation-time pass belongs in <b>M3</b> (the first moment pilot-authored knowledge arrives);
+the cross-pack surface arrives with the resolver in <b>M4</b>. Until then, say “governed authoring,” not “consolidation,”
+in any external narrative.</p>
+
+<!-- ================================================================ -->
+<h2 id="s9"><span class="no">9</span>Milestones to first real usage</h2>
+
+<p>Sequenced against the existing plan (S1.1→S1.3, F0.3, control-plane Slices B/D, Step-10 second-consumer gate) — not a
+parallel roadmap. Effort in unit-weeks under the existing loop discipline.</p>
+
+<div class="mile">
+  <div class="mh"><span class="mn">M1 · Trustworthy serve</span><span class="me">~3 unit-weeks · BE</span></div>
+  <p>Build S1.1 (deterministic digest-addressed compile), S1.2 (verify-before-load, typed refusals), S1.3 (external
+  immutable eval receipt) exactly as specced — plus two pilot-critical items no spec covers: <b>(a)</b> register a
+  governance-gated <code>hydrate</code> tool on the serve MCP door (or stop instructing agents to call one that isn’t there);
+  <b>(b)</b> re-benchmark the current pack so “latest” carries a fresh receipt.</p>
+  <div class="crit-row"><b>Exit:</b> runtime refuses tampered/incomplete candidates; served version carries an immutable receipt with
+  <code>gate_passed:true</code>; an agent completes the full directory→hydrate→answer loop against the production door in an e2e test.</div>
+</div>
+
+<div class="mile">
+  <div class="mh"><span class="mn">M2 · Pilot consumption</span><span class="me">~2 unit-weeks · BE+FE+docs</span></div>
+  <p>One named team’s agent uses the pack read-only. Pilot deployment profile: disable the role-header fallback via config,
+  require <code>ONTOWIZ_JWT_SECRET</code>, Bearer-only writes, server-side usage recording at <code>/v1/context</code>. Write the
+  first adopter-facing quickstart (deploy serve → point an agent at MCP/REST → interpret the trust envelope). Control-plane
+  <b>Slice B</b>: live read-only shell over the real backend. Add a <b>scale probe</b> (compile 100/500/1000-artifact synthetic
+  packs; measure directory size, retrieval quality, real-tokenizer counts) so §10’s break points get numbers.</p>
+  <div class="crit-row"><b>Exit:</b> pilot agents answering real questions with pack context; ≥N server-recorded sessions; auth P0 list closed;
+  pilot can restate what backing_deltas/confidence mean.</div>
+</div>
+
+<div class="mile">
+  <div class="mh"><span class="mn">M3 · Governed authoring loop</span><span class="me">~3–4 unit-weeks · BE+FE</span></div>
+  <p>The pilot’s own knowledge enters a pack through served doors. Wire GovernanceStore endpoints (F0.3) and make review
+  decisions drive real delta approval through the bridge with an <b>authenticated curator identity</b> (control-plane
+  <b>Slice D</b>). Document the seed-YAML format as the official v1 authoring interface. Add the minimal <b>curation-time
+  consolidation pass</b> (§8): dedup + contradiction surfacing on incoming candidates. Include a legal/privacy checkpoint
+  before any client knowledge enters a pack.</p>
+  <div class="crit-row"><b>Exit:</b> one pack version whose delta trail contains pilot-authored knowledge, approved in the UI by an
+  authenticated curator, recompiled via S1.1, receipted via S1.3, served back — the chain delta→artifact→answer auditable end-to-end.</div>
+</div>
+
+<div class="mile">
+  <div class="mh"><span class="mn">M4 · Second pack, pilot-authored (the platform gate)</span><span class="me">~3 unit-weeks + SME time</span></div>
+  <p>Compile a second pack ≥50% from pilot material (the 11 uncompiled <code>ontology/domains</code> modules are the cheapest
+  second domain — zero new elicitation needed to start). Minimal Step-5 resolver as the first real consumer of
+  PackLayer/<code>depends_on</code>, proven with a thin oncology overlay; cross-pack conflict surfacing (§8). This is the
+  Step-10 “second consumer” gate — the first moment “a new team can author their own pack” is true rather than aspirational.</p>
+  <div class="crit-row"><b>Exit:</b> second pack family passes its eval gate with a lift receipt; a new team member stands up
+  authoring-to-serving with &lt;1 day of core-team help. <b>Explicit non-goals before this point:</b> mining/interview agents at scale,
+  OCI/Sigstore, SSO, MLR beyond demo-grade, platform-side structured-data fusion.</div>
+</div>
+
+<h4>Two enablers that gate everything above</h4>
+<ul>
+  <li><b>Recalibrate the harness — don’t relax it.</b> Today <code>verify-audit</code> makes unit hygiene falsifiable but not the
+  product claim: a pack-quality regression or a broken agent seam passes every gate, while 98.5% coverage is enforced on
+  1.8k-LOC packages and the 12.9k-line serving engine has 3 tests. Add two product gates (days of work, machinery exists):
+  a pack-eval receipt gate in CI, and one blocking e2e agent-loop smoke. Put ontowiz-ctx’s consumed seam under ruff/mypy +
+  a modest floor; quarantine its ~3.4k dormant lines.</li>
+  <li><b>Unblock the review gate as a process change.</b> The log nuance matters: review <i>engaged</i> on 07-12 (two spec-red
+  responses committed) — then the repo went idle 8 days; no VERIFIED code since 07-10, and ~40 planned units serialize
+  through one reviewer with no SLA. Fix: 48h review SLA or a second qualified reviewer; pre-authorize S1.1→S1.3 as a batch;
+  script the review-SHA/bundle cut. Keep the builder/reviewer separation itself — it is an asset (§10).</li>
+</ul>
+
+<!-- ================================================================ -->
+<h2 id="s10"><span class="no">10</span>Risk &amp; honesty ledger</h2>
+
+<h3>Wording rules for any external narrative (each verified in code)</h3>
+<div class="tblwrap"><table>
+  <tr><th>Never say</th><th>Say instead</th><th>Because</th></tr>
+  <tr><td>“Signed packs”</td><td>“Content-sealed (SHA-256), tamper-evident; load-time verification lands with S1.2”</td><td>No authorship/PKI; seal never checked at load; anyone with <code>reseal_pack</code> can re-seal an edit</td></tr>
+  <tr><td>“+0.308 accuracy lift”</td><td>“+0.308 governed-term-adoption lift (v0.1.0, 2026-06-12, temp 0); the durable claim is with-pack 26/26”</td><td>The judge is word-boundary containment; it measures whether governed vocabulary reached the answer, not graded reasoning; the receipt is 5+ weeks old and two versions behind</td></tr>
+  <tr><td>“RBAC-protected review”</td><td>“Role-gated review with a dev header fallback that must be disabled for any shared deployment”</td><td>Unauthenticated callers can assert <code>curator</code> via <code>X-OntoWiz-Role</code>; “review” writes a comment, not a lifecycle change</td></tr>
+  <tr><td>“Guardrails are never trimmed”</td><td>“Guardrail always-include is enforced in the legacy assembler; enforcement in the live gate is a scheduled fix”</td><td><code>ALWAYS_INCLUDED_KINDS</code> has zero non-test consumers; the live gate silently drops an untagged Guardrail</td></tr>
+  <tr><td>Demoing /control-plane as product</td><td>Lead with live /catalog + <code>/v1/context</code> + the benchmark receipt; show the control plane <i>after</i>, labeled design-intent</td><td>All five control-plane views run on hardcoded fixtures with canned outcomes (<code>simulation:true</code> in their own envelope)</td></tr>
+  <tr><td>“The platform consolidates SME knowledge”</td><td>“Governed authoring today; consolidation (dedup/conflict/merge) is scheduled at M3/M4”</td><td>§8 — no consolidation mechanism exists outside dead code</td></tr>
+</table></div>
+
+<h3>Scale &amp; tenancy watchlist (unquantified — the M2 probe assigns numbers)</h3>
+<ul>
+  <li>L3 directory grows <b>linearly</b> with artifact count, identifier extraction is O(n²), retrieval is lexical-only,
+  and every token figure is a whitespace split (no tokenizer dependency exists). Proven at 24 artifacts; unknown at 500.</li>
+  <li>Multi-tenancy/client-confidential segregation has no mechanism; direction (client overlays in separate repos,
+  ADR-018) is right and undemonstrated. SQLite behind one locked connection; no backup/monitoring story for the stores.</li>
+  <li>Count conventions for anyone re-auditing: 30-case current eval suite vs 26-case June receipt; 218 collected package
+  tests (213 defs); 321 legacy tests of which 312 selected (9 e2e deselected — and never part of the falsifiable audit).</li>
+</ul>
+
+<h3>What is genuinely strong — keep it</h3>
+<div class="call good"><p>The discipline itself is a sales asset for this buyer. Three red-team rounds found and fixed real
+defects (path traversal, governance bypass, parser data-loss) with fixes re-verified per PROJECT_STATUS; the audit gate ran
+cold and passed during <i>this</i> review; the docs were honest in every spot-check — the repo has no vaporware problem, which
+is rare. An independently executable audit gate with recorded per-unit evidence maps directly onto the validation posture
+pharma procurement audits for. The fastest route to a milestone is not to loosen this harness but to re-aim it at the
+product seams (§9) and let the already-specced S1 wave through the review gate.</p></div>
+
+<div class="foot">
+  Prepared 2026-07-20 · Onto_Wiz platform audit · Method: 14-agent parallel code audit (10 subsystem readers, 3 analysts,
+  1 adversarial critic; 1.43M tokens of analysis, 379 tool calls), all headline claims re-verified against source; the
+  six-gate <code>verify-audit.sh</code> and the frontend Vitest gate were executed cold during the audit (both PASS).
+  Companion docs: <code>SME_Knowledge_Codification_Blueprint.md</code> · <code>docs/adr/ADR-018/019</code> ·
+  <code>docs/specs/PLATFORM_BASELINE_STRUCTURE_2026-07.md</code> · <code>docs/specs/S1-1/2/3</code> · <code>docs/PROJECT_STATUS.md</code>.
+</div>
+
+</div>
+</body>
+</html>
