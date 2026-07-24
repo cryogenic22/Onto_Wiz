@@ -42,6 +42,14 @@ from .governance import (
     DeltaRecord,
     GovernanceStore,
 )
+from .hydrate import (
+    HydrationPayload,
+    SectionNotServableError,
+    hydrate_for_pack,
+    hydrate_from_result,
+    hydrate_sections,
+    servable_sections,
+)
 from .lineage import LineageEntry, explain_concept
 from .registry import LoadedPack, PackRegistry, load_pack
 from .registry_view import ArtifactRow, PackDetail, pack_detail
@@ -53,6 +61,12 @@ __all__ = [
     "get_context",
     "context_for_pack",
     "context_for_function",
+    "hydrate_sections",
+    "hydrate_for_pack",
+    "hydrate_from_result",
+    "servable_sections",
+    "HydrationPayload",
+    "SectionNotServableError",
     "catalog_index",
     "CatalogEntry",
     "function_counts",

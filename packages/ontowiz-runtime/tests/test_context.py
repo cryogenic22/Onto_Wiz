@@ -125,3 +125,70 @@ def test_always_included_kinds_constant_available():
     # safety layers the F2 budget step must never trim (consumed downstream)
     from ontowiz_spec import ALWAYS_INCLUDED_KINDS
     assert ArtifactKind.GUARDRAIL in ALWAYS_INCLUDED_KINDS
+
+
+# ── F0.10: ALWAYS_INCLUDED_KINDS is enforced, not just declared ───────────────
+#
+# The constant had zero non-test consumers: `gate()` never imported it, so the tag
+# filter dropped a safety artifact whose tags did not intersect the request. A
+# guardrail vanishing precisely when the caller narrows the context is the worst
+# failure mode of slicing, so the carve-out below is scoped to the *tag* filter —
+# lifecycle still governs absolutely.
+
+
+def _safety(cls, id_: str, state: Lifecycle = Lifecycle.ACTIVE, **kw):
+    """Build a safety-layer artifact carrying an out-of-domain tag."""
+    art = cls(id=id_, name=id_,
+              tags=[Tag(dimension=TagDimension.ANALYTICS_DOMAIN, value="manufacturing")],
+              **kw)
+    if state == Lifecycle.DRAFT:
+        return art
+    return art.transition(state, changed_by="c", delta_id="d")
+
+
+def test_guardrail_survives_tag_slice():
+    from ontowiz_spec import Guardrail
+    arts = [_artifact("c", Lifecycle.ACTIVE, domain="commercial"),
+            _safety(Guardrail, "g", blocks_drivers=["price war"])]
+    eligible = {a.id for a in gate(arts, tags=COMMERCIAL)}
+    # the guardrail carries only a manufacturing tag, yet must reach a commercial slice
+    assert eligible == {"c", "g"}
+
+
+def test_all_always_included_kinds_bypass_tag_filter():
+    from ontowiz_spec import ALWAYS_INCLUDED_KINDS, DataQuirk, Guardrail, OverrideRule
+    arts = [_safety(Guardrail, "g"), _safety(OverrideRule, "o"), _safety(DataQuirk, "q")]
+    assert {a.kind for a in arts} == set(ALWAYS_INCLUDED_KINDS)
+    assert {a.id for a in gate(arts, tags=COMMERCIAL)} == {"g", "o", "q"}
+
+
+def test_draft_guardrail_is_not_rescued_by_carve_out():
+    from ontowiz_spec import Guardrail
+    arts = [_safety(Guardrail, "g", state=Lifecycle.DRAFT)]
+    # governance is absolute: an unapproved safety rule is still not servable
+    assert gate(arts, tags=COMMERCIAL) == []
+    assert gate(arts, tags=COMMERCIAL, dev_mode=True) == []
+
+
+def test_tag_filter_still_drops_ordinary_kinds():
+    # the carve-out is narrow — it must not become "tags no longer filter"
+    arts = [_artifact("c", Lifecycle.ACTIVE, domain="commercial"),
+            _artifact("m", Lifecycle.ACTIVE, domain="manufacturing")]
+    assert [a.id for a in gate(arts, tags=COMMERCIAL)] == ["c"]
+
+
+def test_guardrail_reaches_the_hydratable_directory():
+    from ontowiz_spec import Guardrail
+    doc = CTXDocument(
+        header=Header(magic="§CTX", version="1.0", layer=Layer.L2),
+        body=(
+            Section(name="DH-KEEP", children=(KeyValue(key="ID", value="c"),)),
+            Section(name="GR-SAFETY", children=(KeyValue(key="ID", value="g"),)),
+        ),
+    )
+    arts = [_artifact("c", Lifecycle.ACTIVE, domain="commercial"),
+            _safety(Guardrail, "g", blocks_drivers=["price war"])]
+    res = get_context("q", doc=doc, artifacts=arts, tags=COMMERCIAL)
+    # enforcement has to survive all the way to what the agent can actually see
+    assert "GR-SAFETY" in res.system_prompt
+    assert "g" in res.trust.artifacts_used
