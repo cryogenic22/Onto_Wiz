@@ -51,7 +51,13 @@ from .lifecycle import (
     Lifecycle,
     LifecycleTransition,
 )
-from .pack_manifest import PackEvalSummary, PackLayer, PackManifest
+from .pack_manifest import (
+    InventoryEntry,
+    OutputFile,
+    PackEvalSummary,
+    PackLayer,
+    PackManifest,
+)
 from .tags import Tag, TagDimension, TagQuery
 
 __version__ = "0.1.0"
@@ -76,6 +82,8 @@ __all__ = [
     "TagDimension",
     "TagQuery",
     "PackManifest",
+    "InventoryEntry",
+    "OutputFile",
     "PackLayer",
     "PackEvalSummary",
     # ported artifact library (SpecOmagic 10 + judgment 3)
