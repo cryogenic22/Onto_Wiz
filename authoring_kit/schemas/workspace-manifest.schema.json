@@ -1,0 +1,87 @@
+{
+  "$defs": {
+    "SourceProfile": {
+      "enum": [
+        "referenced",
+        "embedded"
+      ],
+      "title": "SourceProfile",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "adapter_neutral": {
+      "const": true,
+      "title": "Adapter Neutral",
+      "type": "boolean"
+    },
+    "archetypes": {
+      "items": {
+        "minLength": 1,
+        "pattern": ".*\\S.*",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Archetypes",
+      "type": "array"
+    },
+    "contains_protected_evaluations": {
+      "const": false,
+      "title": "Contains Protected Evaluations",
+      "type": "boolean"
+    },
+    "format": {
+      "const": "ontowiz-authoring-workspace",
+      "title": "Format",
+      "type": "string"
+    },
+    "format_version": {
+      "const": 1,
+      "title": "Format Version",
+      "type": "integer"
+    },
+    "owner_roles": {
+      "items": {
+        "minLength": 1,
+        "pattern": ".*\\S.*",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Owner Roles",
+      "type": "array"
+    },
+    "schema_revision": {
+      "const": 1,
+      "title": "Schema Revision",
+      "type": "integer"
+    },
+    "schema_target": {
+      "const": "ontowiz-spec/vNext-min",
+      "title": "Schema Target",
+      "type": "string"
+    },
+    "source_profile": {
+      "$ref": "#/$defs/SourceProfile"
+    },
+    "workspace_id": {
+      "pattern": "^(?!con$|prn$|aux$|nul$|com[1-9]$|lpt[1-9]$)[a-z0-9][a-z0-9_-]{0,62}$",
+      "title": "Workspace Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "format",
+    "format_version",
+    "schema_target",
+    "schema_revision",
+    "workspace_id",
+    "owner_roles",
+    "archetypes",
+    "source_profile",
+    "adapter_neutral",
+    "contains_protected_evaluations"
+  ],
+  "title": "WorkspaceManifest",
+  "type": "object"
+}

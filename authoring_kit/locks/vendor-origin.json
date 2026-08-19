@@ -1,0 +1,39 @@
+{
+  "lock_version": 1,
+  "source_repository": "C:/Users/kapil/Documents/Onto_Wiz",
+  "source_package": "packages/ontowiz-spec/ontowiz_spec",
+  "vendor_package": "src/ontowiz_spec/pinned_v0_1",
+  "copy_policy": "byte-for-byte",
+  "files": [
+    {
+      "bytes": 2269,
+      "path": "__init__.py",
+      "sha256": "10e972cef2f9ff7d65039f1c7b7407215f47005375e823807737b2ce566d93ab"
+    },
+    {
+      "bytes": 11674,
+      "path": "artifacts.py",
+      "sha256": "f17229dfb1831fa650fb8d3a7fb10e8f540fa789274322ef5d1af6ed02fbb924"
+    },
+    {
+      "bytes": 25495,
+      "path": "library.py",
+      "sha256": "9bb68154bfac111a2551f45d2ce26892c9e6ee012d1a750ed25363ac075e67da"
+    },
+    {
+      "bytes": 1736,
+      "path": "lifecycle.py",
+      "sha256": "8a2392cf478c6fd13a06b788f2b780cd1f78fe1f892a4bb4a42934a87b3a671b"
+    },
+    {
+      "bytes": 3104,
+      "path": "pack_manifest.py",
+      "sha256": "11d0afb3a02a77b76f5b99d2543c1907dbb9d9357de14ee13e2c3941ad1f7de2"
+    },
+    {
+      "bytes": 1312,
+      "path": "tags.py",
+      "sha256": "9a30f99fb2bfa037217a559a430514169d4b15530a8b09a411844adffd5e9095"
+    }
+  ]
+}

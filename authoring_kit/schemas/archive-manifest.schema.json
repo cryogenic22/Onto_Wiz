@@ -1,0 +1,187 @@
+{
+  "$defs": {
+    "ArchiveEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "byte_count": {
+          "minimum": 0,
+          "title": "Byte Count",
+          "type": "integer"
+        },
+        "media_type": {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "title": "Media Type",
+          "type": "string"
+        },
+        "path": {
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?(?:/|$))(?!.*(?:^|/)(?:[Cc][Oo][Nn]|[Pp][Rr][Nn]|[Aa][Uu][Xx]|[Nn][Uu][Ll]|[Cc][Oo][Mm][1-9]|[Ll][Pp][Tt][1-9])(?:\\.[A-Za-z0-9._-]*)?(?:/|$))(?!.*[. ](?:/|$))[A-Za-z0-9][A-Za-z0-9._/-]*$",
+          "title": "Path",
+          "type": "string"
+        },
+        "role": {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "title": "Role",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "role",
+        "media_type",
+        "byte_count",
+        "sha256"
+      ],
+      "title": "ArchiveEntry",
+      "type": "object"
+    },
+    "ArchiveTransferAuthorization": {
+      "additionalProperties": false,
+      "properties": {
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "source_profile": {
+          "$ref": "#/$defs/SourceProfile"
+        },
+        "target_client_boundary": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "pattern": ".*\\S.*",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Client Boundary"
+        }
+      },
+      "required": [
+        "source_profile",
+        "effective_date"
+      ],
+      "title": "ArchiveTransferAuthorization",
+      "type": "object"
+    },
+    "SourceProfile": {
+      "enum": [
+        "referenced",
+        "embedded"
+      ],
+      "title": "SourceProfile",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "canonical_json": {
+      "const": "RFC8785-subset:UTF-8,NFC,sorted-keys,no-whitespace",
+      "title": "Canonical Json",
+      "type": "string"
+    },
+    "entries": {
+      "items": {
+        "$ref": "#/$defs/ArchiveEntry"
+      },
+      "title": "Entries",
+      "type": "array"
+    },
+    "envelope_version": {
+      "const": 1,
+      "title": "Envelope Version",
+      "type": "integer"
+    },
+    "fixed_timestamp": {
+      "const": "1980-01-01T00:00:00Z",
+      "title": "Fixed Timestamp",
+      "type": "string"
+    },
+    "format": {
+      "enum": [
+        "ontowiz-authoring-workspace",
+        "ontowiz-candidate-pack"
+      ],
+      "title": "Format",
+      "type": "string"
+    },
+    "format_version": {
+      "const": 1,
+      "title": "Format Version",
+      "type": "integer"
+    },
+    "max_entries": {
+      "const": 10000,
+      "title": "Max Entries",
+      "type": "integer"
+    },
+    "max_entry_bytes": {
+      "const": 67108864,
+      "title": "Max Entry Bytes",
+      "type": "integer"
+    },
+    "max_total_bytes": {
+      "const": 536870912,
+      "title": "Max Total Bytes",
+      "type": "integer"
+    },
+    "schema_revision": {
+      "const": 1,
+      "title": "Schema Revision",
+      "type": "integer"
+    },
+    "schema_target": {
+      "const": "ontowiz-spec/vNext-min",
+      "title": "Schema Target",
+      "type": "string"
+    },
+    "semantic_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Semantic Digest",
+      "type": "string"
+    },
+    "transfer_authorization": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ArchiveTransferAuthorization"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "zip_compression": {
+      "const": "stored",
+      "title": "Zip Compression",
+      "type": "string"
+    }
+  },
+  "required": [
+    "envelope_version",
+    "format",
+    "format_version",
+    "schema_target",
+    "schema_revision",
+    "zip_compression",
+    "canonical_json",
+    "fixed_timestamp",
+    "max_entries",
+    "max_entry_bytes",
+    "max_total_bytes",
+    "entries",
+    "transfer_authorization",
+    "semantic_digest"
+  ],
+  "title": "ArchiveManifest",
+  "type": "object"
+}

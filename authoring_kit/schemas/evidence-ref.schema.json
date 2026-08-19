@@ -1,0 +1,131 @@
+{
+  "$defs": {
+    "EvidenceMode": {
+      "enum": [
+        "observed",
+        "interpretation"
+      ],
+      "title": "EvidenceMode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "if": {
+    "properties": {
+      "quoted": {
+        "const": true
+      }
+    }
+  },
+  "properties": {
+    "claim": {
+      "minLength": 1,
+      "pattern": ".*\\S.*",
+      "title": "Claim",
+      "type": "string"
+    },
+    "confidence": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "extracted_at": {
+      "format": "date-time",
+      "title": "Extracted At",
+      "type": "string"
+    },
+    "id": {
+      "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "locator": {
+      "minLength": 1,
+      "pattern": ".*\\S.*",
+      "title": "Locator",
+      "type": "string"
+    },
+    "locator_type": {
+      "enum": [
+        "page",
+        "slide",
+        "paragraph",
+        "timestamp",
+        "row",
+        "cell",
+        "section"
+      ],
+      "title": "Locator Type",
+      "type": "string"
+    },
+    "mode": {
+      "$ref": "#/$defs/EvidenceMode"
+    },
+    "permitted_use": {
+      "minLength": 1,
+      "pattern": ".*\\S.*",
+      "title": "Permitted Use",
+      "type": "string"
+    },
+    "quote_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Quote Digest"
+    },
+    "quoted": {
+      "title": "Quoted",
+      "type": "boolean"
+    },
+    "source_checksum": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Source Checksum",
+      "type": "string"
+    },
+    "source_id": {
+      "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "valid_as_of": {
+      "format": "date",
+      "title": "Valid As Of",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "source_id",
+    "source_checksum",
+    "claim",
+    "locator_type",
+    "locator",
+    "mode",
+    "permitted_use",
+    "quoted",
+    "valid_as_of",
+    "extracted_at",
+    "confidence"
+  ],
+  "then": {
+    "properties": {
+      "quote_digest": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      }
+    },
+    "required": [
+      "quote_digest"
+    ]
+  },
+  "title": "EvidenceRef",
+  "type": "object"
+}

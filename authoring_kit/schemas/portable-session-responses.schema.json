@@ -1,0 +1,212 @@
+{
+  "$defs": {
+    "PortableCandidateArtifactBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "payload_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Payload Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "payload_digest"
+      ],
+      "title": "PortableCandidateArtifactBinding",
+      "type": "object"
+    },
+    "PortableEvidenceBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {
+          "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "evidence_item_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Evidence Item Digest",
+          "type": "string"
+        },
+        "source_checksum": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Source Checksum",
+          "type": "string"
+        },
+        "source_id": {
+          "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+          "title": "Source Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "evidence_item_digest",
+        "source_id",
+        "source_checksum"
+      ],
+      "title": "PortableEvidenceBinding",
+      "type": "object"
+    },
+    "PortableSessionResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_artifact_bindings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PortableCandidateArtifactBinding"
+          },
+          "title": "Candidate Artifact Bindings",
+          "type": "array"
+        },
+        "evidence_bindings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PortableEvidenceBinding"
+          },
+          "title": "Evidence Bindings",
+          "type": "array"
+        },
+        "id": {
+          "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "pack_manifest_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Pack Manifest Digest",
+          "type": "string"
+        },
+        "question_id": {
+          "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+          "title": "Question Id",
+          "type": "string"
+        },
+        "response": {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "title": "Response",
+          "type": "string"
+        },
+        "source_bindings": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PortableSourceBinding"
+          },
+          "title": "Source Bindings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "question_id",
+        "response",
+        "pack_manifest_digest"
+      ],
+      "title": "PortableSessionResponse",
+      "type": "object"
+    },
+    "PortableSourceBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "registered_checksum": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Registered Checksum",
+          "type": "string"
+        },
+        "source_id": {
+          "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_record_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Source Record Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "registered_checksum",
+        "source_record_digest"
+      ],
+      "title": "PortableSourceBinding",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "ontowiz-candidate-session-responses",
+      "title": "Format",
+      "type": "string"
+    },
+    "format_version": {
+      "const": 1,
+      "title": "Format Version",
+      "type": "integer"
+    },
+    "record_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Record Digest",
+      "type": "string"
+    },
+    "responses": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/PortableSessionResponse"
+      },
+      "title": "Responses",
+      "type": "array"
+    },
+    "session_id": {
+      "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "session_record_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Session Record Digest",
+      "type": "string"
+    },
+    "session_sequence": {
+      "minimum": 0,
+      "title": "Session Sequence",
+      "type": "integer"
+    },
+    "status": {
+      "const": "candidate",
+      "title": "Status",
+      "type": "string"
+    },
+    "workspace_id": {
+      "pattern": "^(?!con$|prn$|aux$|nul$|com[1-9]$|lpt[1-9]$)[a-z0-9][a-z0-9_-]{0,62}$",
+      "title": "Workspace Id",
+      "type": "string"
+    },
+    "workspace_revision": {
+      "minimum": 0,
+      "title": "Workspace Revision",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "workspace_id",
+    "workspace_revision",
+    "session_id",
+    "session_sequence",
+    "status",
+    "record_digest",
+    "format",
+    "format_version",
+    "session_record_digest"
+  ],
+  "title": "PortableSessionResponses",
+  "type": "object"
+}

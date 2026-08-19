@@ -1,0 +1,138 @@
+{
+  "$defs": {
+    "PortableGapQuestion": {
+      "additionalProperties": false,
+      "properties": {
+        "blocking": {
+          "title": "Blocking",
+          "type": "boolean"
+        },
+        "gap_kind": {
+          "enum": [
+            "source",
+            "evidence",
+            "decision",
+            "evaluation",
+            "rule_evaluation",
+            "authority"
+          ],
+          "title": "Gap Kind",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "owner_role": {
+          "anyOf": [
+            {
+              "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Owner Role"
+        },
+        "prompt": {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "title": "Prompt",
+          "type": "string"
+        },
+        "resolves": {
+          "items": {
+            "minLength": 1,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "maxItems": 16,
+          "minItems": 1,
+          "title": "Resolves",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "gap_kind",
+        "owner_role",
+        "blocking",
+        "prompt",
+        "resolves"
+      ],
+      "title": "PortableGapQuestion",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "ontowiz-candidate-session-questions",
+      "title": "Format",
+      "type": "string"
+    },
+    "format_version": {
+      "const": 1,
+      "title": "Format Version",
+      "type": "integer"
+    },
+    "questions": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/PortableGapQuestion"
+      },
+      "title": "Questions",
+      "type": "array"
+    },
+    "record_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Record Digest",
+      "type": "string"
+    },
+    "session_id": {
+      "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "session_record_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Session Record Digest",
+      "type": "string"
+    },
+    "session_sequence": {
+      "minimum": 0,
+      "title": "Session Sequence",
+      "type": "integer"
+    },
+    "status": {
+      "const": "candidate",
+      "title": "Status",
+      "type": "string"
+    },
+    "workspace_id": {
+      "pattern": "^(?!con$|prn$|aux$|nul$|com[1-9]$|lpt[1-9]$)[a-z0-9][a-z0-9_-]{0,62}$",
+      "title": "Workspace Id",
+      "type": "string"
+    },
+    "workspace_revision": {
+      "minimum": 0,
+      "title": "Workspace Revision",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "workspace_id",
+    "workspace_revision",
+    "session_id",
+    "session_sequence",
+    "status",
+    "record_digest",
+    "format",
+    "format_version",
+    "session_record_digest"
+  ],
+  "title": "PortableSessionQuestions",
+  "type": "object"
+}

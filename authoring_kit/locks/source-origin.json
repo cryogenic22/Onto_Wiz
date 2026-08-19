@@ -1,0 +1,65 @@
+{
+  "lock_version": 1,
+  "source_repository": "C:/Users/kapil/Documents/Onto_Wiz",
+  "phase_one_access": "read-only",
+  "schema_target": "ontowiz-spec/vNext-min",
+  "schema_revision": 1,
+  "files": [
+    {
+      "bytes": 22822,
+      "path": "docs/specs/ONTOWIZ_AUTHORING_KIT_2026-07.md",
+      "sha256": "0c020e97bc953a4e4660541e01851df65623ebf05f0d9149c6e32b09b8f38042"
+    },
+    {
+      "bytes": 18370,
+      "path": "docs/specs/ENTERPRISE_MATURITY_CONSOLIDATION_2026-07.md",
+      "sha256": "4911e6c2acd2823a9f4c33e99badad969ab0410509e306f90f873cc9b6063ef9"
+    },
+    {
+      "bytes": 6646,
+      "path": "docs/specs/EXPERIMENT_PRE_REGISTRATION_2026-07.md",
+      "sha256": "af4ac90094538616a33b861a4b7cc8801aa02623d6e338ba40a64876a7fb5d69"
+    },
+    {
+      "bytes": 23327,
+      "path": "docs/specs/S1-1_DETERMINISTIC_COMPILE.md",
+      "sha256": "8db18d4e62e66ea7fb0b4f46b334fc0031f920ce4ea543c75de2e85a4f6cae38"
+    },
+    {
+      "bytes": 5809,
+      "path": "docs/specs/S1-3_IMMUTABLE_EVAL_RECEIPT.md",
+      "sha256": "cda9aed58908f9ca55704a28851ebc63d127f710d4acec0d2f00bd2baef7d95b"
+    },
+    {
+      "bytes": 11674,
+      "path": "packages/ontowiz-spec/ontowiz_spec/artifacts.py",
+      "sha256": "f17229dfb1831fa650fb8d3a7fb10e8f540fa789274322ef5d1af6ed02fbb924"
+    },
+    {
+      "bytes": 1736,
+      "path": "packages/ontowiz-spec/ontowiz_spec/lifecycle.py",
+      "sha256": "8a2392cf478c6fd13a06b788f2b780cd1f78fe1f892a4bb4a42934a87b3a671b"
+    },
+    {
+      "bytes": 3104,
+      "path": "packages/ontowiz-spec/ontowiz_spec/pack_manifest.py",
+      "sha256": "11d0afb3a02a77b76f5b99d2543c1907dbb9d9357de14ee13e2c3941ad1f7de2"
+    },
+    {
+      "bytes": 5248,
+      "path": "packages/ontowiz-factory/ontowiz_factory/missions.py",
+      "sha256": "05fc0eb5caf8ea342eb7be28d11975c5e93b1c98b4d858d71f051cc307102167"
+    },
+    {
+      "bytes": 3649,
+      "path": "packages/ontowiz-factory/ontowiz_factory/evals.py",
+      "sha256": "0241decc9d96a90812126d1626e9563051b8d8481d3f1217a6bfe3ff9a41d021"
+    },
+    {
+      "bytes": 8340,
+      "path": "packages/ontowiz-factory/ontowiz_factory/compiler.py",
+      "sha256": "c6845d7a77ee7c98c5f98e5b18dea45d1b20673d9a715ff3192f1882333a8b6f"
+    }
+  ]
+}
+

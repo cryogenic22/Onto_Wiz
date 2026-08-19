@@ -1,0 +1,4 @@
+interface:
+  display_name: "OntoWiz Authoring"
+  short_description: "Govern candidate-only OntoWiz authoring"
+  default_prompt: "Use $ontowiz-authoring to resume and safely advance this candidate OntoWiz workspace."

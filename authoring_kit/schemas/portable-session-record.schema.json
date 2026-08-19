@@ -1,0 +1,109 @@
+{
+  "$defs": {
+    "PortableDeltaBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "delta_id": {
+          "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+          "title": "Delta Id",
+          "type": "string"
+        },
+        "proposal_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Proposal Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "delta_id",
+        "proposal_digest"
+      ],
+      "title": "PortableDeltaBinding",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "canonical_state_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Canonical State Digest",
+      "type": "string"
+    },
+    "delta_bindings": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/PortableDeltaBinding"
+      },
+      "title": "Delta Bindings",
+      "type": "array"
+    },
+    "format": {
+      "const": "ontowiz-candidate-session-record",
+      "title": "Format",
+      "type": "string"
+    },
+    "format_version": {
+      "const": 1,
+      "title": "Format Version",
+      "type": "integer"
+    },
+    "pack_manifest_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Pack Manifest Digest",
+      "type": "string"
+    },
+    "question_ids": {
+      "default": [],
+      "items": {
+        "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+        "type": "string"
+      },
+      "title": "Question Ids",
+      "type": "array"
+    },
+    "record_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Record Digest",
+      "type": "string"
+    },
+    "session_id": {
+      "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "session_sequence": {
+      "minimum": 0,
+      "title": "Session Sequence",
+      "type": "integer"
+    },
+    "status": {
+      "const": "candidate",
+      "title": "Status",
+      "type": "string"
+    },
+    "workspace_id": {
+      "pattern": "^(?!con$|prn$|aux$|nul$|com[1-9]$|lpt[1-9]$)[a-z0-9][a-z0-9_-]{0,62}$",
+      "title": "Workspace Id",
+      "type": "string"
+    },
+    "workspace_revision": {
+      "minimum": 0,
+      "title": "Workspace Revision",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "workspace_id",
+    "workspace_revision",
+    "session_id",
+    "session_sequence",
+    "status",
+    "record_digest",
+    "format",
+    "format_version",
+    "canonical_state_digest",
+    "pack_manifest_digest"
+  ],
+  "title": "PortableSessionRecord",
+  "type": "object"
+}

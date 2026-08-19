@@ -1,0 +1,746 @@
+{
+  "$defs": {
+    "Applicability": {
+      "additionalProperties": false,
+      "properties": {
+        "audiences": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "title": "Audiences",
+          "type": "array"
+        },
+        "effective_from": {
+          "format": "date",
+          "title": "Effective From",
+          "type": "string"
+        },
+        "lifecycle_stages": {
+          "items": {
+            "minLength": 1,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Lifecycle Stages",
+          "type": "array"
+        },
+        "markets": {
+          "items": {
+            "minLength": 1,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Markets",
+          "type": "array"
+        },
+        "products": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "title": "Products",
+          "type": "array"
+        }
+      },
+      "required": [
+        "markets",
+        "lifecycle_stages",
+        "effective_from"
+      ],
+      "title": "Applicability",
+      "type": "object"
+    },
+    "CandidateLifecycle": {
+      "enum": [
+        "draft",
+        "review"
+      ],
+      "title": "CandidateLifecycle",
+      "type": "string"
+    },
+    "CandidateLifecycleTransition": {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "At"
+        },
+        "changed_by": {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "title": "Changed By",
+          "type": "string"
+        },
+        "delta_id": {
+          "anyOf": [
+            {
+              "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Delta Id"
+        },
+        "from_state": {
+          "const": "draft",
+          "title": "From State",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "title": "Reason",
+          "type": "string"
+        },
+        "to_state": {
+          "const": "review",
+          "title": "To State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "from_state",
+        "to_state",
+        "changed_by",
+        "reason"
+      ],
+      "title": "CandidateLifecycleTransition",
+      "type": "object"
+    },
+    "ClaimType": {
+      "enum": [
+        "observation",
+        "interpretation",
+        "causal_hypothesis",
+        "normative"
+      ],
+      "title": "ClaimType",
+      "type": "string"
+    },
+    "PinnedArtifactDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_json": {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "title": "Canonical Json",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ontowiz_spec__pinned_v0_1__artifacts__ArtifactKind"
+        },
+        "sha256": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "canonical_json",
+        "sha256"
+      ],
+      "title": "PinnedArtifactDocument",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "mode": {
+          "$ref": "#/$defs/ProvenanceMode"
+        },
+        "open_questions": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "title": "Open Questions",
+          "type": "array"
+        },
+        "supplied_by": {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "title": "Supplied By",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode",
+        "supplied_by",
+        "confidence"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "ProvenanceMode": {
+      "enum": [
+        "extracted",
+        "sme_authored",
+        "ai_inferred"
+      ],
+      "title": "ProvenanceMode",
+      "type": "string"
+    },
+    "RiskLevel": {
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "title": "RiskLevel",
+      "type": "string"
+    },
+    "Tag": {
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "title": "Dimension",
+          "type": "string"
+        },
+        "parent": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "pattern": ".*\\S.*",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent"
+        },
+        "value": {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dimension",
+        "value"
+      ],
+      "title": "Tag",
+      "type": "object"
+    },
+    "ontowiz_spec__pinned_v0_1__artifacts__ArtifactKind": {
+      "description": "The closed catalogue of artifact types the system understands.",
+      "enum": [
+        "instruction_set",
+        "taxonomy",
+        "jargon_map",
+        "entity_registry",
+        "fewshot_library",
+        "override_rule",
+        "prompt_template",
+        "decision_heuristic",
+        "data_quirk",
+        "process_playbook",
+        "judgment_pattern",
+        "guardrail",
+        "action_template",
+        "eval_case",
+        "metric_definition",
+        "source_contract",
+        "question_playbook",
+        "anti_pattern",
+        "exception_rule"
+      ],
+      "title": "ArtifactKind",
+      "type": "string"
+    },
+    "ontowiz_spec__vnext__ArtifactKind": {
+      "description": "The existing 19 kinds plus four additive vNext-min contract kinds.",
+      "enum": [
+        "instruction_set",
+        "taxonomy",
+        "jargon_map",
+        "entity_registry",
+        "fewshot_library",
+        "override_rule",
+        "prompt_template",
+        "decision_heuristic",
+        "data_quirk",
+        "process_playbook",
+        "judgment_pattern",
+        "guardrail",
+        "action_template",
+        "eval_case",
+        "metric_definition",
+        "source_contract",
+        "question_playbook",
+        "anti_pattern",
+        "exception_rule",
+        "evidence_contract",
+        "applicability_contract",
+        "decision_contract",
+        "tool_contract"
+      ],
+      "title": "ArtifactKind",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "lifecycle": {
+            "const": "draft"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "lifecycle_history": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "lifecycle": {
+            "const": "review"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "lifecycle_history": {
+            "maxItems": 1,
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "action_template",
+              "anti_pattern",
+              "data_quirk",
+              "decision_heuristic",
+              "entity_registry",
+              "eval_case",
+              "exception_rule",
+              "fewshot_library",
+              "guardrail",
+              "instruction_set",
+              "jargon_map",
+              "judgment_pattern",
+              "metric_definition",
+              "override_rule",
+              "process_playbook",
+              "prompt_template",
+              "question_playbook",
+              "source_contract",
+              "taxonomy"
+            ]
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "pinned_artifact": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "pinned_artifact"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "metric_definition"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "formula": {
+            "minLength": 1,
+            "pattern": ".*\\S.*"
+          },
+          "formula_inputs": {
+            "minItems": 1
+          },
+          "grain": {
+            "minLength": 1,
+            "pattern": ".*\\S.*"
+          },
+          "unit": {
+            "minLength": 1,
+            "pattern": ".*\\S.*"
+          }
+        },
+        "required": [
+          "formula",
+          "formula_inputs",
+          "unit",
+          "grain"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "claim_type": {
+            "const": "causal_hypothesis"
+          }
+        },
+        "required": [
+          "claim_type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "alternatives": {
+            "minItems": 1
+          },
+          "disconfirming_conditions": {
+            "minItems": 1
+          }
+        },
+        "required": [
+          "alternatives",
+          "disconfirming_conditions"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "override_rule",
+              "guardrail",
+              "decision_heuristic"
+            ]
+          },
+          "risk_level": {
+            "enum": [
+              "high",
+              "critical"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "risk_level"
+        ]
+      },
+      "then": {
+        "properties": {
+          "exception_ids": {
+            "minItems": 1
+          }
+        },
+        "required": [
+          "exception_ids"
+        ]
+      }
+    }
+  ],
+  "description": "Candidate projection retaining every field from the platform ArtifactBase.",
+  "properties": {
+    "abstention_conditions": {
+      "items": {
+        "minLength": 1,
+        "pattern": ".*\\S.*",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Abstention Conditions",
+      "type": "array"
+    },
+    "alternatives": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "pattern": ".*\\S.*",
+        "type": "string"
+      },
+      "title": "Alternatives",
+      "type": "array"
+    },
+    "applicability": {
+      "$ref": "#/$defs/Applicability"
+    },
+    "approved_at": {
+      "default": null,
+      "title": "Approved At",
+      "type": "null"
+    },
+    "claim_type": {
+      "$ref": "#/$defs/ClaimType",
+      "default": "observation"
+    },
+    "confidence": {
+      "default": 1.0,
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "created_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Created At"
+    },
+    "created_by": {
+      "default": "system",
+      "minLength": 1,
+      "pattern": ".*\\S.*",
+      "title": "Created By",
+      "type": "string"
+    },
+    "definition": {
+      "minLength": 1,
+      "pattern": ".*\\S.*",
+      "title": "Definition",
+      "type": "string"
+    },
+    "disconfirming_conditions": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "pattern": ".*\\S.*",
+        "type": "string"
+      },
+      "title": "Disconfirming Conditions",
+      "type": "array"
+    },
+    "evidence_refs": {
+      "items": {
+        "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Evidence Refs",
+      "type": "array"
+    },
+    "exception_ids": {
+      "default": [],
+      "items": {
+        "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+        "type": "string"
+      },
+      "title": "Exception Ids",
+      "type": "array"
+    },
+    "formula": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Formula"
+    },
+    "formula_inputs": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "pattern": ".*\\S.*",
+        "type": "string"
+      },
+      "title": "Formula Inputs",
+      "type": "array"
+    },
+    "grain": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Grain"
+    },
+    "id": {
+      "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "kind": {
+      "$ref": "#/$defs/ontowiz_spec__vnext__ArtifactKind"
+    },
+    "layer": {
+      "default": "base",
+      "minLength": 1,
+      "pattern": ".*\\S.*",
+      "title": "Layer",
+      "type": "string"
+    },
+    "lifecycle": {
+      "$ref": "#/$defs/CandidateLifecycle",
+      "default": "draft"
+    },
+    "lifecycle_history": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/CandidateLifecycleTransition"
+      },
+      "title": "Lifecycle History",
+      "type": "array"
+    },
+    "name": {
+      "minLength": 1,
+      "pattern": ".*\\S.*",
+      "title": "Name",
+      "type": "string"
+    },
+    "owner_role": {
+      "minLength": 1,
+      "pattern": ".*\\S.*",
+      "title": "Owner Role",
+      "type": "string"
+    },
+    "pinned_artifact": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PinnedArtifactDocument"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "reviewed_by": {
+      "default": null,
+      "title": "Reviewed By",
+      "type": "null"
+    },
+    "risk_level": {
+      "$ref": "#/$defs/RiskLevel",
+      "default": "medium"
+    },
+    "source_document_ids": {
+      "items": {
+        "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Source Document Ids",
+      "type": "array"
+    },
+    "tags": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Tag"
+      },
+      "title": "Tags",
+      "type": "array"
+    },
+    "unit": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Unit"
+    },
+    "updated_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Updated At"
+    },
+    "version": {
+      "default": 1,
+      "minimum": 1,
+      "title": "Version",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "kind",
+    "name",
+    "source_document_ids",
+    "provenance",
+    "evidence_refs",
+    "applicability",
+    "owner_role",
+    "abstention_conditions",
+    "definition"
+  ],
+  "title": "CandidateArtifact",
+  "type": "object"
+}

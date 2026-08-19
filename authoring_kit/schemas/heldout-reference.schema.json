@@ -1,0 +1,40 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "evaluator_key_id": {
+      "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+      "title": "Evaluator Key Id",
+      "type": "string"
+    },
+    "suite_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Suite Digest",
+      "type": "string"
+    },
+    "suite_id": {
+      "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+      "title": "Suite Id",
+      "type": "string"
+    },
+    "suite_schema": {
+      "minLength": 1,
+      "pattern": ".*\\S.*",
+      "title": "Suite Schema",
+      "type": "string"
+    },
+    "suite_version": {
+      "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$",
+      "title": "Suite Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "suite_id",
+    "suite_version",
+    "suite_schema",
+    "suite_digest",
+    "evaluator_key_id"
+  ],
+  "title": "HeldoutReference",
+  "type": "object"
+}

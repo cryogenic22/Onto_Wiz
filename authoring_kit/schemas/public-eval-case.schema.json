@@ -1,0 +1,318 @@
+{
+  "$defs": {
+    "Applicability": {
+      "additionalProperties": false,
+      "properties": {
+        "audiences": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "title": "Audiences",
+          "type": "array"
+        },
+        "effective_from": {
+          "format": "date",
+          "title": "Effective From",
+          "type": "string"
+        },
+        "lifecycle_stages": {
+          "items": {
+            "minLength": 1,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Lifecycle Stages",
+          "type": "array"
+        },
+        "markets": {
+          "items": {
+            "minLength": 1,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Markets",
+          "type": "array"
+        },
+        "products": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "title": "Products",
+          "type": "array"
+        }
+      },
+      "required": [
+        "markets",
+        "lifecycle_stages",
+        "effective_from"
+      ],
+      "title": "Applicability",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "mode": {
+          "$ref": "#/$defs/ProvenanceMode"
+        },
+        "open_questions": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "title": "Open Questions",
+          "type": "array"
+        },
+        "supplied_by": {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "title": "Supplied By",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode",
+        "supplied_by",
+        "confidence"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "ProvenanceMode": {
+      "enum": [
+        "extracted",
+        "sme_authored",
+        "ai_inferred"
+      ],
+      "title": "ProvenanceMode",
+      "type": "string"
+    },
+    "PublicSuite": {
+      "enum": [
+        "dev",
+        "regression",
+        "challenge"
+      ],
+      "title": "PublicSuite",
+      "type": "string"
+    },
+    "ScenarioField": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "title": "Name",
+          "type": "string"
+        },
+        "value": {
+          "minLength": 1,
+          "pattern": ".*\\S.*",
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "ScenarioField",
+      "type": "object"
+    },
+    "ScoringWeights": {
+      "additionalProperties": false,
+      "properties": {
+        "decision_quality": {
+          "exclusiveMinimum": 0,
+          "title": "Decision Quality",
+          "type": "number"
+        },
+        "evidence": {
+          "exclusiveMinimum": 0,
+          "title": "Evidence",
+          "type": "number"
+        },
+        "human_boundary": {
+          "exclusiveMinimum": 0,
+          "title": "Human Boundary",
+          "type": "number"
+        },
+        "method": {
+          "exclusiveMinimum": 0,
+          "title": "Method",
+          "type": "number"
+        },
+        "uncertainty": {
+          "exclusiveMinimum": 0,
+          "title": "Uncertainty",
+          "type": "number"
+        }
+      },
+      "required": [
+        "decision_quality",
+        "method",
+        "evidence",
+        "uncertainty",
+        "human_boundary"
+      ],
+      "title": "ScoringWeights",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "anyOf": [
+    {
+      "properties": {
+        "required_behaviours": {
+          "minItems": 1
+        }
+      },
+      "required": [
+        "required_behaviours"
+      ]
+    },
+    {
+      "properties": {
+        "prohibited_behaviours": {
+          "minItems": 1
+        }
+      },
+      "required": [
+        "prohibited_behaviours"
+      ]
+    }
+  ],
+  "properties": {
+    "applicability": {
+      "$ref": "#/$defs/Applicability"
+    },
+    "critical_failures": {
+      "items": {
+        "minLength": 1,
+        "pattern": ".*\\S.*",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Critical Failures",
+      "type": "array"
+    },
+    "decision_id": {
+      "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+      "title": "Decision Id",
+      "type": "string"
+    },
+    "deliberately_missing": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "pattern": ".*\\S.*",
+        "type": "string"
+      },
+      "title": "Deliberately Missing",
+      "type": "array"
+    },
+    "evidence_expectations": {
+      "items": {
+        "minLength": 1,
+        "pattern": ".*\\S.*",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Evidence Expectations",
+      "type": "array"
+    },
+    "id": {
+      "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "prohibited_behaviours": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "pattern": ".*\\S.*",
+        "type": "string"
+      },
+      "title": "Prohibited Behaviours",
+      "type": "array"
+    },
+    "protected": {
+      "const": false,
+      "title": "Protected",
+      "type": "boolean"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "required_behaviours": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "pattern": ".*\\S.*",
+        "type": "string"
+      },
+      "title": "Required Behaviours",
+      "type": "array"
+    },
+    "required_context": {
+      "items": {
+        "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Required Context",
+      "type": "array"
+    },
+    "scenario": {
+      "items": {
+        "$ref": "#/$defs/ScenarioField"
+      },
+      "minItems": 1,
+      "title": "Scenario",
+      "type": "array"
+    },
+    "scoring": {
+      "$ref": "#/$defs/ScoringWeights"
+    },
+    "status": {
+      "const": "candidate",
+      "title": "Status",
+      "type": "string"
+    },
+    "suite": {
+      "$ref": "#/$defs/PublicSuite"
+    }
+  },
+  "required": [
+    "id",
+    "decision_id",
+    "suite",
+    "status",
+    "protected",
+    "applicability",
+    "scenario",
+    "required_context",
+    "evidence_expectations",
+    "scoring",
+    "critical_failures",
+    "provenance"
+  ],
+  "title": "PublicEvalCase",
+  "type": "object"
+}

@@ -1,0 +1,135 @@
+{
+  "$defs": {
+    "Applicability": {
+      "additionalProperties": false,
+      "properties": {
+        "audiences": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "title": "Audiences",
+          "type": "array"
+        },
+        "effective_from": {
+          "format": "date",
+          "title": "Effective From",
+          "type": "string"
+        },
+        "lifecycle_stages": {
+          "items": {
+            "minLength": 1,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Lifecycle Stages",
+          "type": "array"
+        },
+        "markets": {
+          "items": {
+            "minLength": 1,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Markets",
+          "type": "array"
+        },
+        "products": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "pattern": ".*\\S.*",
+            "type": "string"
+          },
+          "title": "Products",
+          "type": "array"
+        }
+      },
+      "required": [
+        "markets",
+        "lifecycle_stages",
+        "effective_from"
+      ],
+      "title": "Applicability",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "action_mode": {
+      "enum": [
+        "advise",
+        "calculate",
+        "recommend"
+      ],
+      "title": "Action Mode",
+      "type": "string"
+    },
+    "applicability": {
+      "$ref": "#/$defs/Applicability"
+    },
+    "decision": {
+      "minLength": 1,
+      "pattern": ".*\\S.*",
+      "title": "Decision",
+      "type": "string"
+    },
+    "human_owned_actions": {
+      "items": {
+        "minLength": 1,
+        "pattern": ".*\\S.*",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Human Owned Actions",
+      "type": "array"
+    },
+    "id": {
+      "pattern": "^(?![Cc][Oo][Nn]$|[Pp][Rr][Nn]$|[Aa][Uu][Xx]$|[Nn][Uu][Ll]$|[Cc][Oo][Mm][1-9]$|[Ll][Pp][Tt][1-9]$)[A-Za-z0-9][A-Za-z0-9_-]{0,127}$",
+      "title": "Id",
+      "type": "string"
+    },
+    "materially_unsafe_answers": {
+      "items": {
+        "minLength": 1,
+        "pattern": ".*\\S.*",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Materially Unsafe Answers",
+      "type": "array"
+    },
+    "out_of_scope": {
+      "items": {
+        "minLength": 1,
+        "pattern": ".*\\S.*",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Out Of Scope",
+      "type": "array"
+    },
+    "owner_role": {
+      "minLength": 1,
+      "pattern": ".*\\S.*",
+      "title": "Owner Role",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "decision",
+    "action_mode",
+    "human_owned_actions",
+    "out_of_scope",
+    "materially_unsafe_answers",
+    "applicability",
+    "owner_role"
+  ],
+  "title": "DecisionContract",
+  "type": "object"
+}
