@@ -1,5 +1,5 @@
 §CTX v1.0 L2 DOMAIN:session-5fbd6c1d
-COMPRESSED:2026-07-12 SOURCE_TOKENS:~3836 CTX_TOKENS:~5686 RATIO:~0.9x
+COMPRESSED:2026-07-12 SOURCE_TOKENS:~3970 CTX_TOKENS:~5910 RATIO:~0.9x
 
 ±ENTITY-USER-REQUEST-1A39F0F0
 REQUEST:resume How I'll resume after you clear
@@ -1351,6 +1351,85 @@ BASIS:structural
 STATUS:current
 EXTRACTOR:tp/1.1
 SRC:session:5fbd6c1d#turn1087
+±ENTITY-TOOL-BASH-0331
+RAN:Bank the session into the CtxPack ledger before clear
+COMMAND:cd "C:/Users/kapil/Documents/Onto_Wiz" && (ctxpack checkpoint 2>&1 || python -m ctxpack.cli.main checkpoint 2>&1) | tail -20
+TURN:1090
+SRC:session:5fbd6c1d#turn1090
+±ENTITY-LITERAL-014512E6
+VALUE:5fbd6c1d
+KIND:git_sha
+TURN:1097
+FACT-ID:ff438d0553afc2f9
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:5fbd6c1d#turn1097
+±ENTITY-LITERAL-B0037AA9
+VALUE:.claude/ctx/session-5fbd6c1d.ctx
+KIND:path
+TURN:1097
+FACT-ID:6dd79b813d435975
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:5fbd6c1d#turn1097
+±ENTITY-TOOL-BASH-0337
+RAN:Commit the PROJECT_STATUS in-progress note and show remaining BE-lane working state
+COMMAND:cd "C:/Users/kapil/Documents/Onto_Wiz" && git add docs/PROJECT_STATUS.md && git diff --cached --name-only && git commit -m "$(cat <<'EOF' docs(status): note Dom
+TURN:1109
+SRC:session:5fbd6c1d#turn1109
+±ENTITY-LITERAL-F568F009
+VALUE:a25656c
+KIND:git_sha
+TURN:1112
+FACT-ID:01f7b0ef127a7d3b
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:5fbd6c1d#turn1112
+±ENTITY-TOOL-BASH-0338
+RAN:Commit the CtxPack ledger if not gitignored
+COMMAND:cd "C:/Users/kapil/Documents/Onto_Wiz" && (git check-ignore .claude/ctx >/dev/null 2>&1 && echo "IGNORED — skipping" || (git add .claude/ctx && echo "=== staged
+TURN:1113
+SRC:session:5fbd6c1d#turn1113
+±ENTITY-LITERAL-5DF1B271
+VALUE:f686f1b
+KIND:git_sha
+TURN:1116
+FACT-ID:18e7b0bc9ea11b66
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:5fbd6c1d#turn1116
+±ENTITY-LITERAL-E95FE429
+VALUE:docs/specs/CONTROL_PLANE_PRODUCT_BLUEPRINT_2026-07.md
+KIND:path
+TURN:1116
+FACT-ID:980140154932601b
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:5fbd6c1d#turn1116
+±ENTITY-LITERAL-CB4D5AE7
+VALUE:docs/specs/PLATFORM_BASELINE_STRUCTURE_2026-07.md
+KIND:path
+TURN:1116
+FACT-ID:e65fe92d10409db1
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:5fbd6c1d#turn1116
+±ENTITY-FILE--PROJECTS-C--USERS-KAPIL-DOCUMENTS-ONTO-WIZ-MEMORY-MEMORY-MD
+PATH:C:\Users\kapil\.claude\projects\C--Users-kapil-Documents-Onto-Wiz\memory\MEMORY.md
+EDITS:1
+LAST-TURN:1102
+SRC:session:5fbd6c1d#turn1102
+±ENTITY-FILE--DOCUMENTS-ONTO-WIZ-MEMORY-PROJECT-ONTOWIZ-PLATFORM-BUILD-MD
+PATH:C:\Users\kapil\.claude\projects\C--Users-kapil-Documents-Onto-Wiz\memory\project_ontowiz_platform_build.md
+EDITS:1
+LAST-TURN:1098
+SRC:session:5fbd6c1d#turn1098
 ±ENTITY-FILE-C-USERS-KAPIL-DOCUMENTS-ONTO-WIZ--GITHUB-WORKFLOWS-CI-YML
 PATH:C:\Users\kapil\Documents\Onto_Wiz\.github\workflows\ci.yml
 EDITS:2
@@ -1373,9 +1452,9 @@ LAST-TURN:212
 SRC:session:5fbd6c1d#turn212
 ±ENTITY-FILE-C-USERS-KAPIL-DOCUMENTS-ONTO-WIZ-DOCS-PROJECT-STATUS-MD
 PATH:C:\Users\kapil\Documents\Onto_Wiz\docs\PROJECT_STATUS.md
-EDITS:8
-LAST-TURN:792
-SRC:session:5fbd6c1d#turn792
+EDITS:9
+LAST-TURN:1105
+SRC:session:5fbd6c1d#turn1105
 ±ENTITY-FILE-C-USERS-KAPIL-DOCUMENTS-ONTO-WIZ-DOCS-SESSION-HANDOFF-MD
 PATH:C:\Users\kapil\Documents\Onto_Wiz\docs\SESSION_HANDOFF.md
 EDITS:3

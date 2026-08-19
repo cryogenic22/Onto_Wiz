@@ -1,34 +1,41 @@
-'use client';
-
 import { cn } from '@/lib/cn';
-import { usePersona } from '@/lib/persona';
 
 interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
+  /** When set, shows the message and marks the field invalid (colour + text + ARIA). */
+  error?: string;
 }
 
-export default function Textarea({ label, className, id, ...props }: TextareaProps) {
-  const persona = usePersona();
-  const density = persona === 'sme'
-    ? 'px-4 py-2.5 text-[length:var(--persona-font-base)] rounded-[var(--persona-radius)]'
-    : 'px-3 py-1.5 text-[length:var(--persona-font-sm)] rounded-[var(--persona-radius)]';
+const FIELD =
+  'resize-y rounded-md border bg-slab px-3 py-1.5 text-[13px] text-ink placeholder:text-ink3 ' +
+  'focus-visible:outline-none disabled:opacity-50 disabled:cursor-not-allowed';
 
+export default function Textarea({ label, error, className, id, ...props }: TextareaProps) {
+  const errorId = error && id ? `${id}-error` : undefined;
   return (
     <div className="flex flex-col gap-1">
       {label && (
-        <label htmlFor={id} className="text-[length:var(--persona-font-sm)] text-slate-400">
+        <label htmlFor={id} className="text-[11px] text-ink2">
           {label}
         </label>
       )}
       <textarea
         id={id}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={errorId}
         className={cn(
-          'bg-slate-800 border border-slate-600 text-slate-200 placeholder:text-slate-500 focus:border-blue-500 focus:outline-none resize-none',
-          density,
+          FIELD,
+          error ? 'border-ember focus-visible:ring-1 focus-visible:ring-ember/40'
+                : 'border-edge focus-visible:border-cyan focus-visible:ring-1 focus-visible:ring-cyan/40',
           className,
         )}
         {...props}
       />
+      {error && (
+        <span id={errorId} className="text-[11px] text-ember">
+          {error}
+        </span>
+      )}
     </div>
   );
 }

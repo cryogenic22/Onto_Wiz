@@ -18,36 +18,9 @@ import type {
   SearchHit,
 } from '@/types/catalog';
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_CATALOG_API_URL ?? 'http://localhost:8080';
-
-type Json = Record<string, unknown>;
-
-function authHeaders(token?: string): Record<string, string> {
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
-async function getJson<T>(path: string, token?: string): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, { headers: authHeaders(token) });
-  if (!res.ok) throw new Error(`GET ${path} failed: ${res.status}`);
-  return res.json() as Promise<T>;
-}
-
-async function postJson<T>(path: string, body: Json, token?: string): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const detail = await res.json().catch(() => null);
-    const msg = (detail as { detail?: string } | null)?.detail ?? `POST ${path} failed: ${res.status}`;
-    throw new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
-  }
-  return res.json() as Promise<T>;
-}
-
-const enc = encodeURIComponent;
+// HTTP helpers moved to `./http` by D1.0 so the pack/context client shares them rather
+// than duplicating a fetch wrapper against this same backend. Behaviour is unchanged.
+import { enc, getJson, postJson } from './http';
 
 // ── Catalog ────────────────────────────────────────────────────────
 export function fetchCatalog(): Promise<CatalogEntry[]> {

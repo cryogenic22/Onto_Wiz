@@ -73,3 +73,5 @@ Thumbs.db
 *-this-session-is-being-continued-from-a-previous-co.txt
 # Windows reserved-name artifact from a stray `> nul` redirect
 nul
+# Scratch render artifacts (blueprint screenshots and other .tmp-* dumps)
+.tmp-*

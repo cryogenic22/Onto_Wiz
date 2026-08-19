@@ -1,0 +1,1158 @@
+§CTX v1.0 L2 DOMAIN:session-32599d8e
+COMPRESSED:2026-08-19 SOURCE_TOKENS:~3084 CTX_TOKENS:~4408 RATIO:~0.9x
+
+±ENTITY-USER-REQUEST-0C5DCE8C
+REQUEST:continue now P3 r2 receives a CONDITIONAL GO.
+Begin P3.0 immediately as a documentation-only contract-freeze diff incorporating the authority review decisions
+TURN:1
+FACT-ID:d2c94eeedd1a880a
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn1
+±ENTITY-CONSTRAINT-D629507C
+RULE:Do not implement OKF, Ossie, DataBindingProfile or Snowflake integration during P3.
+STATED-TURN:1
+FACT-ID:8bd02cdca4937589
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn1
+±ENTITY-CONSTRAINT-971AFDBB
+RULE:Signoile must be logical-complete and binding-ready only.
+STATED-TURN:1
+FACT-ID:69e8eeeef00c4ebe
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn1
+±ENTITY-CONSTRAINT-C68829BA
+RULE:Do not self-grant a gate.
+STATED-TURN:1
+FACT-ID:eacc35c113299143
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn1
+±ENTITY-LITERAL-FF8ACC18
+VALUE:docs/PROJECT_STATUS.md
+KIND:path
+TURN:3
+FACT-ID:e00e7839a024e36b
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn3
+±ENTITY-LITERAL-6DE6D2E6
+VALUE:0b0245c
+KIND:git_sha
+TURN:11
+FACT-ID:8e81b9cad68c0957
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@11,assistant@19,assistant@75,assistant@110,assistant@137,assistant@143,assistant@157,assistant@300,assistant@329,assistant@440,assistant@451,user@452,assistant@454,assistant@780,assistant@789
+SRC:session:32599d8e#turn11
+±ENTITY-TOOL-BASH-0007
+RAN:Verify canonical Authoring Kit repo state
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit 2>/dev/null && echo "=== EXISTS ===" && git rev-parse --short HEAD && echo "=== STATUS ===" && git status --po
+TURN:20
+SRC:session:32599d8e#turn20
+±ENTITY-TASK-A02CF342
+TASK:Map real code contracts (authority/IPC/CLI/runtime/skill)
+TURN:40
+SRC:session:32599d8e#turn40
+±ENTITY-TASK-D8BC2225
+TASK:Write P3.0 contract-freeze docs (5 surfaces + index)
+TURN:42
+SRC:session:32599d8e#turn42
+±ENTITY-TASK-68C86195
+TASK:Submit P3.0 as untrusted diff on build/P3.0 + review bundle, HOLD
+TURN:44
+SRC:session:32599d8e#turn44
+±ENTITY-TOOL-BASH-0026
+RAN:List canonical repo root + locate lockfiles + python version
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && echo "=== ROOT ===" && ls -1 && echo "=== requirements/locks ===" && ls -1 *.txt *.lock requirements* const
+TURN:66
+SRC:session:32599d8e#turn66
+±ENTITY-TOOL-BASH-0029
+RAN:Create build/P3.0 branch off 0b0245c and docs/contracts dir
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && git checkout -b build/P3.0 && echo "=== ON BRANCH ===" && git rev-parse --abbrev-ref HEAD && git rev-parse 
+TURN:76
+SRC:session:32599d8e#turn76
+±ENTITY-TOOL-BASH-0036
+RAN:Confirm doc-only change + run ruff and vendor lock
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && echo "=== NEW/CHANGED FILES (must be docs only) ===" && git status --porcelain && echo "=== DIFF NAMESTAT v
+TURN:96
+SRC:session:32599d8e#turn96
+±ENTITY-TOOL-BASH-0037
+RAN:Run full pytest suite for baseline-unchanged evidence
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && python -m pytest -q 2>&1 | tail -15
+TURN:100
+SRC:session:32599d8e#turn100
+±ENTITY-TOOL-BASH-0038
+RAN:Extract pytest summary line and run mypy strict
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && echo "=== PYTEST SUMMARY ===" && python -m pytest -q 2>&1 | grep -Ei "passed|failed|error" | tail -3 && ech
+TURN:103
+SRC:session:32599d8e#turn103
+±ENTITY-LITERAL-FAE31ECE
+VALUE:100%
+KIND:number_unit
+TURN:106
+FACT-ID:52cc95a1c0366f77
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@106,assistant@110,assistant@118,assistant@122,assistant@434,user@452
+SRC:session:32599d8e#turn106
+±ENTITY-TOOL-BASH-0042
+RAN:Capture raw pytest summary line
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && python -m pytest -q -p no:cacheprovider 2>&1 | tr -d '\r' | tail -4
+TURN:119
+SRC:session:32599d8e#turn119
+±ENTITY-TOOL-BASH-0047
+RAN:Commit P3.0 freeze on build/P3.0, print review SHA, confirm main unchanged
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && git add docs/contracts docs/reviews/P3.0_REVIEW_BUNDLE.md && git commit -q -F - <<'EOF' docs(P3.0): freeze 
+TURN:134
+SRC:session:32599d8e#turn134
+±ENTITY-TOOL-BASH-0049
+RAN:Amend commit with supersession note, print final review SHA
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && git add docs/contracts/P3.0_CONTRACT_FREEZE.md && git commit -q --amend --no-edit && echo "=== amended revi
+TURN:140
+SRC:session:32599d8e#turn140
+±ENTITY-LITERAL-53D7DED3
+VALUE:fc261e0
+KIND:git_sha
+TURN:143
+FACT-ID:d21136ff8f6c4b47
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@143,assistant@157,assistant@160,assistant@292,assistant@296,assistant@300,assistant@329,assistant@332,assistant@440,assistant@451,user@452,assistant@454,assistant@789
+SRC:session:32599d8e#turn143
+±ENTITY-LITERAL-83189503
+VALUE:#3
+KIND:pr
+TURN:143
+FACT-ID:ea4af000b3beffd3
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@143,assistant@176,assistant@209,assistant@218,assistant@240,assistant@332
+SRC:session:32599d8e#turn143
+±ENTITY-INCIDENT-7F8697BC
+TYPE:saved
+PARSE-OK:true
+RAW:ctx-incident: saved | fact="P3.0 freeze submitted @ build/P3.0 fc261e0, HELD" | evidence="git rev-parse HEAD on OntoWiz_Authoring_Kit build/P3.0"
+TURN:157
+FACT:P3.0 freeze submitted @ build/P3.0 fc261e0, HELD
+EVIDENCE:git rev-parse HEAD on OntoWiz_Authoring_Kit build/P3.0
+FACT-ID:cc56d7d6f564e971
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+LINKED-FACT-ID:d21136ff8f6c4b47
+SRC:session:32599d8e#turn157
+±ENTITY-DECISION-A6DD6707
+DECISION:Decision: delivered P3.0 as a documentation-only contract-freeze bundle grounded in real `0b0245c` `file:line`, incorporating the CONDITIONAL-GO authority decisions, rather than a prose restatement of r2.
+TURN:157
+FACT-ID:a0751ca39dffd140
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn157
+±ENTITY-DECISION-6397730E
+DECISION:Decision: froze the authority surface to the actual 9-method `AuthoringTrustProvider` and removed r2's `attest_journal`/`verify_journal`/provider-`prepare_intent`, because none exist at `0b0245c` — credential issuance is an out-of-band `AuthoringIntent`→`OperationCredential` exch
+TURN:157
+FACT-ID:6857f9848acac3c2
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn157
+±ENTITY-DECISION-BABC3AD8
+DECISION:Decision: named the keyless proxy `AuthorityHostClient` and froze `owak checkpoint` to require exactly one new read-only `export_workspace` adapter op converging on `build_workspace_archive`.
+TURN:157
+FACT-ID:3c848fc09637bd5c
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn157
+±ENTITY-DECISION-E21E5C12
+DECISION:Decision: froze skill bundles as `owak skill build --host {codex|claude}`, Codex-first/Claude-second, with a byte-identical shared core and test-enforced parity.
+TURN:157
+FACT-ID:6a7658af8d80e3a9
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn157
+±ENTITY-CONSTRAINT-0A3DF905
+RULE:Constraint: canonical `main` stays clean at `0b0245c`; P3.0 sits on `build/P3.0` @ `fc261e0` as an untrusted diff, HELD — I do not self-grant the gate; on your grant I start P3.1 (keyless `AuthorityHostClient` + wire protocol + transports + protected config + `E_AUTHORITY_UNAVAILABLE` + interruption→recovery), TDD red→green.
+STATED-TURN:157
+FACT-ID:676b566458fd26ab
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn157
+±ENTITY-CONSTRAINT-B823386C
+RULE:Constraint: OKF, Ossie, `DataBindingProfile`, and Snowflake integration are OUT of P3; Signoile is authored logical-complete + binding-ready only.
+STATED-TURN:157
+FACT-ID:2ccb090f2d90e8a8
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn157
+±ENTITY-LITERAL-9BA97B72
+VALUE:docs/reviews/P3.0_REVIEW_BUNDLE.md
+KIND:path
+TURN:157
+FACT-ID:d532ce8f7ef51af7
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn157
+±ENTITY-USER-REQUEST-8686C396
+REQUEST:P3.0 at fc261e0 is NOT GRANTED yet
+TURN:158
+FACT-ID:30ac2cda23ce81bd
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn158
+±ENTITY-CONSTRAINT-09949DF7
+RULE:Do not amend or erase the immutable review SHA, do not touch main, and do not begin P3.1 concurrently.
+STATED-TURN:158
+FACT-ID:9f2482205401c992
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn158
+±ENTITY-CONSTRAINT-1D881438
+RULE:State accurately that AdapterRequest/Response never carry credentials, while authority IPC necessarily carries the exact OperationCredential transiently.
+STATED-TURN:158
+FACT-ID:36d4fd48fd8c6ed5
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn158
+±ENTITY-CONSTRAINT-8599A3F6
+RULE:Do not combine missing source/evidence or missing evaluation/owner.
+STATED-TURN:158
+FACT-ID:f334ab413f8b7469
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn158
+±ENTITY-CONSTRAINT-E7F2C6A4
+RULE:Do not leave pinned download versus platform-specific vendored wheels unresolved.
+STATED-TURN:158
+FACT-ID:393800cc819e6490
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn158
+±ENTITY-CONSTRAINT-DDAFE4CC
+RULE:Define the skill archive format/version/manifest/verifier and use generic deterministic ZIP primitives; do not apply candidate-document validation to a skill bundle.
+STATED-TURN:158
+FACT-ID:af5217c435cc85c0
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn158
+±ENTITY-LITERAL-9EF6A80F
+VALUE:#1
+KIND:pr
+TURN:168
+FACT-ID:c667ed80a4ec8a83
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@168,assistant@332,assistant@403
+SRC:session:32599d8e#turn168
+±ENTITY-LITERAL-8772A62A
+VALUE:#5
+KIND:pr
+TURN:176
+FACT-ID:5b67fdbb362dbf44
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@176,assistant@182,assistant@188,assistant@412
+SRC:session:32599d8e#turn176
+±ENTITY-LITERAL-F8C575E6
+VALUE:#9
+KIND:pr
+TURN:182
+FACT-ID:19bfb08cfc2bed42
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@182,assistant@188,assistant@258
+SRC:session:32599d8e#turn182
+±ENTITY-TASK-63BD0768
+TASK:Apply 9 P3.0a corrections to the frozen contracts
+TURN:189
+SRC:session:32599d8e#turn189
+±ENTITY-TASK-4E3CB3AF
+TASK:Commit P3.0a on top of fc261e0 + re-run all gates + review bundle, HOLD
+TURN:191
+SRC:session:32599d8e#turn191
+±ENTITY-LITERAL-B71EA9D4
+VALUE:#8
+KIND:pr
+TURN:209
+FACT-ID:97cfca0590bf47b0
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@209,assistant@218
+SRC:session:32599d8e#turn209
+±ENTITY-LITERAL-702FB5D6
+VALUE:#2
+KIND:pr
+TURN:209
+FACT-ID:0822658cd4cb3a78
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@209,assistant@218,assistant@240,assistant@399,assistant@403
+SRC:session:32599d8e#turn209
+±ENTITY-LITERAL-EFEFD5A3
+VALUE:#4
+KIND:pr
+TURN:218
+FACT-ID:69914b1ba82b19c1
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@218,assistant@368
+SRC:session:32599d8e#turn218
+±ENTITY-LITERAL-7E262A21
+VALUE:#7
+KIND:pr
+TURN:218
+FACT-ID:55709d4ac3ff0e87
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@218,assistant@233,assistant@240
+SRC:session:32599d8e#turn218
+±ENTITY-LITERAL-A1DADD3E
+VALUE:#6
+KIND:pr
+TURN:248
+FACT-ID:f038a3c90d4040f5
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@248,assistant@258
+SRC:session:32599d8e#turn248
+±ENTITY-TOOL-BASH-0096
+RAN:Run diff/ruff/vendor lock/source-origin lock on P3.0a working tree
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && echo "=== STATUS (doc-only on top of fc261e0) ===" && git status --porcelain && echo "=== changed vs commit
+TURN:285
+SRC:session:32599d8e#turn285
+±ENTITY-TOOL-BASH-0097
+RAN:Run full pytest to file + strict mypy for P3.0a evidence
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && OUT="/c/Users/kapil/AppData/Local/Temp/claude/C--Users-kapil-Documents-Onto-Wiz/32599d8e-676e-4184-907e-9c1
+TURN:289
+SRC:session:32599d8e#turn289
+±ENTITY-TOOL-BASH-0099
+RAN:Commit P3.0a on top of fc261e0; print new SHA + confirm fc261e0 preserved + main untouched
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && git add docs/contracts docs/reviews/P3.0a_REVIEW_BUNDLE.md && git commit -q -F - <<'EOF' docs(P3.0a): corre
+TURN:297
+SRC:session:32599d8e#turn297
+±ENTITY-LITERAL-191A3147
+VALUE:080ef16
+KIND:git_sha
+TURN:300
+FACT-ID:a893ec05b20482c0
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@300,assistant@329,assistant@332,assistant@440,assistant@451,user@452,assistant@454,assistant@789
+SRC:session:32599d8e#turn300
+±ENTITY-ERROR-D0182B3A
+MESSAGE:<tool_use_error>String to replace not found in file. String: description: "OntoWiz Authoring Kit — CODEX build canonical (main clean @ 0b0245c); I'm builder under a strict gated authority review; r2 got a CONDITIONAL GO; active=P3.0 contrac
+TURN:304
+FACT-ID:f0bf97280336579f
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:tool
+SRC:session:32599d8e#turn304
+±ENTITY-INCIDENT-6E53F1AD
+TYPE:user-corrected
+PARSE-OK:true
+RAW:ctx-incident: user-corrected | fact="freeze claimed the kernel enforces proposer≠confirmer" | expected="kernel enforces separation of duty via _validate_confirmation_actor" | got="_validate_confirmation_actor checks confirmer role membership only (authoring.py:2145-2148); SoD is host-side/operational" | evidence="authority review of fc261e0 + authoring.py:2137-2148"
+TURN:329
+FACT:freeze claimed the kernel enforces proposer≠confirmer
+EXPECTED:kernel enforces separation of duty via _validate_confirmation_actor
+GOT:_validate_confirmation_actor checks confirmer role membership only (authoring.py:2145-2148); SoD is host-side/operational
+EVIDENCE:authority review of fc261e0 + authoring.py:2137-2148
+FACT-ID:ef02366cde9b1491
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn329
+±ENTITY-DECISION-2B8D601D
+DECISION:Decision: created P3.0a as a new documentation-only commit `080ef16` on top of `fc261e0` (not amended), correcting all nine authority-flagged contradictions grounded in `0b0245c`, keeping `main` clean and not starting P3.1.
+TURN:329
+FACT-ID:1b78f857b58fd72b
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn329
+±ENTITY-DECISION-A322D1DC
+DECISION:Decision: froze candidate ratification as a host-side human control rather than a kernel proposer≠confirmer invariant, because `_validate_confirmation_actor` (`authoring.py:2145-2148`) enforces only confirmer role membership, not principal distinctness.
+TURN:329
+FACT-ID:d639202e603a3d73
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn329
+±ENTITY-DECISION-D94446A5
+DECISION:Decision: rewrote F1 as single-defect tests at the real kernel refusal points and recorded new residual R2 — `package` does not hard-gate Definition-of-Ready, so missing dev/regression eval surfaces only as a blocking DoR question, not a package refusal.
+TURN:329
+FACT-ID:8d1df95233c29284
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn329
+±ENTITY-DECISION-17FBA993
+DECISION:Decision: excluded `advance_authority` from the authority wire allowlist and made the authoring client hard-refuse it, since its only kernel call site is `install_authority` recovery (`authoring.py:3196`), never the authoring loop.
+TURN:329
+FACT-ID:998d3fd233169e79
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn329
+±ENTITY-DECISION-9AB740F4
+DECISION:Decision: resolved the runtime model as two artifacts — an exact-version separately-installed `owak` runtime plus a thin wheels-free/engine-free portable skill bundle — and defined a distinct `ontowiz-skill-bundle` archive format/manifest/verifier that reuses generic ZIP determin
+TURN:329
+FACT-ID:a911e79f99faaf4f
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn329
+±ENTITY-CONSTRAINT-2703DE8E
+RULE:Constraint: `fc261e0` remains immutable in history and `main` stays at `0b0245c`; P3.0a (`080ef16`) is HELD as an untrusted diff — I do not self-grant, and P3.1 does not start until the authority grants the corrected freeze.
+STATED-TURN:329
+FACT-ID:3dc589d5c360ebf8
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn329
+±ENTITY-LITERAL-02871385
+VALUE:locks/source-origin.json:3
+KIND:path
+TURN:329
+FACT-ID:bcfd783403428bc0
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn329
+±ENTITY-LITERAL-E9D2314F
+VALUE:docs/reviews/P3.0a_REVIEW_BUNDLE.md
+KIND:path
+TURN:329
+FACT-ID:8a30d717fc7a8c41
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn329
+±ENTITY-USER-REQUEST-C48B14A3
+REQUEST:P3.0a at 080ef16 remains HELD
+TURN:330
+FACT-ID:997d6a77fe4ea0eb
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn330
+±ENTITY-CONSTRAINT-13AC8A30
+RULE:Create a small documentation-only P3.0b commit on top; preserve both earlier immutable SHAs and do not start P3.1 yet.
+STATED-TURN:330
+FACT-ID:a9ea4d9b3faccf4d
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn330
+±ENTITY-CONSTRAINT-9230007D
+RULE:Freeze one shared readiness gate: resume may report blockers; checkpoint may preserve an incomplete workspace; validate and package must fail while blocking questions remain.
+STATED-TURN:330
+FACT-ID:e15096f5046a6f70
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn330
+±ENTITY-TASK-F09563CF
+TASK:Apply 5 P3.0b corrections to frozen contracts
+TURN:341
+SRC:session:32599d8e#turn341
+±ENTITY-TASK-A4E10025
+TASK:Commit P3.0b on 080ef16 + gates + ledger/bundle, HOLD
+TURN:343
+SRC:session:32599d8e#turn343
+±ENTITY-ERROR-268245B4
+MESSAGE:<tool_use_error>String to replace not found in file. String: ## 6. F1 — six fail-closed dimensions, **single-defect** tests at the **real** refusal point (gates the demo) **Revised by P3.0a (correction #5).** F1 runs **before** the Signoile
+TURN:356
+FACT-ID:413eacc57f9050ac
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:tool
+SRC:session:32599d8e#turn356
+±ENTITY-TOOL-BASH-0141
+RAN:Run diff/ruff/vendor/source-lock on P3.0b working tree
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && echo "=== STATUS ===" && git status --porcelain && echo "=== changed vs HEAD 080ef16 ===" && git diff --sta
+TURN:427
+SRC:session:32599d8e#turn427
+±ENTITY-TOOL-BASH-0142
+RAN:Run pytest to file + mypy strict for P3.0b evidence
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && OUT="/c/Users/kapil/AppData/Local/Temp/claude/C--Users-kapil-Documents-Onto-Wiz/32599d8e-676e-4184-907e-9c1
+TURN:431
+SRC:session:32599d8e#turn431
+±ENTITY-TOOL-BASH-0144
+RAN:Commit P3.0b on top of 080ef16; print SHA + chain + confirm main clean
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && git add docs/contracts docs/reviews/P3.0b_REVIEW_BUNDLE.md && git commit -q -F - <<'EOF' docs(P3.0b): final
+TURN:437
+SRC:session:32599d8e#turn437
+±ENTITY-LITERAL-E1197083
+VALUE:d2997ad
+KIND:git_sha
+TURN:440
+FACT-ID:73e8fe304b48891d
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@440,assistant@451,user@452,assistant@454,user@455,assistant@457,assistant@500,assistant@780,assistant@789
+SRC:session:32599d8e#turn440
+±ENTITY-INCIDENT-86523755
+TYPE:user-corrected
+PARSE-OK:true
+RAW:ctx-incident: user-corrected | fact="R2 (package does not hard-gate DoR) is future hardening, out of P3" | expected="deferred to a candidate future unit" | got="R2 is an in-scope F1 defect; F1 freezes a shared readiness gate so validate+package fail while blocking questions remain" | evidence="authority review of 080ef16"
+TURN:451
+FACT:R2 (package does not hard-gate DoR) is future hardening, out of P3
+EXPECTED:deferred to a candidate future unit
+GOT:R2 is an in-scope F1 defect; F1 freezes a shared readiness gate so validate+package fail while blocking questions remain
+EVIDENCE:authority review of 080ef16
+FACT-ID:398578781b11e0dd
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn451
+±ENTITY-DECISION-01B657B3
+DECISION:Decision: created P3.0b as a new documentation-only commit `d2997ad` on top of `080ef16` (no amend; `fc261e0` and `080ef16` both preserved), applying the five final corrections, keeping `main` clean and not starting P3.1.
+TURN:451
+FACT-ID:c7fda8610dafa610
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn451
+±ENTITY-DECISION-58DE9798
+DECISION:Decision: reversed R2 from "future hardening" to an in-scope F1 defect — froze one shared readiness gate (reusing `compile_questions`, no parallel validator) where `validate` and `package` fail while blocking questions remain, `resume` reports, and `checkpoint` is exempt, with ev
+TURN:451
+FACT-ID:dae85553569abbc0
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn451
+±ENTITY-DECISION-DC1A597A
+DECISION:Decision: corrected the F1 refusal mapping so missing `owner_role` fails at `propose` via model validation (`vnext.py:318`/`:826`), and split abstention into two single-defect tests — CandidateArtifact `abstention_conditions` (`vnext.py:319`) vs DecisionContract `materially_unsaf
+TURN:451
+FACT-ID:46ef0262eaeb34a8
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn451
+±ENTITY-DECISION-BCC445FF
+DECISION:Decision: froze the exact confirmation flow (owak submits intent → host human approval in a separate session → intent-bound credential returned to the waiting keyless CLI → owak confirm applies) and the canonical skill suffix `.owskill` with a per-host upload mapping.
+TURN:451
+FACT-ID:d5ff2182dc39c822
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn451
+±ENTITY-CONSTRAINT-8F1E4D4D
+RULE:Constraint: `fc261e0` and `080ef16` remain immutable in history and `main` stays at `0b0245c`; P3.0b (`d2997ad`) is HELD as an untrusted diff — I do not self-grant, and P3.1 does not start until the authority grants the corrected freeze.
+STATED-TURN:451
+FACT-ID:cbb8037b8e7b2236
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn451
+±ENTITY-LITERAL-77A430C4
+VALUE:docs/reviews/P3.0b_REVIEW_BUNDLE.md
+KIND:path
+TURN:451
+FACT-ID:49234559c921f745
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn451
+±ENTITY-LITERAL-A2CD37FD
+VALUE:docs/contracts/P3.0a_CORRECTIONS.md
+KIND:path
+TURN:451
+FACT-ID:6a820965736ceff2
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn451
+±ENTITY-USER-REQUEST-B6EBCD7E
+REQUEST:All five P3.0b corrections applied and the ledger updated
+TURN:452
+FACT-ID:6594bd8ee6aa5e0f
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn452
+±ENTITY-LITERAL-CF2DD7F0
+VALUE:Documents\OntoWiz_Authoring_Kit\docs\reviews\P3.0b_REVIEW_BUNDLE.md
+KIND:path
+TURN:452
+FACT-ID:ab4447e3bb1c3f7f
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn452
+±ENTITY-LITERAL-AAF3BF53
+VALUE:..\OntoWiz_Authoring_Kit\docs\reviews\P3.0b_REVIEW_BUNDLE.md
+KIND:path
+TURN:452
+FACT-ID:b53ab411e6985033
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn452
+±ENTITY-USER-REQUEST-D4477612
+REQUEST:P3.0 AS CORRECTED THROUGH P3.0b IS GRANTED at immutable SHA d2997ad.
+Proceed directly to P3.1: keyless AuthorityHostClient over authenticated local IPC, developed TDD red→green and submitted as the next untrusted diff.
+Binding clarification: the shared readiness gate must not mak
+TURN:455
+FACT-ID:55452f300715d795
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn455
+±ENTITY-CONSTRAINT-FCEF58AE
+RULE:Binding clarification: the shared readiness gate must not make AdapterSession snapshot/resume fail.
+STATED-TURN:455
+FACT-ID:67a4f85c1a721c3f
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn455
+±ENTITY-CONSTRAINT-242046CC
+RULE:Resume must return blocking questions and checkpoint must preserve incomplete workspaces.
+STATED-TURN:455
+FACT-ID:46cbe9152a60ff82
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn455
+±ENTITY-CONSTRAINT-A4AF90ED
+RULE:- Credentials cross only authenticated authority IPC transiently and never enter adapter JSON, argv, environment, logs or files.
+STATED-TURN:455
+FACT-ID:1fa48d65760faa39
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn455
+±ENTITY-CONSTRAINT-6F371C5E
+RULE:- E_AUTHORITY_UNAVAILABLE must survive every provider-call wrapping point.
+STATED-TURN:455
+FACT-ID:966d3d847f828194
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn455
+±ENTITY-CONSTRAINT-02E1F5C1
+RULE:Do not self-grant P3.1.
+STATED-TURN:455
+FACT-ID:60fe5441e4fc9e84
+BASIS:user_imperative
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn455
+±ENTITY-LITERAL-8941F113
+VALUE:tests/adapters/_support.py
+KIND:path
+TURN:472
+FACT-ID:d4b8544453f27d93
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@472,assistant@476
+SRC:session:32599d8e#turn472
+±ENTITY-DECISION-B9FE3FAD
+DECISION:Decision: to avoid an import cycle, the `AuthorityClientError` hierarchy lives in a dependency-free `authority_errors.py` that `authoring.py`, `authority_client.py`, and `adapters.py` all import; the 9 kernel wrapping sites each gain a narrow `except AuthorityClientError: raise` 
+TURN:490
+FACT-ID:38daf7ea3d8127ff
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn490
+±ENTITY-TOOL-BASH-0159
+RAN:Create build/P3.1 branch off d2997ad; check multiprocessing.connection families
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && git checkout -b build/P3.1 && git rev-parse --abbrev-ref HEAD && git rev-parse --short HEAD && mkdir -p tes
+TURN:491
+SRC:session:32599d8e#turn491
+±ENTITY-TASK-7C06C0D0
+TASK:P3.1 errors module + kernel pass-throughs
+TURN:493
+SRC:session:32599d8e#turn493
+±ENTITY-TASK-FF84CECB
+TASK:P3.1 authority_client.py (wire+transport+config+client)
+TURN:495
+SRC:session:32599d8e#turn495
+±ENTITY-TASK-F5FE9B0D
+TASK:P3.1 adapter mapping + reference host + tests + gates
+TURN:497
+SRC:session:32599d8e#turn497
+±ENTITY-TOOL-BASH-0177
+RAN:Sanity import + ruff on changed kernel files
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && python -c "import ontowiz_authoring.authority_errors, ontowiz_authoring.authoring, ontowiz_authoring.adapte
+TURN:535
+SRC:session:32599d8e#turn535
+±ENTITY-ERROR-97400000
+MESSAGE:Exit code 1 Traceback (most recent call last): File "<string>", line 1, in <module> import ontowiz_authoring.authority_errors, ontowiz_authoring.authoring, ontowiz_authoring.adapters; print('import ok') ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TURN:536
+FACT-ID:b3fd093a14e7407e
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:tool
+SRC:session:32599d8e#turn536
+±ENTITY-TOOL-BASH-0178
+RAN:Sanity import (PYTHONPATH=src) + ruff on changed kernel files
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && PYTHONPATH=src python -c "import ontowiz_authoring.authority_errors, ontowiz_authoring.authoring, ontowiz_a
+TURN:539
+SRC:session:32599d8e#turn539
+±ENTITY-TOOL-BASH-0187
+RAN:Import + ruff + mypy-strict on new P3.1 modules
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && PYTHONPATH=src python -c "import ontowiz_authoring.authority_client as c; print('import ok', sorted(c.WIRE_
+TURN:565
+SRC:session:32599d8e#turn565
+±ENTITY-TOOL-BASH-0188
+RAN:List ruff errors + locate AuthenticationError
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && python -m ruff check src/ontowiz_authoring/authority_client.py --output-format=concise 2>&1 | head -20 && e
+TURN:569
+SRC:session:32599d8e#turn569
+±ENTITY-DECISION-83638C6E
+DECISION:`AuthenticationError` lives at `multiprocessing` top-level (mypy-resolvable); I'll import it there, rename `AuthorityHostRefusal`→`AuthorityHostRefusalError` (N818), and wrap the 5 long lines.
+TURN:572
+FACT-ID:0c6ff99c9ae88065
+BASIS:inferred
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn572
+±ENTITY-TOOL-BASH-0198
+RAN:ruff --fix + full ruff + mypy strict on src
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && python -m ruff check --fix src/ontowiz_authoring/authority_client.py 2>&1 | tail -3 && echo "=== RUFF ALL S
+TURN:592
+SRC:session:32599d8e#turn592
+±ENTITY-TOOL-BASH-0199
+RAN:Show remaining ruff errors in src
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && python -m ruff check src --output-format=concise 2>&1 | head -10
+TURN:596
+SRC:session:32599d8e#turn596
+±ENTITY-TOOL-BASH-0200
+RAN:ruff --fix adapters import sort
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && python -m ruff check --fix src/ontowiz_authoring/adapters.py 2>&1 | tail -2
+TURN:599
+SRC:session:32599d8e#turn599
+±ENTITY-LITERAL-36B07B2A
+VALUE:tests/adapters/conftest.py
+KIND:path
+TURN:620
+FACT-ID:bac3503728dfffa6
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn620
+±ENTITY-TOOL-BASH-0209
+RAN:ruff --fix + run authority test suite
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && python -m ruff check --fix tests/authority 2>&1 | tail -5 && echo "=== RUFF tests/authority ===" && python 
+TURN:627
+SRC:session:32599d8e#turn627
+±ENTITY-TOOL-BASH-0211
+RAN:Kill stuck python + list ruff errors in tests/authority
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && taskkill //F //IM python.exe //T 2>/dev/null; echo "killed stale python"; echo "=== RUFF ERRORS ===" && pyt
+TURN:635
+SRC:session:32599d8e#turn635
+±ENTITY-TOOL-BASH-0212
+RAN:Run pure-unit authority tests (no IPC)
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && python -m pytest tests/authority -k "advance or wire or writab or resolve" -q -p no:cacheprovider 2>&1 | ta
+TURN:639
+SRC:session:32599d8e#turn639
+±ENTITY-TOOL-BASH-0213
+RAN:Run single IPC read test with 45s guard
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && python -m pytest tests/authority -k "reads_provider_state_over_ipc" -q -p no:cacheprovider 2>&1 | tail -20;
+TURN:643
+SRC:session:32599d8e#turn643
+±ENTITY-TOOL-BASH-0214
+RAN:Run full authority suite verbose to locate hang
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && python -m pytest tests/authority -v -p no:cacheprovider 2>&1 | tail -35; echo "EXIT=$?"
+TURN:647
+SRC:session:32599d8e#turn647
+±ENTITY-TOOL-BASH-0221
+RAN:ruff + pytest on tests/authority
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && echo "=== RUFF tests/authority ===" && python -m ruff check tests/authority 2>&1 | tail -4 && echo "=== PYT
+TURN:668
+SRC:session:32599d8e#turn668
+±ENTITY-TOOL-BASH-0222
+RAN:Show remaining ruff errors
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && python -m ruff check tests/authority --output-format=concise 2>&1 | head -8
+TURN:672
+SRC:session:32599d8e#turn672
+±ENTITY-TOOL-BASH-0225
+RAN:Full suite with coverage; extract summary + new-module coverage
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && OUT="/c/Users/kapil/AppData/Local/Temp/claude/C--Users-kapil-Documents-Onto-Wiz/32599d8e-676e-4184-907e-9c1
+TURN:682
+SRC:session:32599d8e#turn682
+±ENTITY-LITERAL-F16375D2
+VALUE:80.76%
+KIND:number_unit
+TURN:685
+FACT-ID:f7f27b05c3cfda39
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn685
+±ENTITY-LITERAL-A9FF303B
+VALUE:82%
+KIND:number_unit
+TURN:685
+FACT-ID:a1a154f59c81b42c
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn685
+±ENTITY-TOOL-BASH-0229
+RAN:ruff all + full coverage suite
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && echo "=== RUFF ALL ===" && python -m ruff check . 2>&1 | tail -4 && OUT="/c/Users/kapil/AppData/Local/Temp/
+TURN:697
+SRC:session:32599d8e#turn697
+±ENTITY-LITERAL-6CD33CEA
+VALUE:80.98%
+KIND:number_unit
+TURN:700
+FACT-ID:0a30b80883f06e75
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@700,assistant@743,assistant@757,assistant@789
+SRC:session:32599d8e#turn700
+±ENTITY-LITERAL-C3B7A8FF
+VALUE:90.95%
+KIND:number_unit
+TURN:700
+FACT-ID:2b88234dc986f36d
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@700,assistant@761,assistant@789
+SRC:session:32599d8e#turn700
+±ENTITY-TOOL-BASH-0230
+RAN:List remaining ruff errors
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && python -m ruff check . --output-format=concise 2>&1 | head -10
+TURN:701
+SRC:session:32599d8e#turn701
+±ENTITY-TOOL-BASH-0238
+RAN:Final gate: ruff + mypy + locks + coverage suite
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && echo "=== RUFF ===" && python -m ruff check . 2>&1 | tail -2 && echo "=== MYPY ===" && python -m mypy 2>&1 
+TURN:722
+SRC:session:32599d8e#turn722
+±ENTITY-TOOL-BASH-0239
+RAN:Extract wrong-pin test failure traceback
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && OUT="/c/Users/kapil/AppData/Local/Temp/claude/C--Users-kapil-Documents-Onto-Wiz/32599d8e-676e-4184-907e-9c1
+TURN:726
+SRC:session:32599d8e#turn726
+±ENTITY-TOOL-BASH-0242
+RAN:Re-run authority suite after teardown fix
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && python -m pytest tests/authority -q -p no:cacheprovider --timeout=60 2>&1 | tail -8; echo "EXIT=$?"
+TURN:736
+SRC:session:32599d8e#turn736
+±ENTITY-TOOL-BASH-0243
+RAN:Full ruff + coverage suite after fix
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && echo "=== RUFF ===" && python -m ruff check . 2>&1 | tail -2 && OUT="/c/Users/kapil/AppData/Local/Temp/clau
+TURN:740
+SRC:session:32599d8e#turn740
+±ENTITY-TOOL-BASH-0244
+RAN:Show the remaining ruff error
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && python -m ruff check . --output-format=concise 2>&1 | head -6
+TURN:744
+SRC:session:32599d8e#turn744
+±ENTITY-TOOL-BASH-0247
+RAN:Final complete gate set for P3.1
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && echo "=== RUFF ===" && python -m ruff check . 2>&1 | tail -2 && echo "=== MYPY ===" && python -m mypy 2>&1 
+TURN:754
+SRC:session:32599d8e#turn754
+±ENTITY-TOOL-BASH-0248
+RAN:Get test count, coverage, and diff scope
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && OUT="/c/Users/kapil/AppData/Local/Temp/claude/C--Users-kapil-Documents-Onto-Wiz/32599d8e-676e-4184-907e-9c1
+TURN:758
+SRC:session:32599d8e#turn758
+±ENTITY-TOOL-BASH-0254
+RAN:Commit P3.1 on build/P3.1; print SHA + confirm main clean
+COMMAND:cd /c/Users/kapil/Documents/OntoWiz_Authoring_Kit && git add src/ontowiz_authoring tests/authority docs/contracts docs/reviews/P3.1_REVIEW_BUNDLE.md && git stat
+TURN:777
+SRC:session:32599d8e#turn777
+±ENTITY-LITERAL-00D8474D
+VALUE:15d8a5c
+KIND:git_sha
+TURN:780
+FACT-ID:87fe39429206fe72
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SOURCE-ROLES:assistant@780,assistant@789
+SRC:session:32599d8e#turn780
+±ENTITY-INCIDENT-23CF05C5
+TYPE:saved
+PARSE-OK:true
+RAW:ctx-incident: saved | fact="kernel wraps every provider call in an except-Exception site (9 total)" | evidence="grep 'except Exception' authoring.py → 2059/2103/2818/2871/2988/3070/3200/3397/3801; E_AUTHORITY_UNAVAILABLE survival test drove the pass-throughs"
+TURN:789
+FACT:kernel wraps every provider call in an except-Exception site (9 total)
+EVIDENCE:grep 'except Exception' authoring.py → 2059/2103/2818/2871/2988/3070/3200/3397/3801; E_AUTHORITY_UNAVAILABLE survival test drove the pass-throughs
+FACT-ID:439b22eea4f74ab5
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn789
+±ENTITY-DECISION-47605834
+DECISION:Decision: implemented the transport over `multiprocessing.connection` named-pipe/UDS with an `authkey` because it provides authenticated local IPC with a bidirectional HMAC challenge out of the box; HTTPS is deferred out of P3.
+TURN:789
+FACT-ID:eba18a1c1d9af379
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn789
+±ENTITY-DECISION-51D470DF
+DECISION:Decision: placed the `AuthorityClientError` hierarchy in a dependency-free `authority_errors.py` and added narrow pass-throughs at all 9 kernel `except Exception` provider-call sites, so a transport failure survives kernel wrapping and maps to `E_AUTHORITY_UNAVAILABLE`, while a r
+TURN:789
+FACT-ID:0fcd63853ec192fe
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn789
+±ENTITY-DECISION-8C56D56E
+DECISION:Decision: reused the existing `tests/adapters` `ExternalTestProvider` behind a tests-only reference host to prove the keyless client end-to-end over a real pipe, keeping `src` and the skill bundle free of any host, provider, or keys.
+TURN:789
+FACT-ID:099789de05d60984
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn789
+±ENTITY-CONSTRAINT-88A488CD
+RULE:Constraint: the P3.1 server pin is a shared symmetric channel secret (mutual HMAC), not asymmetric public-key pinning, and config-writability is enforced on POSIX only — both recorded as honest limitations; asymmetric pinning is future HTTPS work outside P3.
+STATED-TURN:789
+FACT-ID:8347651d7c3da0f3
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn789
+±ENTITY-CONSTRAINT-0BC7CF39
+RULE:Constraint: `main` stays at `0b0245c` and the freeze chain `fc261e0→080ef16→d2997ad` is preserved; P3.1 (`15d8a5c`) is HELD as an untrusted diff — I do not self-grant, and P3.2 does not start until you grant P3.1.
+STATED-TURN:789
+FACT-ID:d540d247cd47f95c
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn789
+±ENTITY-LITERAL-FA695D27
+VALUE:docs/reviews/P3.1_REVIEW_BUNDLE.md
+KIND:path
+TURN:789
+FACT-ID:2622fba30d8a6e82
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:assistant
+SRC:session:32599d8e#turn789
+±ENTITY-USER-REQUEST-9B15C581
+REQUEST:/compact
+TURN:790
+FACT-ID:bafa9bdd84496751
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.3
+SOURCE-ROLE:user
+SRC:session:32599d8e#turn790
+±ENTITY-FILE-L-DOCUMENTS-ONTO-WIZ-MEMORY-PROJECT-ONTOWIZ-AUTHORING-KIT-MD
+PATH:C:\Users\kapil\.claude\projects\C--Users-kapil-Documents-Onto-Wiz\memory\project_ontowiz_authoring_kit.md
+EDITS:16
+LAST-TURN:786
+SRC:session:32599d8e#turn786
+±ENTITY-FILE-S-ONTOWIZ-AUTHORING-KIT-DOCS-CONTRACTS-CONTRACT-AUTHORITY-MD
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\docs\contracts\CONTRACT_AUTHORITY.md
+EDITS:6
+LAST-TURN:400
+SRC:session:32599d8e#turn400
+±ENTITY-FILE-CUMENTS-ONTOWIZ-AUTHORING-KIT-DOCS-CONTRACTS-CONTRACT-CLI-MD
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\docs\contracts\CONTRACT_CLI.md
+EDITS:7
+LAST-TURN:765
+SRC:session:32599d8e#turn765
+±ENTITY-FILE-TS-ONTOWIZ-AUTHORING-KIT-DOCS-CONTRACTS-CONTRACT-IPC-WIRE-MD
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\docs\contracts\CONTRACT_IPC_WIRE.md
+EDITS:8
+LAST-TURN:237
+SRC:session:32599d8e#turn237
+±ENTITY-FILE-NTS-ONTOWIZ-AUTHORING-KIT-DOCS-CONTRACTS-CONTRACT-RUNTIME-MD
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\docs\contracts\CONTRACT_RUNTIME.md
+EDITS:4
+LAST-TURN:255
+SRC:session:32599d8e#turn255
+±ENTITY-FILE-NTOWIZ-AUTHORING-KIT-DOCS-CONTRACTS-CONTRACT-SKILL-BUNDLE-MD
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\docs\contracts\CONTRACT_SKILL_BUNDLE.md
+EDITS:6
+LAST-TURN:413
+SRC:session:32599d8e#turn413
+±ENTITY-FILE-ONTOWIZ-AUTHORING-KIT-DOCS-CONTRACTS-P3-0-CONTRACT-FREEZE-MD
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\docs\contracts\P3.0_CONTRACT_FREEZE.md
+EDITS:17
+LAST-TURN:762
+SRC:session:32599d8e#turn762
+±ENTITY-FILE-TS-ONTOWIZ-AUTHORING-KIT-DOCS-CONTRACTS-P3-0A-CORRECTIONS-MD
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\docs\contracts\P3.0a_CORRECTIONS.md
+EDITS:2
+LAST-TURN:419
+SRC:session:32599d8e#turn419
+±ENTITY-FILE-NTS-ONTOWIZ-AUTHORING-KIT-DOCS-REVIEWS-P3-0-REVIEW-BUNDLE-MD
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\docs\reviews\P3.0_REVIEW_BUNDLE.md
+EDITS:3
+LAST-TURN:126
+SRC:session:32599d8e#turn126
+±ENTITY-FILE-TS-ONTOWIZ-AUTHORING-KIT-DOCS-REVIEWS-P3-0A-REVIEW-BUNDLE-MD
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\docs\reviews\P3.0a_REVIEW_BUNDLE.md
+EDITS:1
+LAST-TURN:293
+SRC:session:32599d8e#turn293
+±ENTITY-FILE-TS-ONTOWIZ-AUTHORING-KIT-DOCS-REVIEWS-P3-0B-REVIEW-BUNDLE-MD
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\docs\reviews\P3.0b_REVIEW_BUNDLE.md
+EDITS:1
+LAST-TURN:435
+SRC:session:32599d8e#turn435
+±ENTITY-FILE-NTS-ONTOWIZ-AUTHORING-KIT-DOCS-REVIEWS-P3-1-REVIEW-BUNDLE-MD
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\docs\reviews\P3.1_REVIEW_BUNDLE.md
+EDITS:1
+LAST-TURN:769
+SRC:session:32599d8e#turn769
+±ENTITY-FILE-ENTS-ONTOWIZ-AUTHORING-KIT-SRC-ONTOWIZ-AUTHORING-ADAPTERS-PY
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\src\ontowiz_authoring\adapters.py
+EDITS:3
+LAST-TURN:561
+SRC:session:32599d8e#turn561
+±ENTITY-FILE-NTS-ONTOWIZ-AUTHORING-KIT-SRC-ONTOWIZ-AUTHORING-AUTHORING-PY
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\src\ontowiz_authoring\authoring.py
+EDITS:10
+LAST-TURN:531
+SRC:session:32599d8e#turn531
+±ENTITY-FILE-OWIZ-AUTHORING-KIT-SRC-ONTOWIZ-AUTHORING-AUTHORITY-CLIENT-PY
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\src\ontowiz_authoring\authority_client.py
+EDITS:13
+LAST-TURN:605
+SRC:session:32599d8e#turn605
+±ENTITY-FILE-OWIZ-AUTHORING-KIT-SRC-ONTOWIZ-AUTHORING-AUTHORITY-ERRORS-PY
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\src\ontowiz_authoring\authority_errors.py
+EDITS:1
+LAST-TURN:503
+SRC:session:32599d8e#turn503
+±ENTITY-FILE--DOCUMENTS-ONTOWIZ-AUTHORING-KIT-TESTS-AUTHORITY---INIT---PY
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\tests\authority\__init__.py
+EDITS:1
+LAST-TURN:609
+SRC:session:32599d8e#turn609
+±ENTITY-FILE--DOCUMENTS-ONTOWIZ-AUTHORING-KIT-TESTS-AUTHORITY-CONFTEST-PY
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\tests\authority\conftest.py
+EDITS:1
+LAST-TURN:621
+SRC:session:32599d8e#turn621
+±ENTITY-FILE-ENTS-ONTOWIZ-AUTHORING-KIT-TESTS-AUTHORITY-REFERENCE-HOST-PY
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\tests\authority\reference_host.py
+EDITS:5
+LAST-TURN:750
+SRC:session:32599d8e#turn750
+±ENTITY-FILE-TOWIZ-AUTHORING-KIT-TESTS-AUTHORITY-TEST-AUTHORITY-CLIENT-PY
+PATH:C:\Users\kapil\Documents\OntoWiz_Authoring_Kit\tests\authority\test_authority_client.py
+EDITS:15
+LAST-TURN:718
+SRC:session:32599d8e#turn718

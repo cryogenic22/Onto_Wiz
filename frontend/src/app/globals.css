@@ -1,35 +1,20 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Scope Tailwind's content scanning to the frontend source only. Without this, v4's
+ * automatic detection walks up to the git root and crawls the whole monorepo
+ * (docs/, packages/, the Prototype 9 HTML), which both wastes work and can crash the
+ * build on non-source tokens. */
+@import 'tailwindcss' source('../');
+@import '../ui/tokens.css';
 
+/* Foundry surface defaults (Prototype 9). The legacy persona density vars were retired
+ * in D0.4 when the primitives rebased onto a single Foundry density; `lib/persona.ts`
+ * (the mode hook the dashboards still use) is unaffected. */
 :root {
-  --background: #0f172a;
-  --foreground: #f8fafc;
-
-  /* Persona: SME (warm) */
-  --persona-spacing-sm: 0.75rem;
-  --persona-spacing-md: 1.25rem;
-  --persona-spacing-lg: 2rem;
-  --persona-radius: 0.75rem;
-  --persona-font-sm: 0.9375rem;
-  --persona-font-base: 1.0625rem;
-  --persona-font-lg: 1.25rem;
-  --persona-font-xl: 1.5rem;
-}
-
-.persona-curator {
-  --persona-spacing-sm: 0.375rem;
-  --persona-spacing-md: 0.75rem;
-  --persona-spacing-lg: 1.25rem;
-  --persona-radius: 0.375rem;
-  --persona-font-sm: 0.8125rem;
-  --persona-font-base: 0.875rem;
-  --persona-font-lg: 1rem;
-  --persona-font-xl: 1.125rem;
+  --background: var(--color-void);
+  --foreground: var(--color-ink);
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
 }

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The AI Context Layer at Enterprise Scale — Reference Architecture &amp; Onto_Wiz Grounding</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1d21; --muted:#5b6470; --line:#e3e7ec; --line2:#eef1f4;
+    --accent:#1f5fa6; --accent-soft:#eaf1f9;
+    --built:#1f7a44; --built-bg:#e7f4ec;
+    --spec:#8a6100; --spec-bg:#fbf1dc;
+    --road:#8a2f2f; --road-bg:#fbe9e9;
+    --code-bg:#f5f7f9; --code-fg:#243b53;
+    --box:#f8fafb; --boxline:#dce2e8;
+    --maxw:1160px;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#15181c; --fg:#e6e9ec; --muted:#9aa4b0; --line:#2a2f36; --line2:#23282e;
+      --accent:#6ab0f3; --accent-soft:#1a2733;
+      --built:#5fd08a; --built-bg:#17301f;
+      --spec:#e0b752; --spec-bg:#332a12;
+      --road:#f08b8b; --road-bg:#331b1b;
+      --code-bg:#1b2026; --code-fg:#c7d6e6;
+      --box:#191d22; --boxline:#2c333b;
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}
+  .wrap{display:grid;grid-template-columns:264px minmax(0,1fr);gap:0;max-width:var(--maxw);margin:0 auto}
+  nav.toc{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:28px 18px 40px 22px;border-right:1px solid var(--line);font-size:13.5px}
+  nav.toc .brand{font-weight:700;font-size:14px;letter-spacing:.02em;margin-bottom:4px;color:var(--fg)}
+  nav.toc .sub{color:var(--muted);font-size:11.5px;margin-bottom:18px}
+  nav.toc a{display:block;color:var(--muted);text-decoration:none;padding:3px 0;border-left:2px solid transparent;padding-left:10px;margin-left:-2px}
+  nav.toc a:hover{color:var(--accent)}
+  nav.toc a.h2{padding-left:22px;font-size:12.5px;color:var(--muted)}
+  nav.toc .grp{margin-top:14px;text-transform:uppercase;letter-spacing:.08em;font-size:10.5px;color:var(--muted);opacity:.7;padding-left:10px}
+  main{padding:40px 46px 120px;min-width:0}
+  header.doc{border-bottom:1px solid var(--line);padding-bottom:26px;margin-bottom:14px}
+  header.doc h1{font-family:var(--serif);font-weight:600;font-size:30px;line-height:1.22;margin:0 0 12px}
+  header.doc .lede{color:var(--muted);font-size:15.5px;max-width:70ch}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:16px;font-size:12.5px;color:var(--muted)}
+  .meta b{color:var(--fg);font-weight:600}
+  h2{font-family:var(--serif);font-weight:600;font-size:23px;margin:52px 0 6px;padding-top:14px;border-top:1px solid var(--line2);line-height:1.25}
+  h2 .n{color:var(--accent);font-weight:600;margin-right:10px;font-variant-numeric:tabular-nums}
+  h3{font-size:16.5px;font-weight:700;margin:30px 0 6px;letter-spacing:.005em}
+  h4{font-size:14px;font-weight:700;margin:20px 0 4px;color:var(--fg)}
+  p{margin:10px 0}
+  a{color:var(--accent)}
+  ul,ol{margin:10px 0;padding-left:22px}
+  li{margin:5px 0}
+  code{font-family:var(--mono);font-size:12.8px;background:var(--code-bg);color:var(--code-fg);padding:1px 5px;border-radius:4px}
+  pre{background:var(--code-bg);color:var(--code-fg);font-family:var(--mono);font-size:12.6px;line-height:1.55;padding:14px 16px;border-radius:8px;overflow-x:auto;border:1px solid var(--boxline)}
+  pre code{background:none;padding:0;font-size:inherit}
+  .small{font-size:13px;color:var(--muted)}
+  .pill{display:inline-block;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.03em;padding:1.5px 8px;border-radius:20px;vertical-align:middle;white-space:nowrap}
+  .b-built{background:var(--built-bg);color:var(--built)}
+  .b-spec{background:var(--spec-bg);color:var(--spec)}
+  .b-road{background:var(--road-bg);color:var(--road)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin:8px 0 0}
+  .call{border:1px solid var(--boxline);border-left-width:4px;border-radius:8px;padding:12px 16px;margin:16px 0;background:var(--box);font-size:14.5px}
+  .call .t{font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+  .call.inv{border-left-color:var(--accent)}.call.inv .t{color:var(--accent)}
+  .call.gap{border-left-color:var(--road)}.call.gap .t{color:var(--road)}
+  .call.note{border-left-color:var(--muted)}.call.note .t{color:var(--muted)}
+  .tw{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:520px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line2);vertical-align:top}
+  th{background:var(--box);font-weight:700;font-size:12px;letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
+  tr:last-child td{border-bottom:none}
+  td code{font-size:12px}
+  .fig{margin:22px 0;border:1px solid var(--line);border-radius:10px;padding:20px;background:var(--box)}
+  .fig .cap{font-size:12.5px;color:var(--muted);margin-top:12px;font-style:italic}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}
+  .node{flex:1 1 0;min-width:120px;background:var(--bg);border:1px solid var(--boxline);border-radius:8px;padding:10px 12px;font-size:12.8px}
+  .node .h{font-weight:700;font-size:12.5px;margin-bottom:3px}
+  .node .d{color:var(--muted);font-size:11.8px;line-height:1.4}
+  .arrow{align-self:center;color:var(--muted);font-size:18px;flex:0 0 auto;padding:0 2px}
+  .band{border:1px dashed var(--boxline);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:12.5px;color:var(--muted);background:transparent}
+  .band b{color:var(--fg)}
+  ol.steps{counter-reset:s;list-style:none;padding-left:0;margin:18px 0}
+  ol.steps>li{counter-increment:s;position:relative;padding:12px 0 12px 52px;border-bottom:1px solid var(--line2)}
+  ol.steps>li:last-child{border-bottom:none}
+  ol.steps>li::before{content:counter(s);position:absolute;left:0;top:12px;width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+  ol.steps>li .st{font-weight:700}
+  ol.steps>li .src{display:inline-block;font-size:11.5px;color:var(--muted);font-family:var(--mono);margin-top:3px}
+  .kbd{font-family:var(--mono);font-size:12px;background:var(--code-bg);color:var(--code-fg);padding:1px 5px;border-radius:4px;border:1px solid var(--boxline)}
+  hr{border:none;border-top:1px solid var(--line);margin:40px 0}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:1000px){
+    .wrap{grid-template-columns:1fr}
+    nav.toc{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);overflow:visible}
+    main{padding:28px 20px 90px}
+    .two{grid-template-columns:1fr}
+    header.doc h1{font-size:25px}
+  }
+  .foot{margin-top:60px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="toc">
+  <div class="brand">The AI Context Layer at Enterprise Scale</div>
+  <div class="sub">Reference architecture &amp; Onto_Wiz grounding · 2026-07</div>
+  <a href="#s0">0 · How to read this</a>
+  <div class="grp">Part I — The reference</div>
+  <a href="#s1">1 · The problem, precisely</a>
+  <a href="#s2">2 · The context supply chain</a>
+  <a href="#s3">3 · Is the ontology a graph?</a>
+  <a href="#s4">4 · Directory &amp; file structure</a>
+  <a href="#s5">5 · The runtime path, step by step</a>
+  <a href="#s6">6 · Where each kind of context lives</a>
+  <div class="grp">Part II — Grounding &amp; scale</div>
+  <a href="#s7">7 · Two worked examples</a>
+  <a href="#s8">8 · Evaluation &amp; trust</a>
+  <a href="#s9">9 · Governance as a control system</a>
+  <a href="#s10">10 · Scale &amp; multi-tenancy</a>
+  <a href="#s11">11 · Gap ledger</a>
+  <a href="#s12">12 · Target architecture &amp; sequence</a>
+  <a href="#appx">Appendix · Citation map</a>
+</nav>
+
+<main>
+<header class="doc">
+  <h1>The AI Context Layer at Enterprise Scale</h1>
+  <div class="lede">A reference architecture for how an agent physically retrieves and uses governed domain knowledge at scale — worked against what Onto_Wiz actually builds today and plans to build, with an honest ledger of the difference.</div>
+  <div class="meta">
+    <span><b>Audience</b> Architects, platform &amp; ML engineering, product</span>
+    <span><b>Method</b> Reference model + grounded code/spec citations</span>
+    <span><b>Examples</b> Brand analytics · MLR field chatbot</span>
+  </div>
+  <div class="legend" style="margin-top:14px">
+    <span><span class="pill b-built">BUILT</span> verified, tested code in the tree</span>
+    <span><span class="pill b-spec">SPECIFIED</span> accepted spec/ADR, little or no code</span>
+    <span><span class="pill b-road">ROADMAP</span> named but deferred or undesigned</span>
+  </div>
+</header>
+
+<section id="s0">
+<h2><span class="n">0</span>How to read this</h2>
+<p>This report answers one question in two registers: <em>what should an enterprise AI context layer physically look like</em> — the folders, the graph, the databases, the vector store, the step-by-step runtime path — and <em>how does the design being built here map onto that</em>. The two registers run in parallel throughout. Where the reference model and the current build diverge, the divergence is named with a status badge rather than smoothed over, because the difference is the actionable part.</p>
+<p>The framing borrows the status vocabulary the platform already enforces on itself: <em>verified, submitted, specified, design-fixture</em> and <em>missing</em> are not interchangeable. Most of the ambitious architecture in Part II is <span class="pill b-spec">SPECIFIED</span> or <span class="pill b-road">ROADMAP</span>; the <span class="pill b-built">BUILT</span> core is deliberately narrow. Stating that plainly is the point of the exercise — a context layer that overstates its own maturity is the failure mode this design was built to avoid.</p>
+<div class="call note"><div class="t">Scope</div>This is an architecture reference, not an implementation spec. It cites concrete files and lines so any claim can be checked against the tree (Appendix), but it does not propose code. Vertical examples are illustrative; "MR chatbot" is read here as a field-facing, MLR-governed medical/market assistant.</div>
+</section>
+
+<section id="s1">
+<h2><span class="n">1</span>The problem, stated precisely</h2>
+<p>An "AI context layer" is the machinery that puts the <em>right slice of governed domain knowledge</em> in front of an agent, at the <em>right resolution</em>, <em>provably</em>, inside a <em>token budget</em>, at <em>request time</em>. Every word in that sentence is a design constraint:</p>
+<ul>
+  <li><b>Right slice.</b> A pharma brand agent asked about a launch does not need the entire company knowledge base; it needs a bounded neighborhood — this brand, its indications, the channels, the applicable rules — and nothing off-scope.</li>
+  <li><b>Right resolution.</b> Knowledge exists at several granularities: a one-line directory of what is available, a semantic summary of an entity, the full governed source. Loading everything at full resolution is both expensive and counterproductive.</li>
+  <li><b>Provably.</b> In a regulated enterprise the agent's answer must be traceable to an approved, versioned, unaltered source. "The model probably read the right document" is not an acceptable audit posture.</li>
+  <li><b>Token budget.</b> Context windows are finite and priced. The layer must select, not stuff.</li>
+  <li><b>Request time, at scale.</b> Selection happens per query, per tenant, across many packs, under latency and isolation constraints.</li>
+</ul>
+<p>The naïve answer — embed every document into a vector store and retrieve the top-<em>k</em> chunks — solves "right slice" weakly and ignores the rest. It has no concept of approval state, no provenance guarantee, no determinism, no staleness model, and no way to prove that what was served is what was evaluated. An enterprise context layer is therefore <b>not primarily a retrieval problem; it is a supply-chain and governance problem with retrieval as one stage.</b> That reframing drives the entire architecture below.</p>
+<div class="call inv"><div class="t">Load-bearing invariant</div>The thing the agent is served must be exactly the thing that was reviewed, evaluated, and released — byte for byte. Everything downstream (projections, indexes, caches) is disposable and rebuildable; none of it is a source of truth. This single rule is what separates an auditable context layer from a demo.</div>
+</section>
+
+<section id="s2">
+<h2><span class="n">2</span>The context supply chain</h2>
+<p>The clean way to reason about an enterprise context layer is as a <b>supply chain</b> that carries knowledge from a subject-matter source to an agent's working memory, with a governance spine running underneath every stage. Retrieval is one link, not the whole chain.</p>
+
+<div class="fig">
+  <div class="row">
+    <div class="node"><div class="h">1 · Sources</div><div class="d">SME interviews, documents, tables, prior decisions — raw, untrusted</div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="h">2 · Knowledge model</div><div class="d">Typed artifacts + ontology graph — the governed source of truth</div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="h">3 · Compile</div><div class="d">Deterministic, network-free build into resolution layers + a digest</div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="h">4 · Substrates</div><div class="d">Files, DBs, object store, graph, vector, cache — each holds one kind of truth</div></div>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <div class="node"><div class="h">5 · Assemble</div><div class="d">Scope + gate + rank into a minimal, budgeted context envelope</div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="h">6 · Serve</div><div class="d">REST/MCP door: authenticate, resolve tenant, return context + trust receipt</div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="h">7 · Evaluate</div><div class="d">Prove the pack changes agent behavior; bind the verdict to the digest</div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="h">8 · Learn</div><div class="d">Corrections re-enter as governed changes, never silent edits</div></div>
+  </div>
+  <div class="band"><b>Governance spine (under all stages):</b> identity · provenance · lifecycle state · approval · versioning · attestation · tenancy. Nothing advances a stage without it.</div>
+  <div class="cap">Figure 1 — The context supply chain. Onto_Wiz's built strength is stages 3–7 (compile → substrate → assemble → serve → evaluate). Its thinnest part is stages 1–2 on the <em>produce</em> side (capture from SMEs/documents, consolidation across sources).</div>
+</div>
+
+<p>Onto_Wiz expresses this supply chain as a canonical, immutable promotion spine — a release never mutates in place; each stage produces a new, digest-addressed artifact:</p>
+<pre><code>01 immutable source   → 02 parsed spans      → 03 candidate proposal
+04 SME Delta review   → 05 approved source    → 06 deterministic compile
+07 candidate digest   → 08 eval receipt       → 09 attested release</code></pre>
+<p class="small">Source: <code>docs/reviews/ontowiz_core_domain_engine_architecture_2026-07.html</code> ("A RELEASE NEVER MUTATES"); the immutable receipt chain is mandated in <code>DOMAIN_PACK_PLATFORM_BUILD_INSTRUCTION_SET_2026-07.md</code> §5.8.</p>
+</section>
+
+<section id="s3">
+<h2><span class="n">3</span>Is the ontology a graph? Yes — a typed property graph with an overlay stack</h2>
+<p>This is the question most teams get wrong, so answer it precisely. In a well-formed enterprise context layer the ontology is <b>a typed property graph</b>: nodes are typed entities with fields; edges are typed, directional, and carry cardinality and semantic guards. It is not a flat list of records, and it is not merely a taxonomy — though a taxonomy (controlled vocabularies) and a terminology layer sit <em>inside</em> it. Two distinctions matter:</p>
+<ul>
+  <li><b>The model graph vs. the runtime projection.</b> The <em>authoring</em> representation is a rich graph. The <em>runtime</em> representation an agent consumes is a compiled projection of that graph, flattened to the resolution the agent needs. These are different objects with different jobs; conflating them is a common error.</li>
+  <li><b>The overlay stack.</b> Enterprise knowledge is not one graph but a <em>precedence stack</em> of graphs: a generic kernel, a domain base, then function / market / therapy / brand / client overlays. Higher layers override lower ones at compile time. This is how one platform serves many tenants without cloning.</li>
+</ul>
+
+<h3>How Onto_Wiz realizes it</h3>
+<p>The governed knowledge is a closed catalogue of <b>19 typed artifact kinds</b> (<code>ontowiz-spec/artifacts.py:53-77</code>) — e.g. <code>ENTITY_REGISTRY</code>, <code>TAXONOMY</code>, <code>JARGON_MAP</code>, <code>DECISION_HEURISTIC</code>, <code>GUARDRAIL</code>, <code>OVERRIDE_RULE</code>, <code>SOURCE_CONTRACT</code>, <code>EVAL_CASE</code>. Every artifact carries governance, provenance, confidence, and an overlay <code>layer</code> field (<code>base → therapy → function → client → engagement</code>).</p>
+<p>The graph itself is explicit. In the reference pack, entities are typed nodes and relationships are typed directed edges with cardinality and semantic guards:</p>
+<pre><code># examples/.../auravia_marketing/0.1.0/ontology/marketing_ontology.yaml
+entity_types:   [type.brand, type.claim, type.metric, type.join_contract, …]   # 24 typed node classes
+relation_types:                                                                # typed edge schema
+  - rel.measures:        {source_types:[study], target_types:[endpoint],
+                          cardinality: many_to_many,
+                          requires_evidence_assertion: true, causal_semantics: false}
+relationships:                                                                 # concrete edges
+  - {id: edge_study_endpoint, type: rel.measures, source: study_vela1, target: endpoint_easi75_week16}</code></pre>
+<p>In the shipped commercial pack the graph is carried inside a single <code>entity_registry</code> artifact — 18 connected entities (Brand, HCP, Payer, Territory, Indication, Competitor, Formulary, Channel, Signal, Forecast…) with typed edges such as <code>treats</code>, <code>competes_with</code>, <code>distributed_via</code> (<code>commercial-entities.yaml:28-49</code>). The engine is even topology-aware: a gist generator classifies nodes as hubs (≥3 inbound refs), bridges, or leaves, and can emit a <code>GRAPH:{n}-entities,{m}-edges</code> summary (<code>ontowiz-ctx/.../packer/l3_generator.py:36,123-169</code>).</p>
+<div class="call note"><div class="t">Honest nuance</div>Today the graph lives <em>as YAML inside artifacts</em> and is projected to text at compile time; there is <b>no dedicated graph database</b>. That is correct at 24 artifacts. At enterprise scale a graph store (or graph projection) becomes a candidate component for neighborhood traversal — see §6 and §10.</div>
+
+<h3>The overlay stack, concretely</h3>
+<p>The manifest models the precedence stack as typed <code>PackLayer</code> entries. The reference pack ships a five-tier stack, each layer forbidden from broadening a correctness constraint below it:</p>
+<pre><code>pharma_commercial_base(10) → market_policy_us(20) → therapy_dermatology(30)
+  → brand_auravia(40) → client_operating_model(50)     # higher precedence overrides lower</code></pre>
+<p class="small">Source: <code>examples/.../auravia_marketing/0.1.0/pack.yaml:29-48</code>. The commercial pack ships <code>layers: []</code> — a single implicit base — which is the correct starting point for a first vertical.</p>
+</section>
+
+<section id="s4">
+<h2><span class="n">4</span>Directory &amp; file structure — physicalizing the layer</h2>
+<p>The context layer is physical: it is folders and files with a strict separation between <b>hand-authored source</b> (the product IP) and <b>compiler-emitted projections</b> (regenerable, never edited). This section shows both the unit (one compiled pack) and the enterprise repository shape around it.</p>
+
+<h3>4.1 · The compiled pack — the unit that crosses the boundary</h3>
+<pre><code>packs/&lt;name&gt;/&lt;version&gt;/                # version is a directory level → packs are immutable per version
+├── pack.yaml            # the manifest: identity, overlay layers, dependency pins,
+│                        #   derived counts, eval summary, CTX pointers, IP flags
+├── artifacts/           # ── AUTHORED SOURCE (the governed product) ──
+│   ├── commercial-entities.yaml     #   the ontology graph (entity_registry)
+│   ├── rule_safety_signal.yaml      #   a governed decision heuristic (carries delta_id)
+│   └── … (one YAML per artifact id, each a typed, lifecycle-governed record)
+├── context.ctx          # ── COMPILED L2 ── semantic body: one section per active artifact
+├── index.l3.ctx         # ── COMPILED L3 ── &lt;500-token directory index (goes in the system prompt)
+└── pack.sig             # SHA-256 integrity seal over the payload + manifest (tamper-evident)</code></pre>
+<p class="small">Confirmed on disk at <code>packs/commercial_analytics/0.3.0/</code> (24 artifact YAMLs + the four derived files); canonical layout documented at <code>ontowiz-spec/pack_manifest.py:8-12</code>.</p>
+
+<div class="two">
+  <div>
+    <h4>Authored (source of truth)</h4>
+    <ul class="small">
+      <li><code>artifacts/*.yaml</code> — typed <code>ArtifactBase</code> records; each ACTIVE state requires a governing <code>delta_id</code> in its lifecycle history, enforced structurally (<code>artifacts.py:135-151</code>).</li>
+      <li>In the richer reference pack, authored source is a module set: <code>ontology/ · knowledge/ · omnichannel/ · analytics/ · agents/ · quality/ · evaluations/ · sources/</code>.</li>
+    </ul>
+  </div>
+  <div>
+    <h4>Compiled (disposable, digest-addressed)</h4>
+    <ul class="small">
+      <li><code>context.ctx</code> (L2), <code>index.l3.ctx</code> (L3), the derived counts in <code>pack.yaml</code>, and <code>pack.sig</code> are all emitted by the compiler and never hand-edited (<code>ontowiz-factory/compiler.py:182-192</code>).</li>
+      <li>Re-running the compiler on the same source must reproduce them byte-for-byte — the determinism requirement in §8.</li>
+    </ul>
+  </div>
+</div>
+
+<h3>4.2 · The <code>.ctx</code> resolution layers (L0 → L3)</h3>
+<p>The context format is a bespoke, human-readable, sigil-delimited text serialization (not YAML, JSON, or a binary blob) with four resolution layers plus a manifest layer (<code>ontowiz-ctx/core/model.py:14-19</code>). The design principle is <b>multi-resolution</b>: keep the cheap directory in the prompt, fetch expensive detail on demand.</p>
+<div class="tw"><table>
+<thead><tr><th>Layer</th><th>Holds</th><th>Resolution / cost</th><th>Where it is used</th></tr></thead>
+<tbody>
+<tr><td><b>L0</b></td><td>Raw source corpus (md/yaml/json/csv)</td><td>Full, unprocessed</td><td>Build-plane input only</td></tr>
+<tr><td><b>L1</b></td><td>Natural-language prose</td><td>Readable summary</td><td>On-demand rendering</td></tr>
+<tr><td><b>L2</b> <code>context.ctx</code></td><td>Semantic body — one section per entity/artifact, key–value bodies</td><td>Medium; hydrated per-section</td><td>The pool the agent pulls from</td></tr>
+<tr><td><b>L3</b> <code>index.l3.ctx</code></td><td>Ultra-lean directory of section names + hydrate instructions</td><td>&lt;500 tokens, whole-corpus</td><td>Sits in the system prompt</td></tr>
+</tbody></table></div>
+<p>A real L2 header and section:</p>
+<pre><code>§CTX v1.0 L2 DOMAIN:commercial
+PACK:commercial_analytics VERSION:0.3.0
+±ENTITY_REGISTRY-COMMERCIAL-ENTITIES
+  BODY: entities=… relationships=type=treats; target=Indication …
+±DECISION_HEURISTIC-RULE_SAFETY_SIGNAL
+  …</code></pre>
+<p class="small">The header magic (<code>§CTX</code>), sections (<code>±NAME</code>), and operator glyphs are defined at <code>model.py:22-37</code> / <code>parser.py:31,35</code>; an ASCII fallback and a BPE-tokenization mode exist but are rendering options, not the storage format (<code>serializer.py:33-44,266-300</code>).</p>
+<div class="call note"><div class="t">Design tension worth flagging</div>Two L3 strategies coexist: the pack compiler ships a lean instruction-style directory (<code>hydration_protocol.py:23-84</code>), while a richer <code>generate_l3</code> that emits explicit <code>ENTITIES / TOPOLOGY / CONSTRAINTS</code> sections exists but is not wired into <code>compile_pack</code>. Converging these is a small but real decision.</div>
+</section>
+
+<section id="s5">
+<h2><span class="n">5</span>The runtime path — what the agent does, step by step</h2>
+<p>This is the core of the question: when the agent layer wants to work, what happens, and which part of context comes from which layer. The current design is <b>whole-pack-load + deterministic governance gate + LLM-as-router hydration</b>. Crucially, the LLM performs the actual retrieval — it reads a tiny directory and asks for exactly the sections it needs. There is (today, by deliberate choice) no vector search in this path.</p>
+
+<ol class="steps">
+  <li><span class="st">Authenticate, resolve tenant, pin the release.</span> The caller arrives at the serve door with an identity; the tenant comes from the authenticated identity, never the request payload. A specific pack is pinned by <code>name@version</code> (target state: by content digest). No "latest" resolution at load.<br><span class="src">ontowiz-serve/api.py · registry.py:63-78 (traversal-guarded load)</span></li>
+  <li><span class="st">Resolve scope.</span> The request carries <code>query · agent_type · tags · budget</code>. Scope narrows the candidate artifact set to what this agent, in this function, is entitled to see.<br><span class="src">ontowiz-runtime/context.py:194-216 (context_for_pack)</span></li>
+  <li><span class="st">Govern &amp; gate (deterministic).</span> Admit only servable-lifecycle artifacts, then intersect on tag keys. A gated-out artifact is never even listed downstream, so the agent cannot bypass the gate. <em>This</em> is the primary "right slice" filter — governance, not similarity.<br><span class="src">context.py:64-88 (gate)</span></li>
+  <li><span class="st">Rank (lexical, ordering only).</span> Eligible artifacts are stable-sorted by query-term overlap so the most relevant lead the directory. This orders; it does not drop.<br><span class="src">context.py:91-106 (_rank_by_query)</span></li>
+  <li><span class="st">Emit the L3 directory into the system prompt.</span> The runtime projects the L2 doc onto the gated IDs and renders a &lt;500-token directory: "you have a knowledge base; call <span class="kbd">ctx_hydrate(section=…)</span> to retrieve detail; only hydrate what you need." This is the <em>only</em> knowledge in the prompt at this point.<br><span class="src">context.py:116-138 → hydration_protocol.py:23-84</span></li>
+  <li><span class="st">LLM-as-router hydration — the actual retrieval.</span> The agent reads the directory and emits <span class="kbd">ctx_hydrate(section="ENTITY-…")</span> for exactly the sections it needs. The handler returns the L2 section body by O(1) name lookup. Multi-hop re-hydration is triggered by a low-confidence heuristic ("not found in context", …).<br><span class="src">hydrator.py:59-138 · benchmark.py:44-104 (HYDRATE_TOOL)</span></li>
+  <li><span class="st">Fetch governed numbers separately.</span> Quantitative answers (metrics, NBRx vs. plan) come from a <em>governed data tool</em> over the warehouse — not from the knowledge sections. Knowledge context and structured data are different substrates with different trust models (§6).<br><span class="src">SPECIFIED — typed serving, Step 8 · structured-data fusion ROADMAP</span></li>
+  <li><span class="st">Policy gate, assemble, return with a trust receipt.</span> A final policy gate applies; the response carries a <em>trust envelope</em> — pack <code>name@version</code>, artifacts used, mean confidence, backing Deltas, lifecycle floor — so the caller can prove what was served.<br><span class="src">context.py:141-155 (TrustEnvelope) · api.py:104-119</span></li>
+</ol>
+
+<div class="fig">
+  <div class="row">
+    <div class="node"><div class="h">System prompt</div><div class="d"><b>L3 directory</b> — always present, &lt;500 tok</div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="h">LLM routes</div><div class="d">calls <code>ctx_hydrate(section)</code> for what it needs</div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="h">L2 section</div><div class="d">semantic body of that entity/rule, on demand</div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="h">Data tool</div><div class="d">live governed numbers from the warehouse</div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="h">Answer + receipt</div><div class="d">trust envelope proves provenance</div></div>
+  </div>
+  <div class="cap">Figure 2 — Request-time context flow. The prompt holds only the cheap directory; the model pulls detail on demand; numbers come from a separate governed tool. Selection is governance-gated first, similarity-ordered second, model-routed third.</div>
+</div>
+
+<div class="call inv"><div class="t">Why "LLM-as-router" instead of top-k vector search</div>At a corpus a &lt;500-token directory can enumerate, letting the model name the sections it wants gives exact, explainable retrieval with zero embedding infrastructure and no statefulness (<code>hydration_protocol.py:1-13</code>, "the LLM IS the query router — no TF-IDF, no embeddings"). This is a sound default for bounded, governed packs. Its limit is corpus size: once a domain outgrows what one directory can list, a semantic prefilter (a vector store) becomes necessary to <em>shortlist</em> before routing. That transition is the main scale question in §10.</div>
+
+<div class="call gap"><div class="t">Two integrity gaps in the current path (name them)</div>
+<b>(a) Verify-before-load is not wired in.</b> <code>pack.sig</code> is written and checkable in the factory, but the serving load path never calls a verifier — the load-time <code>verify_candidate_dir</code> is <span class="pill b-road">ROADMAP</span> (spec S1.2). <b>(b) Always-included safety artifacts are not enforced.</b> <code>ALWAYS_INCLUDED_KINDS</code> (guardrails, override rules, data quirks) is declared in the spec but the live gate never references it, so a safety artifact without a matching tag is silently dropped. Both are on the near-term backlog (card F0.10 / Step 1).</div>
+</section>
+
+<section id="s6">
+<h2><span class="n">6</span>Where each kind of context lives — files vs. database vs. graph vs. vector store</h2>
+<p>The most common architectural mistake is putting everything in one store — usually a vector database — and asking it to be the system of record. The correct design uses <b>several substrates, each holding exactly one kind of truth</b>, with a strict rule that projections are disposable. Here is the mapping, with Onto_Wiz's current and target realization.</p>
+
+<div class="tw"><table>
+<thead><tr><th>Substrate</th><th>Holds (the truth it owns)</th><th>Why it lives here</th><th>Onto_Wiz status</th></tr></thead>
+<tbody>
+<tr>
+  <td><b>Git / pack repo</b><br><span class="small">approved semantic source</span></td>
+  <td>Hand-authored artifacts at an immutable commit — the governed knowledge that was approved.</td>
+  <td>Reviewable, diff-able, immutable per SHA. Human approval attaches to a commit, not a mutable row.</td>
+  <td><span class="pill b-built">BUILT</span> as local dirs; <code>PackSource</code> seam (local → Git SHA → DB-materialized) <span class="pill b-spec">SPECIFIED</span></td>
+</tr>
+<tr>
+  <td><b>Governance / relational DB</b><br><span class="small">workflow &amp; audit truth</span></td>
+  <td>Deltas, lifecycle state, approvals, reviewer identity, tenancy, idempotency, audit trail.</td>
+  <td>Transactional, queryable, authenticated. This is the <em>process</em> record, distinct from the <em>content</em> record.</td>
+  <td><span class="pill b-spec">SPECIFIED</span> — durable <code>GovernanceStore</code> exists but is endpointless; three competing write models to consolidate (F0.3)</td>
+</tr>
+<tr>
+  <td><b>Artifact registry + object store</b><br><span class="small">released truth</span></td>
+  <td>Compiled, signed, attested release bundles addressed by content digest; provenance receipts; rollback pointers.</td>
+  <td>Runtime loads by digest, never a Git checkout, never a glob. Immutable, verifiable, tenant-scoped.</td>
+  <td><span class="pill b-road">ROADMAP</span> — target is OCI + Sigstore + SLSA; <code>pack.sig</code> is a precursor seal, not the end state</td>
+</tr>
+<tr>
+  <td><b>Ontology / graph store</b><br><span class="small">structural truth</span></td>
+  <td>Typed nodes + edges; neighborhoods; traversal for "what is related to X".</td>
+  <td>Traversal and neighborhood queries are graph-shaped; forcing them through text or vectors loses the structure.</td>
+  <td><span class="pill b-built">BUILT</span> as graph-in-YAML + L2/L3 projection; a dedicated graph <em>store</em> is a scale option, not present</td>
+</tr>
+<tr>
+  <td><b>Vector store</b><br><span class="small">semantic shortlist</span></td>
+  <td>Embeddings of sections/chunks for approximate similarity — a <em>prefilter</em>, never the source.</td>
+  <td>Needed when the corpus outgrows a directory the model can route over, or for cross-pack discovery.</td>
+  <td><span class="pill b-road">ROADMAP</span> — deliberately absent today; "semantic search when a vector store is added" is a named future (<code>evidence.py:369-371</code>)</td>
+</tr>
+<tr>
+  <td><b>Cache / projections</b><br><span class="small">disposable</span></td>
+  <td>Compiled <code>.ctx</code> layers, lexical index, embeddings, per-tenant materializations.</td>
+  <td>Rebuildable from source at any time. Fast to read, safe to drop. <em>Never</em> a source of truth.</td>
+  <td><span class="pill b-built">BUILT</span> — L2/L3 are exactly this; the invariant "projections are disposable" is committed</td>
+</tr>
+</tbody></table></div>
+
+<div class="call inv"><div class="t">The rule that ties the substrates together</div>Each substrate owns one truth: Git owns <em>approved source</em>, the relational DB owns <em>workflow</em>, the registry owns <em>released bytes</em>, the graph owns <em>structure</em>, the vector store owns <em>a similarity shortlist</em>, the cache owns <em>nothing</em>. The compiled, attested bundle in the registry is the single served artifact; everything else either feeds it (source, workflow) or is derived from it (projections). "The served thing IS the eval-gated thing" — serve-time multi-pack merging is rejected; overlays are resolved to one sealed pack at <em>compile</em> time.</div>
+
+<h3>So — vector store or not?</h3>
+<p>For a bounded, governed pack the honest answer is <b>you may not need one, and starting without it is defensible</b>. Onto_Wiz's LLM-as-router works because a governed pack is small and its directory fits the prompt. A vector store earns its place at three specific thresholds: (1) a single domain's active sections exceed what a &lt;500-token directory can enumerate; (2) you need <em>cross-pack</em> discovery ("which of 200 packs is relevant to this query"); or (3) you ingest large unstructured corpora where governance happens after retrieval rather than before. Until one of those is real, a vector store adds operational cost and a second, weaker provenance path. The architecture should <em>reserve the seam</em> (a retrieval interface) without building the store prematurely — which is exactly the posture of the <code>PackSource</code>/projection design.</p>
+</section>
+
+<section id="s7">
+<h2><span class="n">7</span>Two worked examples</h2>
+<p>Tracing real questions shows which substrate answers which part.</p>
+
+<h3>7.1 · Brand analytics — "Why is Auravia's NBRx below plan this quarter?"</h3>
+<div class="tw"><table>
+<thead><tr><th>What the agent needs</th><th>Which layer / substrate serves it</th></tr></thead>
+<tbody>
+<tr><td>The brand's shape: indications, channels, competitors, forecast drivers</td><td><b>Ontology graph</b> → projected into the L2 <code>ENTITY_REGISTRY</code> section, hydrated on demand</td></tr>
+<tr><td>How to diagnose a shortfall (which signals to check, in what order)</td><td><b>Decision heuristics</b> — L2 <code>DECISION_HEURISTIC</code> sections (e.g. <code>rule_safety_signal</code>)</td></tr>
+<tr><td>The guardrail: do not assert causation without an approved causal analysis</td><td><b>Guardrail / override artifacts</b> — must be always-included (today a gap, §5)</td></tr>
+<tr><td>The actual numbers: NBRx, plan, trend by territory</td><td><b>Governed data tool over the warehouse</b> — a separate structured-data path, not the knowledge sections</td></tr>
+<tr><td>Proof the answer is sourced from approved content</td><td><b>Trust envelope</b> from the serve door — pack version, artifacts used, backing Deltas</td></tr>
+</tbody></table></div>
+<p class="small">This example is exactly why the design keeps knowledge context and structured analytics on different substrates: the graph and heuristics tell the agent <em>how to reason</em>; the warehouse tells it <em>what is true this quarter</em>; the guardrail constrains <em>what it may claim</em>. Fusing these two halves ("typed analytics / table-join contracts") is <span class="pill b-road">ROADMAP</span> — today only the serving spine between them is built.</p>
+
+<h3>7.2 · MLR-governed field chatbot — "Can I tell an HCP that Auravia clears skin faster than X?"</h3>
+<div class="tw"><table>
+<thead><tr><th>What the agent needs</th><th>Which layer / substrate serves it</th></tr></thead>
+<tbody>
+<tr><td>Approved vs. prohibited claim language for this brand/market</td><td><b>Terminology + taxonomy</b> — L2 <code>JARGON_MAP</code>/<code>TAXONOMY</code>; <code>preferred</code>/<code>prohibited_expression</code> roles from the ontology</td></tr>
+<tr><td>The hard rule: comparative claims require an approved head-to-head evidence assertion</td><td><b>Guardrail + relation guard</b> (<code>requires_evidence_assertion: true</code> on the edge type)</td></tr>
+<tr><td>The market overlay: what is permitted in this jurisdiction</td><td><b>Overlay stack</b> — <code>market_policy</code> layer overriding the base at compile time</td></tr>
+<tr><td>A safe refusal path when no approved evidence exists</td><td><b>Override rule</b> — always-included; must survive budget trimming</td></tr>
+</tbody></table></div>
+<p class="small">The MLR case is the sharpest argument for governance-first selection over similarity-first: a vector store would happily retrieve a persuasive-but-prohibited claim because it is textually similar. The lifecycle gate + always-included guardrails are what make the refusal path structural rather than probabilistic.</p>
+</section>
+
+<section id="s8">
+<h2><span class="n">8</span>Evaluation &amp; trust — proving the layer works</h2>
+<p>An enterprise context layer must prove two things: that a pack <em>loads and verifies</em>, and that it <em>changes agent behavior for the better</em>. Onto_Wiz measures the second directly with an <b>agent-lift benchmark</b>: the same question is answered twice — once with the pack wired in through the real router loop, once blind — and the mean delta is the lift.</p>
+<ul>
+  <li><b>Same code path as production.</b> The with-pack answer uses the exact <code>context_for_pack</code> + hydrate loop the product ships, so the benchmark measures the real system, not a proxy (<code>ontowiz-factory/benchmark.py</code>).</li>
+  <li><b>A gate, not a vanity metric.</b> Promotion is blocked unless <code>pass_rate ≥ min</code> <em>and</em> <code>lift ≥ min_lift</code> — "a pack that passes its evals but adds no agent lift is blocked" (<code>evals.py:94-107</code>). The shipped commercial pack shows <b>+0.308</b> measured lift (v0.1.0, term-adoption).</li>
+  <li><b>The verdict binds to the content.</b> The eval receipt is (target state) keyed to the <code>candidate_digest</code>, so you cannot serve one pack and cite another's evaluation. Today the summary is baked into <code>pack.yaml</code> as <code>PackEvalSummary</code>; making it an immutable digest-bound receipt is S1.3 (<span class="pill b-spec">SPECIFIED</span>).</li>
+</ul>
+<div class="call inv"><div class="t">The property this buys</div>At serve time the answer carries a trust envelope; at release time the pack carries an eval receipt bound to its digest. Together they close the loop the naïve RAG stack cannot: you can prove, after the fact, that what the agent used was approved, unaltered, and measured to help.</div>
+</section>
+
+<section id="s9">
+<h2><span class="n">9</span>Governance as a control system</h2>
+<p>Everything above rests on a governance spine that most "context layer" designs omit. The non-negotiable invariants (from <code>DOMAIN_PACK_PLATFORM_BUILD_INSTRUCTION_SET_2026-07.md</code> §3) are worth stating because they are what make the architecture enterprise-grade rather than a clever cache:</p>
+<ul>
+  <li><b>LLM output is a candidate, never an authority.</b> Extraction proposes; a human Delta review approves. No model output reaches a release decision unreviewed.</li>
+  <li><b>Delta-gated promotion.</b> An artifact cannot become ACTIVE without a governing <code>delta_id</code> — enforced in the type system, not by convention (<code>artifacts.py:135-151</code>). This is the platform's single strongest built idea.</li>
+  <li><b>Deterministic, network-free compile.</b> Same source → byte-identical output, regardless of input order, working directory, or wall-clock. This is what S1.1 (in review now) locks down: an explicit input/output inventory and a reproducible <code>candidate_digest</code>.</li>
+  <li><b>Candidate bytes never change after the digest is computed.</b> No volatile value (timestamp, path, eval result) is ever written inside a candidate directory.</li>
+  <li><b>Aggregate scores cannot hide a critical failure.</b> A compliance, privacy, tenancy, or numeric failure is not averaged away by a good overall score.</li>
+  <li><b>Synthetic content is permanently barred from production release</b>, and the kernel may not hard-code any one client or domain — enforced by the "second-consumer gate" (§10).</li>
+  <li><b>Typed staleness, not a "last updated" badge.</b> Staleness has eight/nine typed reasons (source expired, label changed, review overdue, dependent changed, eval too old, projection obsolete…), each carrying an owner and a required remediation. This is <span class="pill b-road">ROADMAP</span> — today <code>freshness</code> fields are echoed to the UI as if measured.</li>
+</ul>
+<p class="small">Governance also needs organizational shape: separation of duties (the build plane "cannot approve its own output"), authenticated principals on every mutation, and contribution scores that "never grant medical, legal, regulatory, or MLR authority." The write-model consolidation onto a single system of record is the live F0.3 decision.</p>
+</section>
+
+<section id="s10">
+<h2><span class="n">10</span>Scale &amp; multi-tenancy</h2>
+<p>Scaling a context layer to an enterprise is <b>scale by composition, not by cloning</b>. A new domain or client should register overlays, validators, and profiles — not fork the engine.</p>
+<ul>
+  <li><b>Compile-time overlay resolution.</b> The overlay stack is resolved into <em>one</em> digest-addressed, sealed pack at compile time; the runtime always serves exactly one pack per agent. Serve-time multi-pack merging is rejected — this preserves "the served thing IS the eval-gated thing."</li>
+  <li><b>The second-consumer gate (Step 10).</b> The platform is only proven domain-independent when a second, non-brand pack compiles and serves "without a schema fork, copied base ontology, new compiler, new lifecycle, or new serving path." This is the structural guard against the kernel quietly hard-coding the first client.</li>
+  <li><b>Tenant isolation is total.</b> Every row, object, cache entry, vector namespace, and projection carries tenant + candidate/release scope; the first pharma deployment isolates database, object storage, registry namespace, projections, keys, backups, logs, and runtime identity into a client-isolated VPC.</li>
+</ul>
+<div class="call gap"><div class="t">Honest scale limits (from the platform's own audit)</div>The system is proven at ~24 artifacts and <b>unquantified beyond that</b>: the L3 directory grows linearly with active sections, identifier extraction is O(n²), and retrieval is lexical-only. A dedicated "scale probe" (M2) is planned to assign real numbers. Multi-tenant <em>confidential</em> segregation "has no mechanism" yet — the direction (client overlays in separate repos, per-tenant registries) is right but undemonstrated. These are the thresholds at which a vector store, a graph store, and hardened tenancy stop being optional.</div>
+</section>
+
+<section id="s11">
+<h2><span class="n">11</span>Gap ledger — reference need vs. Onto_Wiz today</h2>
+<p>A consolidated, honest reading of the difference between the reference architecture and the current build. This is the actionable core of the report.</p>
+<div class="tw"><table>
+<thead><tr><th>Capability</th><th>Why an enterprise layer needs it</th><th>Status</th><th>Note</th></tr></thead>
+<tbody>
+<tr><td>Govern → compile → seal → gate → serve → measure lift</td><td>The consume spine — the whole point</td><td><span class="pill b-built">BUILT</span></td><td>Real, tested; the platform's genuine strength</td></tr>
+<tr><td>Delta-gated promotion, type-enforced</td><td>No unapproved knowledge reaches production</td><td><span class="pill b-built">BUILT</span></td><td>Enforced at two levels</td></tr>
+<tr><td>Deterministic compile + input/output inventory + digest</td><td>Reproducibility &amp; audit</td><td><span class="pill b-spec">SPECIFIED</span></td><td>S1.1 submitted, in independent review now</td></tr>
+<tr><td>Verify-before-load on the serve path</td><td>Never serve an unattested/tampered pack</td><td><span class="pill b-road">ROADMAP</span></td><td>S1.2; <code>pack.sig</code> written but not checked at load</td></tr>
+<tr><td>Always-included safety artifacts enforced</td><td>Guardrails must survive budget trimming</td><td><span class="pill b-road">ROADMAP</span></td><td>Declared, unenforced (card F0.10)</td></tr>
+<tr><td>Schema registry + migrations</td><td>Contracts evolve without silent breakage</td><td><span class="pill b-spec">SPECIFIED</span></td><td>Step 2; no <code>schema_version</code> story yet</td></tr>
+<tr><td>Artifact registry (OCI + Sigstore + SLSA)</td><td>Digest-addressed, attested, tenant-scoped release</td><td><span class="pill b-road">ROADMAP</span></td><td><code>PackSource</code>/<code>ArtifactRegistry</code> seams specified, zero code</td></tr>
+<tr><td>Encryption-at-rest + license binding</td><td>IP protection in on-prem/embed modes</td><td><span class="pill b-road">ROADMAP</span></td><td>Placeholder flags only; seal ≠ confidentiality</td></tr>
+<tr><td>Consolidation (dedup · contradiction · conflict classes · merge)</td><td>Multiple SMEs/sources must reconcile, not collide</td><td><span class="pill b-road">ROADMAP</span></td><td>The sharpest gap — no owner/design; targeted M3 (intra-pack) / M4 (cross-pack)</td></tr>
+<tr><td>Capture / extraction (SME interview, doc→knowledge)</td><td>The produce side — how knowledge enters</td><td><span class="pill b-road">ROADMAP</span></td><td>Thinnest part of the tree; "Grill Me" instruction set is the plan</td></tr>
+<tr><td>Semantic retrieval (vector store) + graph store</td><td>Scale beyond a routable directory; neighborhood traversal</td><td><span class="pill b-road">ROADMAP</span></td><td>Deliberately deferred; reserve the seam, build at threshold (§10)</td></tr>
+<tr><td>Typed staleness</td><td>Actionable freshness, owner + remediation</td><td><span class="pill b-road">ROADMAP</span></td><td>Fields echoed as if measured today</td></tr>
+<tr><td>Structured-data fusion (table/join/query contracts)</td><td>Numbers alongside knowledge, safely typed</td><td><span class="pill b-road">ROADMAP</span></td><td>Only the serving spine between the halves is built</td></tr>
+<tr><td>Multi-tenant confidential segregation + observability</td><td>Real enterprise isolation &amp; ops</td><td><span class="pill b-road">ROADMAP</span></td><td>SQLite behind one connection today; no backup/monitoring/OTel</td></tr>
+<tr><td>Control-plane product (authoring, eval, release, simulator UIs)</td><td>A team a client can operate</td><td><span class="pill b-road">ROADMAP</span></td><td>Only <code>/catalog</code> is real; the five thesis screens are synthetic fixtures</td></tr>
+</tbody></table></div>
+<p class="small">The platform's own one-line self-assessment: the consume side (govern → compile → seal → gate → serve → measure) is real; the produce side (capture, consolidation, an operable authoring path) is the thinnest part; the July pivot (ADR-018/019, S1.x) "targets exactly the right defects, but is so far documentation plus zero implementation." This report does not soften that.</p>
+</section>
+
+<section id="s12">
+<h2><span class="n">12</span>Recommended target architecture &amp; sequence</h2>
+<p>Pulling it together: the target is three deployable planes over the shared substrate set, built back-to-front so the integrity kernel is locked before the surfaces that depend on it.</p>
+
+<div class="fig">
+  <div class="band" style="border-style:solid"><b>Control plane</b> <span class="small">(Tier A, key-free of model creds)</span> — catalog · governance · curation · eval metadata · releases · admin. <span class="small">Cannot hold model credentials or serve agent traffic.</span></div>
+  <div class="row" style="margin-top:12px">
+    <div class="node"><div class="h">Build plane <span class="small">(Tier B)</span></div><div class="d">Isolated compiler/eval workers. Hold model creds + source access. <b>Cannot activate or approve their own output.</b></div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="h">Registry <span class="small">(digest-addressed)</span></div><div class="d">Signed, attested release bundles. The only thing the runtime loads.</div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="h">Data plane <span class="small">(Tier A, per-tenant)</span></div><div class="d">Projections · context resolution · agent traffic. <b>Cannot mutate governance or serve an unattested candidate.</b></div></div>
+  </div>
+  <div class="band" style="margin-top:12px"><b>Substrates:</b> Git (approved source) · relational DB (workflow/audit) · registry+object store (released bytes) · graph (structure, at scale) · vector (shortlist, at scale) · cache (disposable projections). <b>Boundary rule:</b> Tier A → Tier A only; Tier A → Tier B is a build failure (<code>tools/check_boundaries.py</code>).</div>
+  <div class="cap">Figure 3 — Target topology (ADR-019). One monorepo, three independently deployable planes, over substrates that each own one truth. Built as a client-isolated VPC for the first pharma deployment.</div>
+</div>
+
+<h3>Build sequence (backend-first, and where we are)</h3>
+<ol>
+  <li><b>Integrity kernel</b> — deterministic compile + inventory (S1.1, <span class="pill b-spec">in review now</span>) → verify-before-load + always-included enforcement (S1.2) → digest-bound eval receipt (S1.3).</li>
+  <li><b>Schema kernel</b> (Step 2) — freeze the canonical contracts + registry + the <code>PackSource</code>/<code>ArtifactRegistry</code> seams. Everything downstream writes against stable interfaces.</li>
+  <li><b>Source → candidate lineage + consolidation</b> (Steps 3–5, M3/M4) — the produce side and the resolver; this is where the single biggest gap (consolidation) must get an owner.</li>
+  <li><b>Projections &amp; typed serving</b> (Step 8) — including the structured-data path for the analytics half of the vertical examples; add graph/vector projections only at the scale thresholds in §10.</li>
+  <li><b>First executable exam</b> (Steps 6–7) — MLR + brand-analytics verticals against the reference pack, production release still barred.</li>
+  <li><b>Control plane, one screen at a time</b> — replace the synthetic fixtures with real authoring/eval/release/simulator surfaces once the backend they depend on exists.</li>
+</ol>
+
+<div class="call inv"><div class="t">The one principle to keep</div>Build the governance and integrity spine before the retrieval sophistication. A vector store bolted onto an ungoverned corpus is a faster way to serve unapproved content; the same vector store over a governed, gated, attested pack is a genuine scale improvement. Sequence protects the difference.</div>
+</section>
+
+<section id="appx">
+<h2><span class="n">A</span>Appendix — citation map</h2>
+<p class="small">Every substantive claim above can be checked against the tree. Paths relative to the repo root.</p>
+<div class="tw"><table>
+<thead><tr><th>Topic</th><th>File</th><th>Lines</th></tr></thead>
+<tbody>
+<tr><td>CTX layer enum (L0–L3, MANIFEST)</td><td><code>packages/ontowiz-ctx/ontowiz_ctx/core/model.py</code></td><td>14-19</td></tr>
+<tr><td>.ctx operators / parser grammar</td><td><code>…/core/model.py</code> · <code>…/core/parser.py</code></td><td>22-37 · 31,35</td></tr>
+<tr><td>L3 directory (system prompt) / topology gist</td><td><code>…/core/hydration_protocol.py</code> · <code>…/core/packer/l3_generator.py</code></td><td>23-84 · 36,123-169</td></tr>
+<tr><td>Hydration (consume L2 by section)</td><td><code>…/core/hydrator.py</code></td><td>59-138</td></tr>
+<tr><td>19 artifact kinds + governance enforcement</td><td><code>packages/ontowiz-spec/ontowiz_spec/artifacts.py</code></td><td>53-77 · 80-84 · 135-151</td></tr>
+<tr><td>Manifest + overlay <code>PackLayer</code> + on-disk layout</td><td><code>packages/ontowiz-spec/ontowiz_spec/pack_manifest.py</code></td><td>8-12 · 19-77</td></tr>
+<tr><td>Pack compiler (L2/L3/manifest/sig, deterministic)</td><td><code>packages/ontowiz-factory/ontowiz_factory/compiler.py</code></td><td>81-108 · 156-202</td></tr>
+<tr><td>Agent-lift benchmark + eval gate</td><td><code>…/ontowiz_factory/benchmark.py</code> · <code>…/evals.py</code></td><td>44-104,190-239 · 94-107</td></tr>
+<tr><td>Runtime gate → directory → trust envelope</td><td><code>packages/ontowiz-runtime/ontowiz_runtime/context.py</code></td><td>64-216</td></tr>
+<tr><td>Registry load + version pin + traversal guard</td><td><code>…/ontowiz_runtime/registry.py</code></td><td>34-78</td></tr>
+<tr><td>Serve doors (REST + MCP), typed errors, RBAC</td><td><code>packages/ontowiz-serve/ontowiz_serve/{api,mcp,roles}.py</code></td><td>api 104-318 · mcp 54-99 · roles 15-20</td></tr>
+<tr><td>Authored graph (entity_registry) / decision heuristic</td><td><code>packs/commercial_analytics/0.3.0/artifacts/{commercial-entities,rule_safety_signal}.yaml</code></td><td>28-49 · 1-56</td></tr>
+<tr><td>Reference property graph + overlay stack</td><td><code>examples/reference_domain_packs/auravia_marketing/0.1.0/{ontology/marketing_ontology,pack}.yaml</code></td><td>48-254 · 29-48</td></tr>
+<tr><td>Determinism spec (manifest v2, inventories, digest)</td><td><code>docs/specs/S1-1_DETERMINISTIC_COMPILE.md</code></td><td>30-100,239-252</td></tr>
+<tr><td>Three planes / seams / tier boundary</td><td><code>docs/adr/ADR-019-…</code> · <code>ADR-018-…</code> · <code>ADR-012-…</code></td><td>Decisions 1-3</td></tr>
+<tr><td>Build steps 0–10, invariants §3</td><td><code>docs/specs/DOMAIN_PACK_PLATFORM_BUILD_INSTRUCTION_SET_2026-07.md</code></td><td>§3,§4,§8</td></tr>
+<tr><td>Honest status ledger (built/spec/roadmap)</td><td><code>docs/reviews/PLATFORM_READINESS_AUDIT_2026-07.html</code></td><td>§1,§4,§6-10</td></tr>
+</tbody></table></div>
+</section>
+
+<div class="foot">
+  Prepared as an architecture reference for the Onto_Wiz Domain Pack Platform · 2026-07. Status vocabulary (<span class="pill b-built">BUILT</span>/<span class="pill b-spec">SPECIFIED</span>/<span class="pill b-road">ROADMAP</span>) mirrors the platform's own control language; where the reference model and the current build diverge, the badge marks the work, not a claim of completion.
+</div>
+
+</main>
+</div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-# Session memory (session 5fbd6c1d, 1088 turns)
+# Session memory (session 5fbd6c1d, 1117 turns)
 
 Deterministic ledger recovered from the session transcript. Full detail: `ctxpack hydrate` on the session .ctx, or grep the raw transcript.
 
@@ -8,7 +8,7 @@ Deterministic ledger recovered from the session transcript. Full detail: `ctxpac
 - I chose the lower-risk **additive** path + **application-integrity checks**, which §13 step 3 explicitly permits ("foreign keys **/ application integrity checks**"). (turn 851)
 - **It overturns my F0.4A #7 decision — and it's right to.** I chose "parser-local IR in Tier B, E1.1 owns the served contract" for minimalism. (turn 990)
 
-## Exact identifiers (verbatim) (showing 40 highest-rank of 57 — full set in the ledger)
+## Exact identifiers (verbatim) (showing 40 highest-rank of 63 — full set in the ledger)
 - docs/PROJECT_STATUS.md [path] (turn 1)
 - 0.3.0 [version] (turn 1)
 - 85% [number_unit] (turn 42)
@@ -21,24 +21,18 @@ Deterministic ledger recovered from the session transcript. Full detail: `ctxpac
 - v0.5.0 [version] (turn 546)
 - 6bc5009 [git_sha] (turn 584)
 - 3f64708 [git_sha] (turn 584)
-- .github/workflows/ci.yml [path] (turn 679)
-- docs/specs/F0-1_CI_GATE_SET.md [path] (turn 679)
 - 7878a96 [git_sha] (turn 698)
-- ontowiz-core/stores.py [path] (turn 716)
 - 5f2a4b5 [git_sha] (turn 803)
-- services/api.ts [path] (turn 803)
 - 0.4.0 [version] (turn 806)
 - 0.1.0 [version] (turn 806)
 - docs/specs/DELIVERY_LOOPS_BACKLOG_2026-07.md:10 [path] (turn 807)
 - docs/specs/BUILD_INSTRUCTION_SET_2026-07.md:176 [path] (turn 807)
-- docs/specs/F0-2H_PERSISTENCE_HARDENING.md [path] (turn 835)
 - #5 [pr] (turn 847)
 - #6 [pr] (turn 847)
 - #7 [pr] (turn 847)
 - #8 [pr] (turn 847)
 - #2 [pr] (turn 851)
 - #3 [pr] (turn 868)
-- docs/specs/F0-4A_PARSER_BOUNDARY.md [path] (turn 924)
 - 8bc247e [git_sha] (turn 939)
 - 2ba342b [git_sha] (turn 954)
 - #9 [pr] (turn 966)
@@ -49,6 +43,12 @@ Deterministic ledger recovered from the session transcript. Full detail: `ctxpac
 - d748f73 [git_sha] (turn 1070)
 - ontowiz_serve/mcp.py [path] (turn 1070)
 - 801a35f [git_sha] (turn 1086)
+- 5fbd6c1d [git_sha] (turn 1097)
+- .claude/ctx/session-5fbd6c1d.ctx [path] (turn 1097)
+- a25656c [git_sha] (turn 1112)
+- f686f1b [git_sha] (turn 1116)
+- docs/specs/CONTROL_PLANE_PRODUCT_BLUEPRINT_2026-07.md [path] (turn 1116)
+- docs/specs/PLATFORM_BASELINE_STRUCTURE_2026-07.md [path] (turn 1116)
 
 ## What was asked
 - resume How I'll resume after you clear

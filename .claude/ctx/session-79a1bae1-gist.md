@@ -1,10 +1,13 @@
-# Session memory (session 79a1bae1, 166 turns)
+# Session memory (session 79a1bae1, 773 turns)
 
 Deterministic ledger recovered from the session transcript. Full detail: `ctxpack hydrate` on the session .ctx, or grep the raw transcript.
 
 ## Constraints (verbatim — do not violate)
 - - feedback_v2_builder_protocol.md — the v2 rule: never self-verify; per-unit → §12.1 mini-spec → TDD → gates → §6 bundle → immutable review SHA on a build/<unit-id> worktree → HOLD; only INT marks VERIFIED. (turn 1)
 - Constraint: 360/768/1440 live screenshots remain the carried outstanding shared-FE-DoD item (same as D0.1/D0.2) — responsive behavior is test-enforced (truncate + flex-wrap) and the local browser-capture path is documented-flaky here; the running dev server on :3000 is currently returning 500 (stale, pre-existing — production `next build` is clean). (turn 165)
+- Constraint: FE will not name new lifecycle/status vocabulary — the §B ★ states must be ratified by BE/KE against `ontowiz-spec` before D0.10 renders them, per blueprint invariant #5. (turn 212)
+- Constraint: the control-plane prototype is **untracked** in the working tree and is not mine — I touched none of its files; it's naturally excluded from the D0.4 review branch (which is `59029aa` + a D0.4-only commit), though its ~8 tests inflate the dev-tree suite count to 100. (turn 369)
+- Constraint: `/control-plane` must always be reported as a simulator, never as evidence of system function. (turn 771)
 
 ## Decisions
 - **Decision:** D0.3 ships three cohesive chip components in one module `frontend/src/ui/chips.tsx` — `AttributionChip` (person + decorative avatar + optional ✓/calibration), `ProvenanceChip` (`.chip.src` source-locator, optional deep-link), `LayerChip` (`.tag` L1–L5 ontology layer (turn 78)
@@ -16,41 +19,34 @@ Deterministic ledger recovered from the session transcript. Full detail: `ctxpac
 - Decision: layer tones stay faithful to Prototype 9 — L1 cyan, L3 molten, L2/L4/L5 neutral — the text label always carries meaning so colour is never the sole signal. (turn 165)
 - Decision: submitted D0.3 as immutable review SHA `59029aa` on `build/D0.3-chips`, cut via a throwaway worktree off D0.2's `5af28b1` with gates run in the main working tree, because the branch tip reconstructs the identical D0.1+D0.2+D0.3 tree and the fresh worktree lacks node_mod (turn 165)
 - Decision: did not edit the INT-owned §0A baseline table (it carries your uncommitted edits and D0.2 was likewise left for you) — signalled `READY FOR REVIEW` via the branch + bundle + this report. (turn 165)
+- Decision: adopted D0 `src/ui` tokens as the single canonical design system per your call; the control-plane prototype's `--cp-*` + `control-plane.module.css` retire onto them (0/15 tokens currently match — a real, quantified drift, not a cosmetic nit). (turn 212)
+- Decision: treat the control-plane prototype as an executable pattern library that reshapes the D0 backlog — proposed new units D0.10–D0.14 so the design system covers the full product before D1.2 rebases it, rather than discovering the gaps mid-rebase. (turn 212)
+- **Decision:** D0.4 rebases the 6 live primitives (Button, Card, Input, Textarea, Modal, ProgressDots) onto Foundry tokens at a single foundry density (retiring the persona density system, which nothing but these primitives consumed), adds focus-visible/error/disabled + dialog a11 (turn 266)
+- Decision: D0.4 rebased the 6 live primitives onto Foundry tokens at a single density and retired the persona density system, which grep-verified only these primitives consumed — so `lib/persona.ts` and the two dashboards that read the mode string stay untouched and no consumer re (turn 369)
+- Decision: deleted `Badge.tsx` rather than recolouring it, because it is dead code (zero JSX usages) strictly superseded by D0.2 `LifecycleBadge` — the anti-bloat call the D0.2 bundle explicitly deferred to D0.4. (turn 369)
+- Decision: the FE lane's blocking constraint is integration, not component count — four reviewed units and a working engine exist, but zero merges and zero real-data consumers, so more D0 units increase inventory without increasing testability. (turn 415)
+- Decision: `/control-plane` must be labelled a simulator in all status reporting — it is fed entirely by `mock-data.ts` and local `/api/control-plane/*` routes and shares no data path with the Python engine, so its polish is not evidence of system function. (turn 415)
+- Decision: built D1.0 as a vertical slice consuming only already-VERIFIED endpoints (F3, F5 UX-2), which satisfies contract-before-consumer against a *shipped* contract and sidesteps the F0.3A block that still holds D1.1. (turn 771)
+- Decision: solved the CORS gap with an FE-owned Next same-origin proxy rather than patching server config, because endpoint/server config is BE-owned — and it additionally removes the build-time-baked backend origin from the client bundle. (turn 771)
+- Decision: corrected the D1.0 spec mid-red after the live response disproved two assumptions, rather than implementing to the draft — provenance is rendered as absent because the endpoint genuinely carries none. (turn 771)
 
-## Exact identifiers (verbatim)
+## Exact identifiers (verbatim) (showing 14 highest-rank of 50 — full set in the ledger)
 - .claude/ctx/session-295a4abf.ctx [path] (turn 1)
-- 1985 BPE [number_unit] (turn 1)
 - docs/reviews/D0.1_REVIEW_BUNDLE.md [path] (turn 1)
 - 0.563.0 [version] (turn 74)
 - 5f2a4b5 [git_sha] (turn 78)
 - 5af28b1 [git_sha] (turn 78)
-- frontend/src/ui/chips.tsx [path] (turn 78)
-- 91.7% [number_unit] (turn 110)
-- 93.5% [number_unit] (turn 110)
-- 100% [number_unit] (turn 110)
-- 85% [number_unit] (turn 110)
-- 59029aa [git_sha] (turn 145)
 - 8bc247e [git_sha] (turn 145)
-- 97.54% [number_unit] (turn 165)
-- 96.25% [number_unit] (turn 165)
-- docs/reviews/D0.3_REVIEW_BUNDLE.md [path] (turn 165)
-- docs/specs/D0.3_CHIPS.md [path] (turn 165)
 - scripts/verify-audit.sh [path] (turn 165)
+- #3 [pr] (turn 198)
+- #5 [pr] (turn 212)
+- 0.1.0 [version] (turn 415)
+- 0.2.0 [version] (turn 415)
+- 0.3.0 [version] (turn 415)
+- http://localhost:3100/packs** [url] (turn 771)
+- 6673eec [git_sha] (turn 771)
 
 ## Memory incidents (ctx telemetry)
 - ctx-incident: saved | fact="FE resume pointer + D0.1/D0.2 submitted SHAs" | evidence="session-start gist + project_ontowiz_foundry_fe.md matched live git state (build/D0.1 8263575, build/D0.2 5af28b1); resumed D0.3 with no rework" (turn 165)
-
-## What was asked
-- resume and some context Done — you're safe to /clear (turn 1)
-
-## Errors seen
-- Exit code 143 Command timed out after 2m 0s (turn 9)
-
-## Files changed
-- C:\Users\kapil\Documents\Onto_Wiz\docs\specs\D0.3_CHIPS.md (1 edits) (turn 79)
-- C:\Users\kapil\Documents\Onto_Wiz\frontend\src\ui\chips.tsx (1 edits) (turn 90)
-- C:\Users\kapil\Documents\Onto_Wiz\frontend\src\app\ui\page.tsx (2 edits) (turn 98)
-- C:\Users\kapil\Documents\Onto_Wiz\frontend\src\app\ui\ui.test.tsx (2 edits) (turn 103)
-- C:\Users\kapil\Documents\Onto_Wiz\frontend\src\ui\chips.test.tsx (2 edits) (turn 115)
-- C:\Users\kapil\Documents\Onto_Wiz\docs\reviews\D0.3_REVIEW_BUNDLE.md (2 edits) (turn 157)
-- C:\Users\kapil\.claude\projects\C--Users-kapil-Documents-Onto-Wiz\memory\project_ontowiz_foundry_fe.md (2 edits) (turn 162)
+- ctx-incident: saved | fact="control-plane prototype is mock-fed, not backend-wired" | evidence="mock-server.ts imports mock-data.ts; src/app/api/control-plane/* are local simulator routes" (turn 415)
+- ctx-incident: saved | fact="ontowiz-serve has no CORS middleware" | evidence="OPTIONS /v1/context → 405; GET /v1/packs with Origin returns no Access-Control-Allow-Origin" (turn 771)

@@ -1,0 +1,576 @@
+§CTX v1.0 L2 DOMAIN:session-295a4abf
+COMPRESSED:2026-07-11 SOURCE_TOKENS:~1564 CTX_TOKENS:~2220 RATIO:~0.9x
+
+±ENTITY-USER-REQUEST-B7EC4117
+REQUEST:can you play the role of frontend team on this repo C:\Users\kapil\Documents\Onto_Wiz\docs\TEAM_START_HERE.md will give you some guidance, i have started the backend team.
+TURN:0
+FACT-ID:570f4b759ee64d07
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn0
+±ENTITY-LITERAL-147E6279
+VALUE:C:\Users\kapil\Documents\Onto_Wiz\docs\TEAM_START_HERE.md
+KIND:path
+TURN:0
+FACT-ID:8dda8ed484f5708a
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn0
+±ENTITY-TOOL-BASH-0005
+RAN:List frontend directory structure
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz" && echo "=== frontend tree (depth 3, no node_modules) ===" && find frontend -type d -not -path '*/node_modules/*' -not -p
+TURN:15
+SRC:session:295a4abf#turn15
+±ENTITY-TOOL-BASH-0006
+RAN:Locate Prototype 9 HTML and review docs
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz" && echo "=== find Prototype 9 ===" && find . -iname "*prototype*9*" -not -path '*/node_modules/*' 2>/dev/null && echo "==
+TURN:17
+SRC:session:295a4abf#turn17
+±ENTITY-TOOL-BASH-0007
+RAN:List all frontend source files
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && echo "=== all src files ===" && find src -type f 2>/dev/null | sort && echo "" && echo "=== ui components ===
+TURN:21
+SRC:session:295a4abf#turn21
+±ENTITY-TOOL-BASH-0014
+RAN:List ADRs, specs, and dep-approval log
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz" && echo "=== ADRs ===" && ls docs/adr/ 2>/dev/null && echo "" && echo "=== specs ===" && ls docs/specs/ 2>/dev/null && ec
+TURN:41
+SRC:session:295a4abf#turn41
+±ENTITY-TOOL-BASH-0015
+RAN:Check node_modules and vitest config
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && echo "=== node_modules present? ===" && test -d node_modules && echo yes || echo no && echo "=== vitest.confi
+TURN:43
+SRC:session:295a4abf#turn43
+±ENTITY-TOOL-BASH-0016
+RAN:Run frontend Vitest baseline
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && echo "=== vitest run ===" && npx vitest run 2>&1 | tail -25
+TURN:47
+SRC:session:295a4abf#turn47
+±ENTITY-TOOL-BASH-0019
+RAN:Inspect PostCSS/Tailwind/TS config
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && echo "=== postcss.config ===" && cat postcss.config.* 2>/dev/null && echo "" && echo "=== tailwind.config ? =
+TURN:57
+SRC:session:295a4abf#turn57
+±ENTITY-DECISION-42236A12
+DECISION:The Lead chose the **in-app `/ui` gallery (zero new deps)** — I'll build the D0 harness that way.
+TURN:64
+FACT-ID:c1c66570de09b913
+BASIS:inferred
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn64
+±ENTITY-DECISION-965C00C2
+DECISION:Decision: build the D0 component gallery as an in-app Next.js `/ui` route rather than Storybook, because it adds zero dependencies (honoring ADR-006/R6), demos on the live URL (which the backlog prefers over tool-only demos), and is covered by the existing Vitest gate.
+TURN:64
+FACT-ID:015f3aa7138f715d
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn64
+±ENTITY-TOOL-BASH-0025
+RAN:Confirm new tests fail (TDD red)
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && npx vitest run src/ui/tokens.test.ts src/app/ui/ui.test.tsx 2>&1 | tail -20
+TURN:74
+SRC:session:295a4abf#turn74
+±ENTITY-LITERAL-9A80B8E2
+VALUE:85%
+KIND:number_unit
+TURN:90
+FACT-ID:cb704082c5caf85a
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn90
+±ENTITY-TOOL-BASH-0031
+RAN:Run new D0.1 tests for green
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && echo "=== targeted (should be green) ===" && npx vitest run src/ui/tokens.test.ts src/app/ui/ui.test.tsx 2>&1
+TURN:95
+SRC:session:295a4abf#turn95
+±ENTITY-TOOL-BASH-0032
+RAN:Show drift-guard failure detail
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && npx vitest run src/ui/tokens.test.ts 2>&1 | grep -A 25 "sync with tokens"
+TURN:99
+SRC:session:295a4abf#turn99
+±ENTITY-TOOL-BASH-0035
+RAN:Re-run D0.1 tests for green
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && npx vitest run src/ui/tokens.test.ts src/app/ui/ui.test.tsx 2>&1 | tail -8
+TURN:107
+SRC:session:295a4abf#turn107
+±ENTITY-TOOL-BASH-0036
+RAN:Full Vitest suite with coverage
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && echo "=== vitest run + coverage ===" && npx vitest run --coverage 2>&1 | tail -30
+TURN:110
+SRC:session:295a4abf#turn110
+±ENTITY-LITERAL-021B4CD4
+VALUE:96.55%
+KIND:number_unit
+TURN:113
+FACT-ID:d8372ecdc57f285e
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn113
+±ENTITY-TOOL-BASH-0037
+RAN:Focused coverage on D0.1 files
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && npx vitest run --coverage src/ui/tokens.test.ts src/app/ui/ui.test.tsx 2>&1 | sed -n '/Coverage report/,/Cove
+TURN:114
+SRC:session:295a4abf#turn114
+±ENTITY-TOOL-BASH-0039
+RAN:Re-run full coverage with explicit ui globs
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && npx vitest run --coverage 2>&1 | sed -n '/Coverage report/,/Coverage summary/p'
+TURN:120
+SRC:session:295a4abf#turn120
+±ENTITY-TOOL-BASH-0040
+RAN:List files v8 actually instrumented
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && npx vitest run --coverage --coverage.reporter=json-summary src/ui/tokens.test.ts src/app/ui/ui.test.tsx >/dev
+TURN:124
+SRC:session:295a4abf#turn124
+±ENTITY-LITERAL-3A6FF09E
+VALUE:src/ui/tokens.ts
+KIND:path
+TURN:127
+FACT-ID:fbfc633b6220b834
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn127
+±ENTITY-LITERAL-C1D6C5C1
+VALUE:src/app/ui/page.tsx
+KIND:path
+TURN:127
+FACT-ID:13832d7cf9119deb
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn127
+±ENTITY-LITERAL-FAE31ECE
+VALUE:100%
+KIND:number_unit
+TURN:127
+FACT-ID:52cc95a1c0366f77
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn127
+±ENTITY-TOOL-BASH-0041
+RAN:Show per-file coverage for D0.1 files
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && node -e "const s=require('./coverage/coverage-summary.json'); for(const k of Object.keys(s)){ if(/ui..(tokens
+TURN:128
+SRC:session:295a4abf#turn128
+±ENTITY-ERROR-52E5C037
+MESSAGE:Exit code 1 [eval]:1 const s=require('./coverage/coverage-summary.json'); for(const k of Object.keys(s)){ if(/ui..(tokens|page)/.test(k.replace(/\/g,'/'))){ const f=k.split(/[\/]/).slice(-2).join('/'); const c=s[k]; console.log(f, 'stmts', 
+TURN:129
+FACT-ID:e52e7caba543aecc
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn129
+±ENTITY-TOOL-BASH-0042
+RAN:Print D0.1 per-file coverage numbers
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && cat > /tmp/covcheck.cjs <<'EOF' const s = require('./coverage/coverage-summary.json'); for (const k of Object
+TURN:132
+SRC:session:295a4abf#turn132
+±ENTITY-ERROR-6B55DA27
+MESSAGE:Exit code 1 C:\Users\kapil\AppData\Local\Temp\covcheck.cjs:3 const f = k.replace(/\/g, '/'); ^^^^^^^^ SyntaxError: missing ) after argument list at wrapSafe (node:internal/modules/cjs/loader:1662:18) at Module._compile (node:internal/module
+TURN:133
+FACT-ID:7b0aa8d0ffc82601
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn133
+±ENTITY-TOOL-BASH-0044
+RAN:Print D0.1 per-file coverage
+COMMAND:node "C:\Users\kapil\AppData\Local\Temp\claude\C--Users-kapil-Documents-Onto-Wiz\295a4abf-a7b8-45a3-8ff7-db1f8bbf117b\scratchpad\covcheck.cjs"
+TURN:138
+SRC:session:295a4abf#turn138
+±ENTITY-TOOL-BASH-0045
+RAN:Run typecheck and lint
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && echo "=== tsc --noEmit ===" && npx tsc --noEmit 2>&1 | tail -15 && echo "EXIT tsc: $?" && echo "" && echo "==
+TURN:142
+SRC:session:295a4abf#turn142
+±ENTITY-TOOL-BASH-0046
+RAN:Run next build
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && npx next build 2>&1 | tail -40
+TURN:145
+SRC:session:295a4abf#turn145
+±ENTITY-TOOL-BASH-0047
+RAN:Run authoritative verify-audit gate
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz" && bash scripts/verify-audit.sh 2>&1 | tail -35
+TURN:149
+SRC:session:295a4abf#turn149
+±ENTITY-LITERAL-B4B427EF
+VALUE:98.38%
+KIND:number_unit
+TURN:152
+FACT-ID:60560800d1d3301b
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn152
+±ENTITY-ERROR-B6CDE733
+MESSAGE:<tool_use_error>File has been modified since read, either by the user or by a linter. Read it again before attempting to write it.</tool_use_error>
+TURN:154
+FACT-ID:da09358c65159f0c
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn154
+±ENTITY-TOOL-BASH-0051
+RAN:Review changed files and ignore status
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz" && echo "=== git status (short) ===" && git status --short && echo "" && echo "=== is frontend/coverage gitignored? ===" 
+TURN:165
+SRC:session:295a4abf#turn165
+±ENTITY-DECISION-E115199C
+DECISION:Decision: build the D0 component gallery as an in-app `/ui` Next.js route instead of Storybook, because it adds zero dependencies (honoring ADR-006/R6), demos on the live URL, and rides the existing Vitest gate — the Lead approved this fork.
+TURN:168
+FACT-ID:a129c144b59894a6
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn168
+±ENTITY-DECISION-2CB57D27
+DECISION:Decision: split D0 into nine R2 units (D0.1 tokens+harness → D0.2 LifecycleBadge → D0.3 chips → D0.4 primitives rebase → D0.5 ConfirmSheet → D0.6 CardStack → D0.7 Drawer → D0.8 DiffView → D0.9 Tree), since D0 as one unit exceeds the one-person-week R2 ceiling.
+TURN:168
+FACT-ID:817ae764777a8bd3
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn168
+±ENTITY-DECISION-BBC12D5A
+DECISION:Decision: make `ui/tokens.ts` (typed) the single source of truth and mirror it into `tokens.css` `@theme`, enforced by a drift-guard test, rather than duplicating token values with no guard.
+TURN:168
+FACT-ID:e0b36a9b45cafa04
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn168
+±ENTITY-DECISION-AC999479
+DECISION:Decision: defer webfont *loading* — D0.1 ships font-family stacks with system fallbacks (Space Grotesk / IBM Plex → system-ui) so the unit stays offline-safe and dependency-clean; wiring the actual Google fonts via built-in `next/font` is a later noted follow-up.
+TURN:168
+FACT-ID:47bd3fb1c5fc1070
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn168
+±ENTITY-LITERAL-E86A13AF
+VALUE:ui/tokens.ts
+KIND:path
+TURN:168
+FACT-ID:e665a43f2a904318
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn168
+±ENTITY-LITERAL-7A393DB9
+VALUE:ui/tokens.css
+KIND:path
+TURN:168
+FACT-ID:48f88208dca675d6
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn168
+±ENTITY-LITERAL-17EEF9C9
+VALUE:app/ui/page.tsx
+KIND:path
+TURN:168
+FACT-ID:a4c11f1e468cf53d
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn168
+±ENTITY-LITERAL-FF8ACC18
+VALUE:docs/PROJECT_STATUS.md
+KIND:path
+TURN:168
+FACT-ID:e00e7839a024e36b
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn168
+±ENTITY-LITERAL-C716848E
+VALUE:docs/specs/D0_DESIGN_SYSTEM.md
+KIND:path
+TURN:168
+FACT-ID:54ca2df422a0c9bb
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn168
+±ENTITY-LITERAL-67C634B6
+VALUE:http://localhost:3000/ui
+KIND:url
+TURN:168
+FACT-ID:f0a1badaede2d363
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn168
+±ENTITY-LITERAL-BEB128F6
+VALUE:1 tokens
+KIND:number_unit
+TURN:168
+FACT-ID:39e8ce2857240504
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn168
+±ENTITY-USER-REQUEST-82BC9763
+REQUEST:relook at - docs/specs/DELIVERY_LOOPS_BACKLOG_2026-07.md:10
+- docs/specs/BUILD_INSTRUCTION_SET_2026-07.md:176
+TURN:169
+FACT-ID:2672787fcd53729d
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn169
+±ENTITY-LITERAL-3CE1CDEF
+VALUE:docs/specs/DELIVERY_LOOPS_BACKLOG_2026-07.md:10
+KIND:path
+TURN:169
+FACT-ID:2b1e5470c93753bc
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn169
+±ENTITY-LITERAL-587DA187
+VALUE:docs/specs/BUILD_INSTRUCTION_SET_2026-07.md:176
+KIND:path
+TURN:169
+FACT-ID:2daa600331b038c0
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn169
+±ENTITY-TOOL-BASH-0056
+RAN:Get build instruction set structure
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz" && echo "=== build instruction set total lines ===" && wc -l docs/specs/BUILD_INSTRUCTION_SET_2026-07.md && echo "" && ec
+TURN:185
+SRC:session:295a4abf#turn185
+±ENTITY-TOOL-BASH-0061
+RAN:Inspect git log and working tree state
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz" && echo "=== recent commits ===" && git log --oneline -8 && echo "" && echo "=== status ===" && git status --short && ech
+TURN:203
+SRC:session:295a4abf#turn203
+±ENTITY-LITERAL-5A22DEF4
+VALUE:7878a96
+KIND:git_sha
+TURN:206
+FACT-ID:83716c0fd4b66ab3
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn206
+±ENTITY-LITERAL-B1100F8E
+VALUE:5f2a4b5
+KIND:git_sha
+TURN:206
+FACT-ID:3c8add8bf1e8800b
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn206
+±ENTITY-LITERAL-581C141D
+VALUE:docs/reviews/D0.1_REVIEW_BUNDLE.md
+KIND:path
+TURN:224
+FACT-ID:cda9a9cc09435a54
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn224
+±ENTITY-TOOL-BASH-0069
+RAN:Start Next dev server (background)
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && npm run dev
+TURN:229
+SRC:session:295a4abf#turn229
+±ENTITY-TOOL-BASH-0070
+RAN:Check dev server readiness and /ui response
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && sleep 4 && echo "=== dev server log ===" && tail -15 "C:\Users\kapil\AppData\Local\Temp\claude\C--Users-kapil
+TURN:233
+SRC:session:295a4abf#turn233
+±ENTITY-LITERAL-A3A84099
+VALUE:360px
+KIND:number_unit
+TURN:246
+FACT-ID:c0adaf32215cd715
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn246
+±ENTITY-ERROR-46E2884E
+MESSAGE:Error capturing screenshot: CDP sendCommand "Page.captureScreenshot" timed out after 30000ms on tab 1964709009. The renderer may be frozen or unresponsive.
+TURN:252
+FACT-ID:eb66a4f1e58781fa
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn252
+±ENTITY-LITERAL-DD24CB31
+VALUE:1568px
+KIND:number_unit
+TURN:262
+FACT-ID:6b39a8abaccb62f5
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn262
+±ENTITY-LITERAL-5D24A3D3
+VALUE:768px
+KIND:number_unit
+TURN:262
+FACT-ID:f68e5cf6ad1789a3
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn262
+±ENTITY-TOOL-BASH-0086
+RAN:Create isolated worktree for D0.1 review branch
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz" && BASE=$(git rev-parse HEAD) && echo "baseline HEAD: $(git rev-parse --short HEAD) ($(git log -1 --format=%s))" && WT="/
+TURN:285
+SRC:session:295a4abf#turn285
+±ENTITY-TOOL-BASH-0087
+RAN:Copy D0.1 files into worktree and stage
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz" && WT="/c/Users/kapil/AppData/Local/Temp/ontowiz-build-D0.1" && FILES="frontend/src/ui/tokens.ts frontend/src/ui/tokens.c
+TURN:289
+SRC:session:295a4abf#turn289
+±ENTITY-TOOL-BASH-0088
+RAN:Commit D0.1 review SHA in worktree
+COMMAND:WT="/c/Users/kapil/AppData/Local/Temp/ontowiz-build-D0.1" && git -C "$WT" commit -F - <<'EOF' 2>&1 | tail -4 feat(D0.1): Foundry design tokens + /ui gallery har
+TURN:293
+SRC:session:295a4abf#turn293
+±ENTITY-TOOL-BASH-0089
+RAN:Remove worktree, verify branch/SHA persist
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz" && WT="/c/Users/kapil/AppData/Local/Temp/ontowiz-build-D0.1" && git worktree remove --force "$WT" && echo "worktree remov
+TURN:297
+SRC:session:295a4abf#turn297
+±ENTITY-INCIDENT-D8883595
+TYPE:user-corrected
+PARSE-OK:true
+RAW:ctx-incident: user-corrected | fact="D0.1 status recording + build process" | expected="builder pastes completion evidence into PROJECT_STATUS.md (old ADR-015 R2)" | got="Backlog v2 §0A/R14 — only INT copies verified outcomes; builders never self-verify; submit immutable SHA + §6 bundle" | evidence="backlog v2 lines 62-66, baseline table line 74 D0.1=IN PROGRESS, user message confirming standing R
+TURN:304
+FACT:D0.1 status recording + build process
+EXPECTED:builder pastes completion evidence into PROJECT_STATUS.md (old ADR-015 R2)
+GOT:Backlog v2 §0A/R14 — only INT copies verified outcomes; builders never self-verify; submit immutable SHA + §6 bundle
+EVIDENCE:backlog v2 lines 62-66, baseline table line 74 D0.1=IN PROGRESS, user message confirming standing REV role
+FACT-ID:0737daff3e80a2b2
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn304
+±ENTITY-DECISION-A566B619
+DECISION:Decision: removed my premature D0.1 completion entry from `PROJECT_STATUS.md` and relocated the evidence to a §6 review bundle, because Backlog v2 §0A/R14 make `PROJECT_STATUS.md` a verified-outcomes-only, INT-owned record and bar builders from self-verifying.
+TURN:304
+FACT-ID:a28d9c8cb9d83228
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn304
+±ENTITY-DECISION-01A3E61A
+DECISION:Decision: submitted D0.1 as immutable review SHA `8263575` on `build/D0.1-tokens-gallery` off baseline `5f2a4b5`, cut in an isolated worktree so the parallel BE session on `foundry-build` is undisturbed (full v2 §0B protocol, per your choice).
+TURN:304
+FACT-ID:3bf7ac871c236b4a
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn304
+±ENTITY-DECISION-038D961C
+DECISION:Decision: D0.2–D0.9 will use the §12.1 eleven-section mini-spec plus the shared FE DoD (WCAG 2.2 AA; 360/768/1440 evidence; badges icon+label not colour-only); D1.1 blocks on BE F0.3A (contract-before-consumer, R11), while D0.2–D0.9 have no API dependency and proceed within Loop 
+TURN:304
+FACT-ID:f937cc958478c832
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn304
+±ENTITY-DECISION-A961D78F
+DECISION:Decision: stopped chasing the 360px screenshot after it proved environmentally unreliable, having verified desktop + 768px cleanly and recorded the layout as responsive-by-construction — a capture limitation, not a UI defect.
+TURN:304
+FACT-ID:a30de29898c7c567
+BASIS:marker_stated
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn304
+±ENTITY-USER-REQUEST-4CDC0E8D
+REQUEST:restart the server
+TURN:308
+FACT-ID:29d0afd1a88ccf58
+BASIS:structural
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn308
+±ENTITY-TOOL-BASH-0091
+RAN:Restart Next dev server (background)
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && npm run dev
+TURN:310
+SRC:session:295a4abf#turn310
+±ENTITY-TOOL-BASH-0092
+RAN:Verify dev server up and /ui responds
+COMMAND:cd "C:\Users\kapil\Documents\Onto_Wiz\frontend" && sleep 4 && tail -8 "C:\Users\kapil\AppData\Local\Temp\claude\C--Users-kapil-Documents-Onto-Wiz\295a4abf-a7b8-
+TURN:314
+SRC:session:295a4abf#turn314
+±ENTITY-LITERAL-1BBEA2C9
+VALUE:http://localhost:3000/ui**
+KIND:url
+TURN:317
+FACT-ID:f0a1badaede2d363
+BASIS:literal_extractor
+STATUS:current
+EXTRACTOR:tp/1.1
+SRC:session:295a4abf#turn317
+±ENTITY-FILE-295A4ABF-A7B8-45A3-8FF7-DB1F8BBF117B-SCRATCHPAD-COVCHECK-CJS
+PATH:C:\Users\kapil\AppData\Local\Temp\claude\C--Users-kapil-Documents-Onto-Wiz\295a4abf-a7b8-45a3-8ff7-db1f8bbf117b\scratchpad\covcheck.cjs
+EDITS:1
+LAST-TURN:136
+SRC:session:295a4abf#turn136
+±ENTITY-FILE-C-USERS-KAPIL-DOCUMENTS-ONTO-WIZ-DOCS-PROJECT-STATUS-MD
+PATH:C:\Users\kapil\Documents\Onto_Wiz\docs\PROJECT_STATUS.md
+EDITS:3
+LAST-TURN:199
+SRC:session:295a4abf#turn199
+±ENTITY-FILE--KAPIL-DOCUMENTS-ONTO-WIZ-DOCS-REVIEWS-D0-1-REVIEW-BUNDLE-MD
+PATH:C:\Users\kapil\Documents\Onto_Wiz\docs\reviews\D0.1_REVIEW_BUNDLE.md
+EDITS:2
+LAST-TURN:281
+SRC:session:295a4abf#turn281
+±ENTITY-FILE-SERS-KAPIL-DOCUMENTS-ONTO-WIZ-DOCS-SPECS-D0-DESIGN-SYSTEM-MD
+PATH:C:\Users\kapil\Documents\Onto_Wiz\docs\specs\D0_DESIGN_SYSTEM.md
+EDITS:3
+LAST-TURN:221
+SRC:session:295a4abf#turn221
+±ENTITY-FILE--USERS-KAPIL-DOCUMENTS-ONTO-WIZ-FRONTEND-SRC-APP-GLOBALS-CSS
+PATH:C:\Users\kapil\Documents\Onto_Wiz\frontend\src\app\globals.css
+EDITS:1
+LAST-TURN:84
+SRC:session:295a4abf#turn84
+±ENTITY-FILE--USERS-KAPIL-DOCUMENTS-ONTO-WIZ-FRONTEND-SRC-APP-UI-PAGE-TSX
+PATH:C:\Users\kapil\Documents\Onto_Wiz\frontend\src\app\ui\page.tsx
+EDITS:1
+LAST-TURN:88
+SRC:session:295a4abf#turn88
+±ENTITY-FILE-ERS-KAPIL-DOCUMENTS-ONTO-WIZ-FRONTEND-SRC-APP-UI-UI-TEST-TSX
+PATH:C:\Users\kapil\Documents\Onto_Wiz\frontend\src\app\ui\ui.test.tsx
+EDITS:1
+LAST-TURN:71
+SRC:session:295a4abf#turn71
+±ENTITY-FILE-C-USERS-KAPIL-DOCUMENTS-ONTO-WIZ-FRONTEND-SRC-UI-TOKENS-CSS
+PATH:C:\Users\kapil\Documents\Onto_Wiz\frontend\src\ui\tokens.css
+EDITS:1
+LAST-TURN:81
+SRC:session:295a4abf#turn81
+±ENTITY-FILE-SERS-KAPIL-DOCUMENTS-ONTO-WIZ-FRONTEND-SRC-UI-TOKENS-TEST-TS
+PATH:C:\Users\kapil\Documents\Onto_Wiz\frontend\src\ui\tokens.test.ts
+EDITS:3
+LAST-TURN:105
+SRC:session:295a4abf#turn105
+±ENTITY-FILE-C-USERS-KAPIL-DOCUMENTS-ONTO-WIZ-FRONTEND-SRC-UI-TOKENS-TS
+PATH:C:\Users\kapil\Documents\Onto_Wiz\frontend\src\ui\tokens.ts
+EDITS:1
+LAST-TURN:78
+SRC:session:295a4abf#turn78
+±ENTITY-FILE-C-USERS-KAPIL-DOCUMENTS-ONTO-WIZ-FRONTEND-VITEST-CONFIG-TS
+PATH:C:\Users\kapil\Documents\Onto_Wiz\frontend\vitest.config.ts
+EDITS:2
+LAST-TURN:118
+SRC:session:295a4abf#turn118
