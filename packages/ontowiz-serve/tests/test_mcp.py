@@ -24,7 +24,9 @@ def _registry(tmp_path) -> PackRegistry:
 
 
 def test_tool_names():
-    assert set(TOOL_NAMES) == {"context/get", "pack/list", "pack/query"}
+    # F0.10 added ctx/hydrate — the tool the served L3 directory has always
+    # instructed agents to call, and which this door previously did not register.
+    assert set(TOOL_NAMES) == {"context/get", "pack/list", "pack/query", "ctx/hydrate"}
 
 
 def test_pack_list(tmp_path):

@@ -5,6 +5,7 @@ Endpoints:
   GET  /v1/packs                      list pack manifests
   GET  /v1/packs/{name}/{version}     one pack manifest
   POST /v1/context                    governance-gated context for a query
+  POST /v1/hydrate                    hydrate sections from the gated directory
 
 Tier A: imports ontowiz_runtime / ontowiz_spec only — never the factory.
 """
@@ -19,10 +20,10 @@ from fastapi import FastAPI, Header, HTTPException, Query
 from fastapi.responses import HTMLResponse
 from ontowiz_runtime import (
     CommentStore,
-    ContextResult,
     LoadedPack,
     PackDetail,
     PackRegistry,
+    SectionNotServableError,
     UsageStore,
     artifact_view,
     catalog_index,
@@ -30,6 +31,7 @@ from ontowiz_runtime import (
     catalog_stats,
     context_for_pack,
     explain_concept,
+    hydrate_for_pack,
     pack_detail,
     pack_diff,
     pack_functions,
@@ -39,6 +41,7 @@ from pydantic import BaseModel, Field
 
 from .auth import AuthError, decode_token, issue_token
 from .catalog_page import catalog_html
+from .envelope import context_payload, hydration_payload
 from .roles import ROLE_CAPABILITIES, require_capability, require_role
 from .users import UserStore
 
@@ -79,6 +82,11 @@ class ContextRequest(BaseModel):
     dev_mode: bool = False
 
 
+class HydrateRequest(ContextRequest):
+    # at least one section, capped like every other free-text field on this door
+    sections: list[str] = Field(min_length=1, max_length=50)
+
+
 def _to_tags(items: list[TagIn]) -> list[Tag]:
     try:
         return [Tag(dimension=TagDimension(t.dimension), value=t.value) for t in items]
@@ -98,24 +106,6 @@ def _detail_payload(d: PackDetail) -> dict:
         "coverage": d.coverage,
         "artifacts": [asdict(r) for r in d.artifacts],
         "gaps": d.gaps,
-    }
-
-
-def _context_payload(r: ContextResult) -> dict:
-    """Serialise a ContextResult to the /v1/context response shape."""
-    return {
-        "query": r.query,
-        "agent_type": r.agent_type,
-        "system_prompt": r.system_prompt,
-        "eligible": [a.id for a in r.eligible],
-        "trust": {
-            "pack": r.trust.pack,
-            "confidence": r.trust.confidence,
-            "lifecycle_floor": r.trust.lifecycle_floor,
-            "artifacts_used": r.trust.artifacts_used,
-            "backing_deltas": r.trust.backing_deltas,
-        },
-        "tokens_estimate": r.tokens_estimate,
     }
 
 
@@ -315,7 +305,24 @@ def create_app(packs_root: str | Path = "packs", *, allow_dev_context: bool = Fa
             req.query, load(req.pack_name, req.pack_version),
             agent_type=req.agent_type, tags=_to_tags(req.tags), dev_mode=dev_mode,
         )
-        return _context_payload(res)
+        return context_payload(res)
+
+    @app.post("/v1/hydrate")
+    def hydrate_route(req: HydrateRequest) -> dict:
+        """Hydrate sections the matching /v1/context call advertised.
+
+        404 (not 403) on a non-servable section: a 403 would confirm the section
+        exists but was withheld, which is the one thing the gate must not reveal.
+        """
+        dev_mode = req.dev_mode and allow_dev_context
+        try:
+            payload = hydrate_for_pack(
+                req.query, load(req.pack_name, req.pack_version), req.sections,
+                agent_type=req.agent_type, tags=_to_tags(req.tags), dev_mode=dev_mode,
+            )
+        except SectionNotServableError as e:
+            raise HTTPException(status_code=404, detail=str(e)) from e
+        return hydration_payload(payload)
 
     return app
 

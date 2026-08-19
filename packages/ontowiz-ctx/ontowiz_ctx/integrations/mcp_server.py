@@ -12,6 +12,15 @@ This server exposes five tools:
   ctx/validate  — Validate a .ctx file and return diagnostics
   ctx/format    — Reformat a .ctx file (canonical, ASCII, natural language)
   ctx/hydrate   — Query-adaptive section retrieval from a .ctx file
+
+LOCAL / DEV TOOL — NOT A TENANT-FACING DOOR (F0.10).
+Every tool here addresses a .ctx **file path** and therefore reads the whole
+document. It runs no lifecycle gate, no tag gate, and issues no trust envelope,
+so its ctx/hydrate will return DRAFT and out-of-slice content that the product
+door deliberately withholds. The governed equivalent is
+`ontowiz_serve.mcp` ctx/hydrate (or `POST /v1/hydrate`), which hydrates only the
+gated projection. Exposing this server to a tenant bypasses governance entirely;
+which surfaces a deployment may publish is decided by F0.8A's serve profile.
 """
 
 from __future__ import annotations

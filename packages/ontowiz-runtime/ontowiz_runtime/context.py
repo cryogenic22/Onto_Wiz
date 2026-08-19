@@ -25,6 +25,7 @@ from ontowiz_ctx.core.hydration_protocol import build_system_prompt
 # Tier A dependencies only.
 from ontowiz_ctx.core.model import CTXDocument, KeyValue, Section
 from ontowiz_spec import (
+    ALWAYS_INCLUDED_KINDS,
     SERVABLE_STATES,
     SERVABLE_STATES_DEV,
     ArtifactBase,
@@ -59,6 +60,10 @@ class ContextResult:
     eligible: list[ArtifactBase] = field(default_factory=list)
     trust: TrustEnvelope = field(default_factory=TrustEnvelope)
     tokens_estimate: int = 0
+    # The document the directory was built from — the gated projection, and the
+    # only thing hydration is allowed to read. Carried so the hydrate door cannot
+    # re-derive eligibility and drift from what was advertised.
+    eligible_doc: CTXDocument | None = None
 
 
 def gate(
@@ -73,6 +78,13 @@ def gate(
     Runs *before* anything is offered to the agent — a non-servable artifact is
     never even listed in the L3 directory, so governance cannot be bypassed
     downstream.
+
+    Safety layers (``ALWAYS_INCLUDED_KINDS``) are exempt from the *tag* narrowing:
+    a guardrail that disappears exactly when the caller asks for a narrower slice
+    is the worst failure mode of slicing. They stay fully subject to the lifecycle
+    filter — an unapproved guardrail is still not servable. The exemption is safe
+    because ``gate`` only ever sees one loaded pack's artifacts; revisit it when
+    multi-pack composition lands (E4-be).
     """
     servable = SERVABLE_STATES_DEV if dev_mode else SERVABLE_STATES
     eligible = [a for a in artifacts if a.lifecycle in servable]
@@ -81,6 +93,9 @@ def gate(
         wanted = {t.key() for t in tags}
         scored: list[ArtifactBase] = []
         for a in eligible:
+            if a.kind in ALWAYS_INCLUDED_KINDS:
+                scored.append(a)
+                continue
             have = {t.key() for t in a.tags}
             if not wanted or (have & wanted):
                 scored.append(a)
@@ -188,6 +203,7 @@ def get_context(
         eligible=eligible,
         trust=trust,
         tokens_estimate=len(system_prompt.split()),
+        eligible_doc=eligible_doc,
     )
 
 
